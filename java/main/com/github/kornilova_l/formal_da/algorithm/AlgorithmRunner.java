@@ -3,13 +3,18 @@ package com.github.kornilova_l.formal_da.algorithm;
 import com.github.kornilova_l.formal_da.vertex.Input;
 import com.github.kornilova_l.formal_da.vertex.Message;
 import com.github.kornilova_l.formal_da.vertex.Vertex;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public abstract class AlgorithmRunner {
-    private Map<Vertex, List<Vertex>> graph;
+    /**
+     * Connections of each vertex is sorted
+     * accordingly to port id
+     */
+    private Map<Vertex, TreeSet<Connection>> graph;
 
-    public AlgorithmRunner(Map<Vertex, List<Vertex>> vertices) {
+    public AlgorithmRunner(Map<Vertex, TreeSet<Connection>> vertices) {
         this.graph = vertices;
     }
 
@@ -19,7 +24,7 @@ public abstract class AlgorithmRunner {
         }
     }
 
-    abstract Input getInput(Vertex vertex);
+    protected abstract Input getInput(Vertex vertex);
 
     public final void doIteration() {
         Map<Vertex, TreeMap<Integer, Message>> incomingMessages = sendMessages();
@@ -43,30 +48,37 @@ public abstract class AlgorithmRunner {
     private Map<Vertex, TreeMap<Integer, Message>> sendMessages() {
         Map<Vertex, TreeMap<Integer, Message>> incomingMessages = new HashMap<>();
         // send messages
-        for (Map.Entry<Vertex, List<Vertex>> vertexAndNeighbours : graph.entrySet()) {
-            Vertex sender = vertexAndNeighbours.getKey();
-            List<Vertex> receivers = vertexAndNeighbours.getValue();
-            List<Message> newMessages = sender.send(receivers);
-            for (int i = 0; i < newMessages.size(); i++) {
-                Vertex receiver = receivers.get(i);
-                Message message = newMessages.get(i);
+        for (Map.Entry<Vertex, TreeSet<Connection>> senderAndConnections : graph.entrySet()) {
+            Vertex sender = senderAndConnections.getKey();
+            TreeSet<Connection> connections = senderAndConnections.getValue();
+            Map<Integer, Message> newMessages = sender.send();
+
+            for (Map.Entry<Integer, Message> newMessage : newMessages.entrySet()) {
+                Vertex receiver = getReceiver(connections, newMessage.getKey());
                 Map<Integer, Message> receiverMessages = incomingMessages.computeIfAbsent(
                         receiver,
                         k -> new TreeMap<>()
                 );
-                receiverMessages.put(getPortNumber(receiver, sender), message);
+                receiverMessages.put(getPortNumber(receiver, sender), newMessage.getValue());
             }
         }
         return incomingMessages;
     }
 
-    private Integer getPortNumber(Vertex receiver, Vertex sender) {
-        int i = 0;
-        for (Vertex neighbour : graph.get(receiver)) {
-            if (neighbour == sender) {
-                return i;
+    private Vertex getReceiver(TreeSet<Connection> connections, Integer portNumber) {
+        for (Connection connection : connections) {
+            if (connection.portId == portNumber) {
+                return connection.receiver;
             }
-            i++;
+        }
+        throw new AssertionError("Cannot find port");
+    }
+
+    private Integer getPortNumber(Vertex sender, Vertex receiver) {
+        for (Connection connection : graph.get(sender)) {
+            if (connection.receiver == receiver) {
+                return connection.portId;
+            }
         }
         throw new AssertionError("Cannot find neighbour which must exist");
     }
@@ -85,4 +97,19 @@ public abstract class AlgorithmRunner {
      * This method will be called after all nodes stopped
      */
     public abstract void outputResult();
+
+    protected class Connection implements Comparable<Connection> {
+        private Vertex receiver;
+        private int portId;
+
+        Connection(Vertex receiver, int portId) {
+            this.receiver = receiver;
+            this.portId = portId;
+        }
+
+        @Override
+        public int compareTo(@NotNull Connection connection) {
+            return Integer.compare(this.portId, connection.portId);
+        }
+    }
 }
