@@ -17,6 +17,10 @@ public class BmmBlackVertex extends BmmVertex {
     private final TreeSet<Integer> unmatchedNeighbours = new TreeSet<>(); // X
     private final TreeSet<Integer> offeringProposal = new TreeSet<>(); // M
 
+    BmmBlackVertex(int id) {
+        super(id);
+    }
+
     /**
      * Add all neighbours to set of unmatched neighbours
      */

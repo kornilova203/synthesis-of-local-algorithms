@@ -6,7 +6,6 @@ import com.github.kornilova_l.formal_da.vertex.Vertex;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 public abstract class AlgorithmRunner {
     /**
@@ -32,9 +31,8 @@ public abstract class AlgorithmRunner {
     }
 
     private void receiveMessages(Map<Vertex, Map<Vertex, Message>> incomingMessages) {
-        for (Map.Entry<Vertex, Map<Vertex, Message>> receiverAndMessages : incomingMessages.entrySet()) {
-            Vertex receiver = receiverAndMessages.getKey();
-            receiver.receive(receiverAndMessages.getValue());
+        for (Vertex vertex : vertices.values()) {
+            vertex.receive(incomingMessages.getOrDefault(vertex, null));
         }
     }
 
@@ -54,7 +52,7 @@ public abstract class AlgorithmRunner {
                 Vertex receiver = newMessage.getKey();
                 Map<Vertex, Message> receiverMessages = incomingMessages.computeIfAbsent(
                         receiver,
-                        k -> new TreeMap<>()
+                        k -> new HashMap<>()
                 );
                 receiverMessages.put(sender, newMessage.getValue());
             }

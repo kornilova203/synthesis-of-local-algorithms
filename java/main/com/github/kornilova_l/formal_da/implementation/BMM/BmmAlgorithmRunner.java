@@ -34,11 +34,11 @@ public class BmmAlgorithmRunner extends AlgorithmRunner {
             int blackCount = scanner.nextInt();
             for (int i = 0; i < whiteCount; i++) {
                 int id = scanner.nextInt();
-                vertices.put(id, new BmmWhiteVertex());
+                vertices.put(id, new BmmWhiteVertex(id));
             }
             for (int i = 0; i < blackCount; i++) {
                 int id = scanner.nextInt();
-                vertices.put(id, new BmmBlackVertex());
+                vertices.put(id, new BmmBlackVertex(id));
             }
 
             // read connections:
@@ -69,7 +69,7 @@ public class BmmAlgorithmRunner extends AlgorithmRunner {
 
     @Override
     public void outputResult() {
-        System.out.println("Maximal matching");
+        System.out.println("Maximal matching:");
         Set<Vertex> outputtedVertices = new HashSet<>();
         for (Vertex vertex : vertices.values()) {
             if (outputtedVertices.contains(vertex)) {
@@ -82,17 +82,8 @@ public class BmmAlgorithmRunner extends AlgorithmRunner {
             if (pair != null) {
                 outputtedVertices.add(vertex);
                 outputtedVertices.add(pair);
-                System.out.println(getId(vertex) + " - " + getId(pair));
+                System.out.println(vertex + " - " + pair);
             }
         }
-    }
-
-    private int getId(Vertex pair) {
-        for (Map.Entry<Integer, Vertex> entry : vertices.entrySet()) {
-            if (entry.getValue() == pair) {
-                return entry.getKey();
-            }
-        }
-        throw new AssertionError("Cannot find vertex");
     }
 }

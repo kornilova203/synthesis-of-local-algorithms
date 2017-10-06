@@ -13,6 +13,10 @@ import static com.github.kornilova_l.formal_da.implementation.BMM.BmmVertex.Stat
 
 public class BmmWhiteVertex extends BmmVertex {
 
+    BmmWhiteVertex(int id) {
+        super(id);
+    }
+
     /**
      * This method does nothing because color of
      * vertex is defined when vertex is created
@@ -43,22 +47,22 @@ public class BmmWhiteVertex extends BmmVertex {
     Map<Vertex, Message> oddIterationSend() {
         Map<Vertex, Message> messages = new HashMap<>();
         if (state == UNMATCHED_RUNNING) {
-            if (k <= deg) {
+            if ((k + 1) / 2 <= deg) {
                 // Send ‘proposal’ to port k
-                Vertex receiver = connections.get(k);
+                Vertex receiver = connections.get((k + 1) / 2);
                 assert receiver != null;
                 messages.put(receiver, new BmmMessage(PROPOSAL));
             } else {
                 state = UNMATCHED_STOPPED;
             }
-            if (state == MATCHED_RUNNING) {
-                // Send ‘matched’ to all ports
-                for (Vertex receiver : connections.values()) {
-                    messages.put(receiver, new BmmMessage(MATCHED));
-                }
-                state = MATCHED_STOPPED;
+        } else if (state == MATCHED_RUNNING) {
+            // Send ‘matched’ to all ports
+            for (Vertex receiver : connections.values()) {
+                messages.put(receiver, new BmmMessage(MATCHED));
             }
+            state = MATCHED_STOPPED;
         }
+
         return messages;
     }
 

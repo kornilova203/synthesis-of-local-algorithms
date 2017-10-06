@@ -9,10 +9,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 abstract class BmmVertex extends Vertex {
+    private final int id;
     Vertex pair = null; // for matched vertices
     State state = State.UNMATCHED_RUNNING;
-    int k = 0; // iteration number
+    int k = 1; // iteration number
     int deg = 0;
+
+    BmmVertex(int id) {
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return Integer.toString(id);
+    }
 
     @NotNull
     @Override
@@ -29,20 +39,23 @@ abstract class BmmVertex extends Vertex {
     }
 
     @Override
-    public void receive(Map<Vertex, Message> messages) {
-        Map<Vertex, BmmMessage> castedMessaged = new HashMap<>();
-        for (Map.Entry<Vertex, Message> entry : messages.entrySet()) {
-            if (entry.getValue() instanceof BmmMessage) {
-                castedMessaged.put(entry.getKey(), ((BmmMessage) entry.getValue()));
+    public void receive(@Nullable Map<Vertex, Message> messages) {
+        if (messages != null) {
+            Map<Vertex, BmmMessage> castedMessaged = new HashMap<>();
+            for (Map.Entry<Vertex, Message> entry : messages.entrySet()) {
+                if (entry.getValue() instanceof BmmMessage) {
+                    castedMessaged.put(entry.getKey(), ((BmmMessage) entry.getValue()));
+                }
+            }
+            switch (k % 2) {
+                case 0:
+                    evenIterationReceive(castedMessaged);
+                    break;
+                case 1:
+                    oddIterationReceive(castedMessaged);
             }
         }
-        switch (k % 2) {
-            case 0:
-                evenIterationReceive(castedMessaged);
-                break;
-            case 1:
-                oddIterationReceive(castedMessaged);
-        }
+        k++;
     }
 
     abstract void oddIterationReceive(Map<Vertex, BmmMessage> messages);
