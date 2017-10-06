@@ -1,11 +1,10 @@
 package com.github.kornilova_l.formal_da.vertex;
 
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 public abstract class Vertex {
-    private final TreeMap<Integer, Vertex> connections = new TreeMap<>();
+    protected final TreeMap<Integer, Vertex> connections = new TreeMap<>();
 
     public abstract void init(Input input);
 
@@ -15,7 +14,7 @@ public abstract class Vertex {
      */
     public abstract Map<Vertex, Message> send();
 
-    public abstract void receive(List<Message> messages);
+    public abstract void receive(Map<Vertex, Message> messages);
 
     public abstract boolean isStopped();
 
