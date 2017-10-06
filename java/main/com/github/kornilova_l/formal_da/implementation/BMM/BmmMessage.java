@@ -1,6 +1,6 @@
 package com.github.kornilova_l.formal_da.implementation.BMM;
 
-import com.github.kornilova_l.formal_da.vertex.Message;
+import com.github.kornilova_l.formal_da.simulator.vertex.Message;
 
 final class BmmMessage extends Message {
     private final BmmMessageContent messageContent;

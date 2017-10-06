@@ -1,8 +1,8 @@
 package com.github.kornilova_l.formal_da.implementation.BMM;
 
 import com.github.kornilova_l.formal_da.simulator.AlgorithmRunner;
-import com.github.kornilova_l.formal_da.vertex.Input;
-import com.github.kornilova_l.formal_da.vertex.Vertex;
+import com.github.kornilova_l.formal_da.simulator.vertex.Input;
+import com.github.kornilova_l.formal_da.simulator.vertex.Vertex;
 
 import java.io.File;
 import java.io.FileInputStream;

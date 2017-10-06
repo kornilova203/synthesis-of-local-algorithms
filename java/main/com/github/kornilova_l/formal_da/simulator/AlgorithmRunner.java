@@ -1,8 +1,8 @@
 package com.github.kornilova_l.formal_da.simulator;
 
-import com.github.kornilova_l.formal_da.vertex.Input;
-import com.github.kornilova_l.formal_da.vertex.Message;
-import com.github.kornilova_l.formal_da.vertex.Vertex;
+import com.github.kornilova_l.formal_da.simulator.vertex.Input;
+import com.github.kornilova_l.formal_da.simulator.vertex.Message;
+import com.github.kornilova_l.formal_da.simulator.vertex.Vertex;
 
 import java.util.HashMap;
 import java.util.Map;

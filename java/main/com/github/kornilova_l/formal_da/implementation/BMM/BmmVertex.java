@@ -1,7 +1,7 @@
 package com.github.kornilova_l.formal_da.implementation.BMM;
 
-import com.github.kornilova_l.formal_da.vertex.Message;
-import com.github.kornilova_l.formal_da.vertex.Vertex;
+import com.github.kornilova_l.formal_da.simulator.vertex.Message;
+import com.github.kornilova_l.formal_da.simulator.vertex.Vertex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

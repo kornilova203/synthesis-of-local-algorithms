@@ -1,4 +1,4 @@
-package com.github.kornilova_l.formal_da.vertex;
+package com.github.kornilova_l.formal_da.simulator.vertex;
 
 import java.util.Map;
 import java.util.TreeMap;
