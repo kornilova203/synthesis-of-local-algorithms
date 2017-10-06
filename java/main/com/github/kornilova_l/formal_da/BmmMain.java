@@ -5,15 +5,12 @@ import com.github.kornilova_l.formal_da.simulator.AlgorithmRunner;
 
 import java.io.File;
 
-public class Main {
+public class BmmMain {
     public static void main(String[] args) {
         AlgorithmRunner algorithmRunner =
                 BmmAlgorithmRunner.createRunner(new File("test_resources/BMM/01.txt"));
 
-        algorithmRunner.initVertices();
-        while (!algorithmRunner.areAllNodesStopped()) {
-            algorithmRunner.doIteration();
-        }
+        algorithmRunner.run();
         algorithmRunner.outputResult();
     }
 }

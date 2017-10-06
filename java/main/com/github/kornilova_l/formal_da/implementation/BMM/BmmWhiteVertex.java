@@ -22,7 +22,7 @@ public class BmmWhiteVertex extends BmmVertex {
      * vertex is defined when vertex is created
      */
     @Override
-    public void init(Input input) {
+    public void init(@Nullable Input input) {
         deg = connections.size();
     }
 

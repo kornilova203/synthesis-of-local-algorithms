@@ -1,8 +1,8 @@
 package com.github.kornilova_l.formal_da.implementation.BMM;
 
 import com.github.kornilova_l.formal_da.simulator.AlgorithmRunner;
-import com.github.kornilova_l.formal_da.simulator.vertex.Input;
 import com.github.kornilova_l.formal_da.simulator.vertex.Vertex;
+import javafx.util.Pair;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,7 +16,7 @@ public class BmmAlgorithmRunner extends AlgorithmRunner {
 
     /**
      * @param file which contains graph structure:
-     *             3 3 // number of white and black vertexes
+     *             3 3 // number of white and black vertices
      *             1 2 3 // white vertexes
      *             4 5 6 // black vertexes
      *             5 // number of connections
@@ -43,18 +43,7 @@ public class BmmAlgorithmRunner extends AlgorithmRunner {
 
             // read connections:
             int connectionsCount = scanner.nextInt();
-            for (int i = 0; i < connectionsCount; i++) {
-                Vertex vertex1 = vertices.get(scanner.nextInt());
-                Vertex vertex2 = vertices.get(scanner.nextInt());
-                if (vertex1 == null || vertex2 == null) {
-                    throw new AssertionError("Cannot find vertex");
-                }
-                int port1 = scanner.nextInt();
-                int port2 = scanner.nextInt();
-                vertex1.addReceiver(vertex2, port1);
-                vertex2.addReceiver(vertex1, port2);
-
-            }
+            readConnections(vertices, connectionsCount, scanner);
             return new BmmAlgorithmRunner(vertices);
         } catch (IOException e) {
             e.printStackTrace();
@@ -62,9 +51,23 @@ public class BmmAlgorithmRunner extends AlgorithmRunner {
         }
     }
 
-    @Override
-    protected Input getInput(Vertex vertex) {
-        return null;
+    public static BmmAlgorithmRunner createRunner(Set<Integer> whiteVertices,
+                                                  Set<Integer> blackVertices,
+                                                  Set<Connection> connections) {
+        Map<Integer, Vertex> vertices = new HashMap<>();
+        for (Integer whiteVertex : whiteVertices) {
+            vertices.put(whiteVertex, new BmmWhiteVertex(whiteVertex));
+        }
+        for (Integer blackVertex : blackVertices) {
+            vertices.put(blackVertex, new BmmBlackVertex(blackVertex));
+        }
+        for (Connection connection : connections) {
+            Vertex vertex1 = vertices.get(connection.vertex1);
+            Vertex vertex2 = vertices.get(connection.vertex2);
+            vertex1.addReceiver(vertex2, connection.port1);
+            vertex2.addReceiver(vertex1, connection.port2);
+        }
+        return new BmmAlgorithmRunner(vertices);
     }
 
     @Override
@@ -84,6 +87,62 @@ public class BmmAlgorithmRunner extends AlgorithmRunner {
                 outputtedVertices.add(pair);
                 System.out.println(vertex + " - " + pair);
             }
+        }
+    }
+
+    public Set<Pair<Integer, Integer>> getMatching() {
+        Set<Pair<Integer, Integer>> pairs = new HashSet<>();
+        for (Map.Entry<Integer, Vertex> entry : vertices.entrySet()) {
+            boolean contains = false;
+            for (Pair<Integer, Integer> pair : pairs) {
+                if (Objects.equals(pair.getKey(), entry.getKey()) ||
+                        Objects.equals(pair.getValue(), entry.getKey())) {
+                    contains = true;
+                    break;
+                }
+            }
+            if (contains) {
+                continue;
+            }
+            if (!(entry.getValue() instanceof BmmVertex)) {
+                continue;
+            }
+            Vertex pair = ((BmmVertex) entry.getValue()).getPair();
+            if (pair != null) {
+                pairs.add(new Pair<>(entry.getKey(), getId(pair)));
+            }
+        }
+        return pairs;
+
+    }
+
+    public static final class Connection {
+        private final int port1;
+        private final int port2;
+        private final int vertex1;
+        private final int vertex2;
+
+        public Connection(int vertex1, int vertex2, int port1, int port2) {
+            this.vertex1 = vertex1;
+            this.vertex2 = vertex2;
+            this.port1 = port1;
+            this.port2 = port2;
+        }
+
+        public int getPort1() {
+            return port1;
+        }
+
+        public int getPort2() {
+            return port2;
+        }
+
+        public int getVertex1() {
+            return vertex1;
+        }
+
+        public int getVertex2() {
+            return vertex2;
         }
     }
 }

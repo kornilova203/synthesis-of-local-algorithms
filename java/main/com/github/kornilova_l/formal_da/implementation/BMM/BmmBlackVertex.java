@@ -25,7 +25,7 @@ public class BmmBlackVertex extends BmmVertex {
      * Add all neighbours to set of unmatched neighbours
      */
     @Override
-    public void init(Input input) {
+    public void init(@Nullable Input input) {
         unmatchedNeighbours.addAll(connections.keySet());
         deg = connections.size();
     }

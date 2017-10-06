@@ -3,9 +3,11 @@ package com.github.kornilova_l.formal_da.simulator;
 import com.github.kornilova_l.formal_da.simulator.vertex.Input;
 import com.github.kornilova_l.formal_da.simulator.vertex.Message;
 import com.github.kornilova_l.formal_da.simulator.vertex.Vertex;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 public abstract class AlgorithmRunner {
     /**
@@ -17,13 +19,16 @@ public abstract class AlgorithmRunner {
         this.vertices = vertices;
     }
 
-    public final void initVertices() {
+    public void initVertices() {
         for (Vertex vertex : vertices.values()) {
             vertex.init(getInput(vertex));
         }
     }
 
-    protected abstract Input getInput(Vertex vertex);
+    @Nullable
+    protected Input getInput(Vertex vertex) {
+        return null;
+    }
 
     public final void doIteration() {
         Map<Vertex, Map<Vertex, Message>> incomingMessages = sendMessages();
@@ -73,4 +78,38 @@ public abstract class AlgorithmRunner {
      * This method will be called after all nodes stopped
      */
     public abstract void outputResult();
+
+    protected static void readConnections(Map<Integer, Vertex> vertices, int connectionsCount, Scanner scanner) {
+        for (int i = 0; i < connectionsCount; i++) {
+            Vertex vertex1 = vertices.get(scanner.nextInt());
+            Vertex vertex2 = vertices.get(scanner.nextInt());
+            if (vertex1 == null || vertex2 == null) {
+                throw new AssertionError("Cannot find vertex");
+            }
+            int port1 = scanner.nextInt();
+            int port2 = scanner.nextInt();
+            vertex1.addReceiver(vertex2, port1);
+            vertex2.addReceiver(vertex1, port2);
+        }
+    }
+
+    /**
+     * Runs algorithm until all nodes stopped
+     */
+    public void run() {
+        initVertices();
+        while (!areAllNodesStopped()) {
+            doIteration();
+        }
+    }
+
+    @Nullable
+    protected Integer getId(@Nullable Vertex vertex) {
+        for (Map.Entry<Integer, Vertex> entry : vertices.entrySet()) {
+            if (entry.getValue() == vertex) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
 }
