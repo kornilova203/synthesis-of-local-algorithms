@@ -1,6 +1,6 @@
 package com.github.kornilova_l.formal_da.implementation.BMM;
 
-import com.github.kornilova_l.formal_da.algorithm.AlgorithmRunner;
+import com.github.kornilova_l.formal_da.simulator.AlgorithmRunner;
 import com.github.kornilova_l.formal_da.vertex.Input;
 import com.github.kornilova_l.formal_da.vertex.Vertex;
 

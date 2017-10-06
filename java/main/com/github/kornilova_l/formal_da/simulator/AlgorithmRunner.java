@@ -1,4 +1,4 @@
-package com.github.kornilova_l.formal_da.algorithm;
+package com.github.kornilova_l.formal_da.simulator;
 
 import com.github.kornilova_l.formal_da.vertex.Input;
 import com.github.kornilova_l.formal_da.vertex.Message;

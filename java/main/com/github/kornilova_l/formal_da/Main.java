@@ -1,7 +1,7 @@
 package com.github.kornilova_l.formal_da;
 
-import com.github.kornilova_l.formal_da.algorithm.AlgorithmRunner;
 import com.github.kornilova_l.formal_da.implementation.BMM.BmmAlgorithmRunner;
+import com.github.kornilova_l.formal_da.simulator.AlgorithmRunner;
 
 import java.io.File;
 
