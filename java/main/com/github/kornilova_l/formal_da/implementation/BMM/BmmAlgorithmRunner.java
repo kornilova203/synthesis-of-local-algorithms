@@ -7,9 +7,7 @@ import com.github.kornilova_l.formal_da.vertex.Vertex;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class BmmAlgorithmRunner extends AlgorithmRunner {
     private BmmAlgorithmRunner(Map<Integer, Vertex> vertexSet) {
@@ -71,6 +69,30 @@ public class BmmAlgorithmRunner extends AlgorithmRunner {
 
     @Override
     public void outputResult() {
+        System.out.println("Maximal matching");
+        Set<Vertex> outputtedVertices = new HashSet<>();
+        for (Vertex vertex : vertices.values()) {
+            if (outputtedVertices.contains(vertex)) {
+                continue;
+            }
+            if (!(vertex instanceof BmmVertex)) {
+                continue;
+            }
+            Vertex pair = ((BmmVertex) vertex).getPair();
+            if (pair != null) {
+                outputtedVertices.add(vertex);
+                outputtedVertices.add(pair);
+                System.out.println(getId(vertex) + " - " + getId(pair));
+            }
+        }
+    }
 
+    private int getId(Vertex pair) {
+        for (Map.Entry<Integer, Vertex> entry : vertices.entrySet()) {
+            if (entry.getValue() == pair) {
+                return entry.getKey();
+            }
+        }
+        throw new AssertionError("Cannot find vertex");
     }
 }

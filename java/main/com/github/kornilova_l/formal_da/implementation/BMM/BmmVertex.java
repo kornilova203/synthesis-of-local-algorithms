@@ -3,6 +3,7 @@ package com.github.kornilova_l.formal_da.implementation.BMM;
 import com.github.kornilova_l.formal_da.vertex.Message;
 import com.github.kornilova_l.formal_da.vertex.Vertex;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +57,11 @@ abstract class BmmVertex extends Vertex {
     abstract Map<Vertex, Message> oddIterationSend();
 
     abstract Map<Vertex, Message> evenIterationSend();
+
+    @Nullable
+    Vertex getPair() {
+        return pair;
+    }
 
     public enum State {
         UNMATCHED_RUNNING,
