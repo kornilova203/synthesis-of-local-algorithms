@@ -3,23 +3,21 @@ package com.github.kornilova_l.formal_da.algorithm;
 import com.github.kornilova_l.formal_da.vertex.Input;
 import com.github.kornilova_l.formal_da.vertex.Message;
 import com.github.kornilova_l.formal_da.vertex.Vertex;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public abstract class AlgorithmRunner {
     /**
-     * Connections of each vertex is sorted
-     * accordingly to port id
+     * maps vertex id to vertex object
      */
-    private Map<Vertex, TreeSet<Connection>> graph;
+    private Map<Integer, Vertex> vertices;
 
-    public AlgorithmRunner(Map<Vertex, TreeSet<Connection>> vertices) {
-        this.graph = vertices;
+    public AlgorithmRunner(Map<Integer, Vertex> vertices) {
+        this.vertices = vertices;
     }
 
     public final void initVertices() {
-        for (Vertex vertex : graph.keySet()) {
+        for (Vertex vertex : vertices.values()) {
             vertex.init(getInput(vertex));
         }
     }
@@ -48,13 +46,11 @@ public abstract class AlgorithmRunner {
     private Map<Vertex, TreeMap<Integer, Message>> sendMessages() {
         Map<Vertex, TreeMap<Integer, Message>> incomingMessages = new HashMap<>();
         // send messages
-        for (Map.Entry<Vertex, TreeSet<Connection>> senderAndConnections : graph.entrySet()) {
-            Vertex sender = senderAndConnections.getKey();
-            TreeSet<Connection> connections = senderAndConnections.getValue();
-            Map<Integer, Message> newMessages = sender.send();
+        for (Vertex sender : vertices.values()) {
+            Map<Vertex, Message> newMessages = sender.send();
 
-            for (Map.Entry<Integer, Message> newMessage : newMessages.entrySet()) {
-                Vertex receiver = getReceiver(connections, newMessage.getKey());
+            for (Map.Entry<Vertex, Message> newMessage : newMessages.entrySet()) {
+                Vertex receiver = newMessage.getKey();
                 Map<Integer, Message> receiverMessages = incomingMessages.computeIfAbsent(
                         receiver,
                         k -> new TreeMap<>()
@@ -65,27 +61,17 @@ public abstract class AlgorithmRunner {
         return incomingMessages;
     }
 
-    private Vertex getReceiver(TreeSet<Connection> connections, Integer portNumber) {
-        for (Connection connection : connections) {
-            if (connection.portId == portNumber) {
-                return connection.receiver;
-            }
-        }
-        throw new AssertionError("Cannot find port");
-    }
-
     private Integer getPortNumber(Vertex sender, Vertex receiver) {
-        for (Connection connection : graph.get(sender)) {
-            if (connection.receiver == receiver) {
-                return connection.portId;
+        for (Map.Entry<Integer, Vertex> connection : sender.getConnections().entrySet()) {
+            if (connection.getValue() == receiver) {
+                return connection.getKey();
             }
         }
         throw new AssertionError("Cannot find neighbour which must exist");
     }
 
     public final boolean areAllNodesStopped() {
-        Set<Vertex> vertices = graph.keySet();
-        for (Vertex vertex : vertices) {
+        for (Vertex vertex : vertices.values()) {
             if (!vertex.isStopped()) {
                 return false;
             }
@@ -97,19 +83,4 @@ public abstract class AlgorithmRunner {
      * This method will be called after all nodes stopped
      */
     public abstract void outputResult();
-
-    protected class Connection implements Comparable<Connection> {
-        private Vertex receiver;
-        private int portId;
-
-        Connection(Vertex receiver, int portId) {
-            this.receiver = receiver;
-            this.portId = portId;
-        }
-
-        @Override
-        public int compareTo(@NotNull Connection connection) {
-            return Integer.compare(this.portId, connection.portId);
-        }
-    }
 }
