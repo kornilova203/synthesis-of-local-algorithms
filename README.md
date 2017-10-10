@@ -24,13 +24,15 @@ mkdir out
 javac -d out -cp ../../.idea/lib/annotations-java8.jar com/github/kornilova_l/formal_da/**/*.java
 cd out
 ```
-To run BMM algorithm specify input file. Rules for input data can be found in [BmmAlgorithmRunner class](java/main/com/github/kornilova_l/formal_da/implementation/BMM/BmmAlgorithmRunner.java)
+To run BMM and VC3 you should specify input file. Rules for input data can be found in [BmmAlgorithmRunner](java/main/com/github/kornilova_l/formal_da/implementation/BMM/BmmAlgorithmRunner.java) class and in [V3cAlgorithmRunner](java/main/com/github/kornilova_l/formal_da/implementation/VC3/Vc3AlgorithmRunner.java) class respectively. There are test data in [test_resources](test_resources) dir.
+
+### BMM
 ```
 java com.github.kornilova_l.formal_da.BmmMain "../../../test_resources/BMM/01.txt"
 java com.github.kornilova_l.formal_da.BmmMain "../../../test_resources/BMM/02.txt"
 ```
 
-To run V3C algorithm specify input file. Rules for input data can be found in [V3cAlgorithmRunner class](java/main/com/github/kornilova_l/formal_da/implementation/VC3/Vc3AlgorithmRunner.java)
+### VC3
 ```
 java com.github.kornilova_l.formal_da.Vc3Main "../../../test_resources/VC3/01.txt"
 java com.github.kornilova_l.formal_da.Vc3Main "../../../test_resources/VC3/02.txt"
