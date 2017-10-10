@@ -7,8 +7,12 @@ import java.io.File;
 
 public class BmmMain {
     public static void main(String[] args) {
+        if (args.length != 1) {
+            System.out.println("Specify path to file");
+            System.exit(0);
+        }
         AlgorithmRunner algorithmRunner =
-                BmmAlgorithmRunner.createRunner(new File("test_resources/BMM/01.txt"));
+                BmmAlgorithmRunner.createRunner(new File(args[0]));
 
         algorithmRunner.run();
         algorithmRunner.outputResult();

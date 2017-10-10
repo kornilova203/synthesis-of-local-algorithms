@@ -120,7 +120,7 @@ public class Vc3AlgorithmRunner extends AlgorithmRunner {
 
     @Override
     public void outputResult() {
-        System.out.println("Minimal vertex cover:");
+        System.out.println("3-approximation of a minimum vertex cover:");
         for (Map.Entry<Integer, Vertex> vertexEntry : vertices.entrySet()) {
             if (vertexEntry.getValue() instanceof Vc3Vertex) {
                 if (((Vc3Vertex) vertexEntry.getValue()).isCover()) {
@@ -128,5 +128,6 @@ public class Vc3AlgorithmRunner extends AlgorithmRunner {
                 }
             }
         }
+        System.out.println("");
     }
 }

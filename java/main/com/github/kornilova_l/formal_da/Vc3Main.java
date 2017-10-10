@@ -7,8 +7,12 @@ import java.io.File;
 
 public class Vc3Main {
     public static void main(String[] args) {
+        if (args.length != 1) {
+            System.out.println("Specify path to file");
+            System.exit(0);
+        }
         AlgorithmRunner algorithmRunner =
-                Vc3AlgorithmRunner.createRunner(new File("test_resources/VC3/01.txt"));
+                Vc3AlgorithmRunner.createRunner(new File(args[0]));
 
         algorithmRunner.run();
         algorithmRunner.outputResult();
