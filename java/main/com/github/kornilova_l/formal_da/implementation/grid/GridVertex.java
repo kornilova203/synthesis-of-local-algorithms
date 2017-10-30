@@ -32,7 +32,7 @@ public class GridVertex extends Vertex {
 
     @Override
     public boolean isStopped() {
-        return false;
+        return true;
     }
 
     @Override
