@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class GridVertex extends Vertex {
     private int id;
@@ -71,18 +70,49 @@ public class GridVertex extends Vertex {
             }
         }
         time++;
+        if (time % k == 0) {
+            doColourReduction();
+        }
+    }
+
+    private void doColourReduction() {
+        if (isLocalMaxima()) {
+            if (hasIndependentNeighbour()) {
+                currentColour = 0;
+            } else {
+                currentColour = 1;
+            }
+        }
+    }
+
+    private boolean hasIndependentNeighbour() {
+        for (ColourReductionMessage colourMessage : colourMessages) {
+            if (colourMessage.getColour() == 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isLocalMaxima() {
+        for (ColourReductionMessage colourMessage : colourMessages) {
+            if (currentColour < colourMessage.getColour()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
     public boolean isStopped() {
-        return time >= k;
+        return currentColour == 1 || currentColour == 0;
     }
 
     @Override
     public String toString() {
-        return Integer.toString(id)
-                + " " +
-                colourMessages.stream().map(ColourReductionMessage::toString).collect(Collectors.joining(" : "));
+        return Integer.toString(currentColour);
+//                + " " +
+//                colourMessages.stream().map(ColourReductionMessage::toString).collect(Collectors.joining(" : "));
     }
 
     int getId() {

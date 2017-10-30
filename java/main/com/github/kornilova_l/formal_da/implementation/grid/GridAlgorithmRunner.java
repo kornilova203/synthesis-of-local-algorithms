@@ -21,7 +21,7 @@ public class GridAlgorithmRunner extends AlgorithmRunner {
      * power of the grid
      */
     @SuppressWarnings("FieldCanBeLocal")
-    private final int k = 2;
+    private final int k = 3;
 
 
     private GridAlgorithmRunner(Map<Integer, Vertex> vertices,
