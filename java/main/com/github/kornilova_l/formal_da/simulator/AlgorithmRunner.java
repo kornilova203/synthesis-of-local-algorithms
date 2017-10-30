@@ -30,7 +30,7 @@ public abstract class AlgorithmRunner {
         return null;
     }
 
-    public final void doIteration() {
+    private void doIteration() {
         Map<Vertex, Map<Vertex, Message>> incomingMessages = sendMessages();
         receiveMessages(incomingMessages);
     }
@@ -65,7 +65,7 @@ public abstract class AlgorithmRunner {
         return incomingMessages;
     }
 
-    public final boolean areAllNodesStopped() {
+    private boolean areAllNodesStopped() {
         for (Vertex vertex : vertices.values()) {
             if (!vertex.isStopped()) {
                 return false;

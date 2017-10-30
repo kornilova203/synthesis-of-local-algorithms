@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public abstract class Vertex {
+    /**
+     * Map from port number to vertex
+     */
     protected final TreeMap<Integer, Vertex> connections = new TreeMap<>();
 
     public abstract void init(@Nullable Input input);
