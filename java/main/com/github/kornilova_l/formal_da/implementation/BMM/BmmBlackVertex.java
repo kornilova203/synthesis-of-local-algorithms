@@ -3,7 +3,6 @@ package com.github.kornilova_l.formal_da.implementation.BMM;
 import com.github.kornilova_l.formal_da.simulator.vertex.Input;
 import com.github.kornilova_l.formal_da.simulator.vertex.Message;
 import com.github.kornilova_l.formal_da.simulator.vertex.Vertex;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -43,16 +42,6 @@ public class BmmBlackVertex extends BmmVertex {
                 }
             }
         }
-    }
-
-    @NotNull
-    private Integer getPort(Vertex vertex) {
-        for (Map.Entry<Integer, Vertex> entry : connections.entrySet()) {
-            if (entry.getValue() == vertex) {
-                return entry.getKey();
-            }
-        }
-        throw new AssertionError("Cannot find vertex");
     }
 
     @Override

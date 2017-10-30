@@ -32,4 +32,14 @@ public abstract class Vertex {
     public void addReceiver(Vertex vertex, int port) {
         connections.put(port, vertex);
     }
+
+    @NotNull
+    protected Integer getPort(Vertex vertex) {
+        for (Map.Entry<Integer, Vertex> entry : connections.entrySet()) {
+            if (entry.getValue() == vertex) {
+                return entry.getKey();
+            }
+        }
+        throw new AssertionError("Cannot find vertex");
+    }
 }

@@ -6,15 +6,24 @@ import com.github.kornilova_l.formal_da.simulator.vertex.Vertex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class GridVertex extends Vertex {
-    private int id = 0;
+    private int id;
+    private int currentColour;
+    private int k;
+    /* each iteration of colour reduction takes k steps */
+    private int time = 0;
+    private final Set<ColourReductionMessage> colourMessages = new HashSet<>();
+    private final Set<ColourReductionMessage> newColourMessages = new HashSet<>();
 
     @Override
     public void init(@Nullable Input input) {
         if (input instanceof GridInput) {
             this.id = ((GridInput) input).getId();
+            this.currentColour = id;
+            this.k = ((GridInput) input).getK();
         } else {
             throw new IllegalArgumentException("Input must be a GridInput instance");
         }
@@ -22,21 +31,61 @@ public class GridVertex extends Vertex {
 
     @Override
     public @NotNull Map<Vertex, Message> send() {
-        return null;
+        Map<Vertex, Message> messages = new HashMap<>();
+        if (time % k == 0) { // if first iteration of colour reduction
+            colourMessages.clear();
+            for (Vertex vertex : connections.values()) {
+                messages.put(vertex, new ColourMessagesSet(currentColour, this));
+            }
+        } else {
+            for (ColourReductionMessage colourMessage : newColourMessages) {
+                List<GridVertex> path = colourMessage.getPath();
+                if (path.size() == k) {
+                    continue;
+                }
+                for (Vertex vertex : connections.values()) {
+                    if (path.get(path.size() - 1) != vertex) { // if it was not received from this colour
+                        Message messagesSet = messages.computeIfAbsent(vertex, v -> new ColourMessagesSet());
+                        if (messagesSet instanceof ColourMessagesSet) {
+                            ((ColourMessagesSet) messagesSet).addMessage(
+                                    new ColourReductionMessage(colourMessage, this)
+                            );
+                        }
+                    }
+                }
+            }
+            newColourMessages.clear();
+        }
+        return messages;
     }
 
     @Override
-    public void receive(Map<Vertex, Message> messages) {
-
+    public void receive(@NotNull Map<Vertex, Message> messages) {
+        for (Map.Entry<Vertex, Message> entry : messages.entrySet()) {
+            Message message = entry.getValue();
+            if (message instanceof ColourMessagesSet) {
+                for (ColourReductionMessage m : ((ColourMessagesSet) message).getMessages()) {
+                    colourMessages.add(m);
+                    newColourMessages.add(m);
+                }
+            }
+        }
+        time++;
     }
 
     @Override
     public boolean isStopped() {
-        return true;
+        return time >= k;
     }
 
     @Override
     public String toString() {
-        return Integer.toString(id);
+        return Integer.toString(id)
+                + " " +
+                colourMessages.stream().map(ColourReductionMessage::toString).collect(Collectors.joining(" : "));
+    }
+
+    int getId() {
+        return id;
     }
 }

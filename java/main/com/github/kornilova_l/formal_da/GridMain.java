@@ -4,7 +4,7 @@ import com.github.kornilova_l.formal_da.implementation.grid.GridAlgorithmRunner;
 
 public class GridMain {
     public static void main(String[] args) {
-        GridAlgorithmRunner algorithmRunner = GridAlgorithmRunner.createRunner(3, 4);
+        GridAlgorithmRunner algorithmRunner = GridAlgorithmRunner.createRunner(5, 6);
         algorithmRunner.run();
         System.out.println(algorithmRunner);
     }

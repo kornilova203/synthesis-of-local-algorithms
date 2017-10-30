@@ -37,7 +37,7 @@ public abstract class AlgorithmRunner {
 
     private void receiveMessages(Map<Vertex, Map<Vertex, Message>> incomingMessages) {
         for (Vertex vertex : vertices.values()) {
-            vertex.receive(incomingMessages.getOrDefault(vertex, null));
+            vertex.receive(incomingMessages.getOrDefault(vertex, new HashMap<>()));
         }
     }
 
