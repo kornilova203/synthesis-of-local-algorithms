@@ -5,9 +5,7 @@ import com.github.kornilova_l.formal_da.simulator.vertex.Input;
 import com.github.kornilova_l.formal_da.simulator.vertex.Vertex;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class GridAlgorithmRunner extends AlgorithmRunner {
     /**
@@ -51,14 +49,27 @@ public class GridAlgorithmRunner extends AlgorithmRunner {
         }
         Map<Integer, Vertex> vertices = new TreeMap<>();
         Map<Vertex, Integer> ids = new HashMap<>(); // for getInput method. Because this sim is for PN model
-        int id = 0;
+        List<Integer> allowedIds = getAllowedIds(n * m);
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
+                int id = allowedIds.remove(0);
                 ids.put(verticesArr[i][j], id);
-                vertices.put(id++, verticesArr[i][j]);
+                vertices.put(id, verticesArr[i][j]);
             }
         }
         return new GridAlgorithmRunner(vertices, verticesArr, n, m, ids);
+    }
+
+    /**
+     * Generate list of n * m unique ids and shuffle
+     */
+    private static List<Integer> getAllowedIds(int nodesCount) {
+        List<Integer> ids = new ArrayList<>();
+        for (int i = 0; i < nodesCount; i++) {
+            ids.add(i);
+        }
+        Collections.shuffle(ids);
+        return ids;
     }
 
     @Override
@@ -78,7 +89,7 @@ public class GridAlgorithmRunner extends AlgorithmRunner {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                stringBuilder.append(verticesArr[i][j]).append("\t");
+                stringBuilder.append(verticesArr[i][j]).append(" ");
             }
             stringBuilder.append("\n");
         }
