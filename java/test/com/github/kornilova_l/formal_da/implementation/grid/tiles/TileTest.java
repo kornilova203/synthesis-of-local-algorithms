@@ -16,12 +16,31 @@ class TileTest {
         /* On diagonal: */
         assertFalse(tile.canBeI(3, 2));
         /* On opposite side: */
-        assertFalse(tile.canBeI(0, 3));
+        assertTrue(tile.canBeI(0, 3));
         /* On diagonal and on opposite side: */
-        assertFalse(tile.canBeI(0, 2));
+        assertTrue(tile.canBeI(0, 2));
 
         assertTrue(tile.canBeI(1, 2));
         assertTrue(tile.canBeI(0, 1));
+    }
+
+    @Test
+    void isMaximalTest() {
+        Tile tile = new Tile(5, 6, 2);
+        assertFalse(tile.isMaximal());
+
+        tile = new Tile(5, 7, 3);
+        assertFalse(tile.isMaximal());
+    }
+
+    @Test
+    void expandingConstructor() {
+        Tile tile = new Tile(3, 4, 3);
+        tile.getGrid()[0][1] = true;
+        Tile expected = new Tile(9, 10, 3);
+        expected.getGrid()[3][4] = true;
+        assertEquals(expected, new Tile(tile));
+
     }
 
 }
