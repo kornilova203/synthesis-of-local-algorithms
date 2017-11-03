@@ -1,17 +1,34 @@
 package com.github.kornilova_l.formal_da.implementation.grid.tiles;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
-import java.util.TreeSet;
 
-public final class Tile implements Comparable<Tile> {
+public final class Tile {
     private final boolean[][] grid;
+
+    int getN() {
+        return n;
+    }
+
+    int getM() {
+        return m;
+    }
+
     private final int n;
     private final int m;
     private final int k;
 
+    /**
+     * Create an empty tile
+     *
+     * @param n size
+     * @param m size
+     * @param k power of graph
+     */
     Tile(int n, int m, int k) {
         grid = new boolean[n][m];
         this.n = n;
@@ -34,7 +51,7 @@ public final class Tile implements Comparable<Tile> {
     }
 
     /**
-     * Clone and expand tile
+     * Clone and expand tile by k
      */
     Tile(Tile tile) {
         k = tile.k;
@@ -46,14 +63,10 @@ public final class Tile implements Comparable<Tile> {
         }
     }
 
-    public boolean[][] getGrid() {
-        return grid;
-    }
-
     /**
      * @return true if grid[x][y] can be an element of an independent set
      */
-    public boolean canBeI(int x, int y) {
+    boolean canBeI(int x, int y) {
         validate(x, y);
         if (grid[x][y]) { // if already I
             return true;
@@ -80,25 +93,10 @@ public final class Tile implements Comparable<Tile> {
     }
 
     @Override
-    public int compareTo(@NotNull Tile tile) {
-        if (n != tile.n || m != tile.m) {
-            throw new IllegalArgumentException("Grid size is different");
-        }
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                if (grid[i][j] != tile.grid[i][j]) {
-                    return i == 0 ? -1 : 1;
-                }
-            }
-        }
-        return 0;
-    }
-
-    @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
+        for (int j = 0; j < m; j++) {
+            for (int i = 0; i < n; i++) {
                 stringBuilder.append(grid[i][j] ? 1 : 0).append(" ");
             }
             stringBuilder.append("\n");
@@ -108,11 +106,12 @@ public final class Tile implements Comparable<Tile> {
     }
 
     /**
-     * Find all cells which can be in I
-     * Check is it possible to cover all this cells
-     * with I set outside the tile
+     * Check if this tile is valid
+     * 1. Expand tile by k cells on each side
+     * 2. Try to generate IS in extended tile
+     * such that it will cover all uncovered cells in original tile.
      */
-    boolean isMaximal() {
+    boolean isTileValid() {
         Set<Coordinate> canBeAddedToIS = new HashSet<>();
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
@@ -124,41 +123,69 @@ public final class Tile implements Comparable<Tile> {
         if (canBeAddedToIS.isEmpty()) {
             return true;
         }
-        return isPossibleToCoverAll(canBeAddedToIS);
+        return isTileValidRecursive(new Tile(this),
+                changeCoordinatesForExpanded(canBeAddedToIS, k),
+                new Coordinate(0, 0));
     }
 
-    private boolean isPossibleToCoverAll(Set<Coordinate> canBeAddedToIS) {
-        canBeAddedToIS = changeCoordinatesForExpanded(canBeAddedToIS, k);
-        TreeSet<Tile> expandedTiles = new TreeSet<>();
-        expandedTiles.add(new Tile(this));
-        int eN = n + 2 * k;
-        int eM = m + 2 * k;
-        for (int i = 0; i < eN; i++) {
-            for (int j = 0; j < eM; j++) {
-                if (i >= k && i < eN - k && j >= k && j < eM - k) {
-                    continue;
-                }
-                TreeSet<Tile> newExpandedTiles = new TreeSet<>();
-                for (Tile expandedTile : expandedTiles) {
-                    if (expandedTile.canBeI(i, j) && expandedTile.doesCover(i, j, canBeAddedToIS)) {
-                        Tile newTile = new Tile(expandedTile, i, j);
-                        if (newTile.coversAll(canBeAddedToIS)) { // if we can generate expanded tile which covers all
-                            return true;
-                        }
-                        newExpandedTiles.add(newTile);
-                    }
-                }
-                expandedTiles.addAll(newExpandedTiles);
-                newExpandedTiles.clear();
+    /**
+     * @return true if it is possible to generate expanded tile
+     * which cover all in uncovered cells in internal tile.
+     */
+    private boolean isTileValidRecursive(Tile expandedTile,
+                                         Set<Coordinate> canBeAddedToIS,
+                                         @Nullable Coordinate curCoordinate) {
+        if (curCoordinate == null) { // if on previous step there was last coordinate
+            return false;
+        }
+        if (isTileValidRecursive(expandedTile, canBeAddedToIS, expandedTile.getNextBorderCoordinate(curCoordinate))) {
+            return true;
+        }
+        if (expandedTile.canBeI(curCoordinate.x, curCoordinate.y) && // it cell can be added to the tile
+                expandedTile.coversAny(curCoordinate, canBeAddedToIS)) {
+            Tile newTile = new Tile(expandedTile, curCoordinate.x, curCoordinate.y);
+            if (newTile.coversAll(canBeAddedToIS)) { // if we can generate expanded tile which covers all
+                return true;
+            }
+            boolean res = isTileValidRecursive(newTile, canBeAddedToIS, newTile.getNextBorderCoordinate(curCoordinate));
+            if (res) {
+                return true;
             }
         }
         return false;
     }
 
     /**
+     * @return next coordinate which does not belong to internal tile
+     * or null if it was last tile
+     */
+    @Nullable
+    Coordinate getNextBorderCoordinate(@NotNull Coordinate curCoordinate) {
+        int x = curCoordinate.x;
+        int y = curCoordinate.y;
+        if (x == n - 1 && y == m - 1) { // if last coordinate
+            return null;
+        }
+        if (x < n - 1) { // if not the last in this row
+            x++;
+            if (y >= k && y < m - k) {
+                if (x >= k && x < n - k) { // if inside internal tile
+                    x = n - k;
+                }
+            }
+        } else {
+            y++;
+            x = 0;
+        }
+        return new Coordinate(x, y);
+    }
+
+    /**
      * Returns true if (x, y) covers at least one point in points
      */
-    private boolean doesCover(int x, int y, Set<Coordinate> points) {
+    private boolean coversAny(Coordinate coordinate, Set<Coordinate> points) {
+        int x = coordinate.x;
+        int y = coordinate.y;
         for (Coordinate point : points) {
             if (Math.abs(x - point.x) + Math.abs(y - point.y) <= k) {
                 return true;
@@ -180,7 +207,24 @@ public final class Tile implements Comparable<Tile> {
      */
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Tile && compareTo((Tile) obj) == 0;
+        if (obj instanceof String) {
+            return Objects.equals(obj, toString());
+        }
+        if (!(obj instanceof Tile)) {
+            return false;
+        }
+        Tile tile = ((Tile) obj);
+        if (tile.n != n || tile.m != m) {
+            throw new IllegalArgumentException("Size of tile is different");
+        }
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (grid[i][j] != tile.grid[i][j]) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private boolean coversAll(Set<Coordinate> canBeAddedToIS) {
@@ -192,7 +236,7 @@ public final class Tile implements Comparable<Tile> {
         return true;
     }
 
-    private class Coordinate {
+    static class Coordinate {
         final int x;
         final int y;
 
@@ -203,7 +247,15 @@ public final class Tile implements Comparable<Tile> {
 
         @Override
         public String toString() {
-            return x + " " + y;
+            return "(" + x + ", " + y + ")";
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof Coordinate)) {
+                return false;
+            }
+            return x == ((Coordinate) obj).x && y == ((Coordinate) obj).y;
         }
     }
 }

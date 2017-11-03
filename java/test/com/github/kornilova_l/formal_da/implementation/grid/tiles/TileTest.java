@@ -1,5 +1,6 @@
 package com.github.kornilova_l.formal_da.implementation.grid.tiles;
 
+import com.github.kornilova_l.formal_da.implementation.grid.tiles.Tile.Coordinate;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -8,11 +9,15 @@ class TileTest {
     @Test
     void canBeI() {
         Tile tile = new Tile(5, 6, 2);
+
         assertTrue(tile.canBeI(4, 4));
-        tile.getGrid()[4][3] = true;
+        tile = new Tile(tile, 4, 3);
         assertFalse(tile.canBeI(4, 4));
-        assertThrows(IllegalArgumentException.class, () -> tile.canBeI(5, 4));
-        assertThrows(IllegalArgumentException.class, () -> tile.canBeI(4, 6));
+
+        Tile testThrowsTile = new Tile(5, 6, 2);
+        assertThrows(IllegalArgumentException.class, () -> testThrowsTile.canBeI(5, 4));
+        assertThrows(IllegalArgumentException.class, () -> testThrowsTile.canBeI(4, 6));
+
         /* On diagonal: */
         assertFalse(tile.canBeI(3, 2));
         /* On opposite side: */
@@ -25,22 +30,39 @@ class TileTest {
     }
 
     @Test
-    void isMaximalTest() {
+    void isValidTest() { // may take some time
         Tile tile = new Tile(5, 6, 2);
-        assertFalse(tile.isMaximal());
+        assertFalse(tile.isTileValid());
 
         tile = new Tile(5, 7, 3);
-        assertFalse(tile.isMaximal());
+        assertTrue(tile.isTileValid());
     }
 
     @Test
     void expandingConstructor() {
         Tile tile = new Tile(3, 4, 3);
-        tile.getGrid()[0][1] = true;
+        tile = new Tile(tile, 0, 1);
         Tile expected = new Tile(9, 10, 3);
-        expected.getGrid()[3][4] = true;
-        assertEquals(expected, new Tile(tile));
 
+        expected = new Tile(expected, 3, 4);
+        assertEquals(expected, new Tile(tile));
     }
 
+    @Test
+    void getNextBorderCoordinateTest() {
+        Tile tile = new Tile(6, 8, 2);
+        assertEquals(new Coordinate(1, 0),
+                tile.getNextBorderCoordinate(new Coordinate(0, 0)));
+
+        assertEquals(new Coordinate(0, 1),
+                tile.getNextBorderCoordinate(new Coordinate(5, 0)));
+
+        assertEquals(new Coordinate(4, 2),
+                tile.getNextBorderCoordinate(new Coordinate(1, 2)));
+
+        assertEquals(new Coordinate(2, 0),
+                tile.getNextBorderCoordinate(new Coordinate(1, 0)));
+
+        assertNull(tile.getNextBorderCoordinate(new Coordinate(tile.getN() - 1, tile.getM() - 1)));
+    }
 }

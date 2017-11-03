@@ -1,25 +1,22 @@
 package com.github.kornilova_l.formal_da.implementation.grid.tiles;
 
-import java.util.TreeSet;
+import com.github.kornilova_l.util.ProgressBar;
+
+import java.util.HashSet;
 
 /**
  * Generates all possible combinations of tiles n x m in kth power of grid
  */
+@SuppressWarnings("WeakerAccess")
 public class TileGenerator {
-    private final TreeSet<Tile> tiles = new TreeSet<>();
-    private final int n;
-    private final int m;
-    private final int k;
+    private final HashSet<Tile> tiles = new HashSet<>();
 
     TileGenerator(int n, int m, int k) {
-        this.n = n;
-        this.m = m;
-        this.k = k;
         tiles.add(new Tile(n, m, k));
 
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                TreeSet<Tile> newTiles = new TreeSet<>();
+                HashSet<Tile> newTiles = new HashSet<>();
                 for (Tile tile : tiles) {
                     if (tile.canBeI(i, j)) {
                         newTiles.add(new Tile(tile, i, j));
@@ -29,53 +26,49 @@ public class TileGenerator {
                 newTiles.clear();
             }
         }
+        printCandidatesFound();
         removeNotMaximal();
+    }
 
+    private void printCandidatesFound() {
+        int candidatesCount = tiles.size();
+        System.out.println("Found " + candidatesCount + " possible tile" + (candidatesCount == 1 ? "" : "s"));
+        System.out.println("Remove tiles which cannot contain maximal independent set...");
     }
 
     /**
      * Remove all tiles which does not have maximal IS
      */
     private void removeNotMaximal() {
-        TreeSet<Tile> notMaximalTiles = new TreeSet<>();
+        int candidatesCount = tiles.size();
+        ProgressBar progressBar = new ProgressBar(candidatesCount);
+        HashSet<Tile> notMaximalTiles = new HashSet<>();
         int i = 0;
-//        tiles.remove(new Tile(n, m, k));
-//        Tile removeTile = null;
-//        for (Tile tile : tiles) {
-//            if (tile.equals(emptyTile)) {
-//                removeTile = tile;
-//                break;
-//            }
-//        }
-        Tile emptyTile = new Tile(n, m, k);
-        Tile cornerTile1 = new Tile(n, m, k);
-        cornerTile1.getGrid()[0][0] = true;
-        Tile cornerTile2 = new Tile(n, m, k);
-        cornerTile1.getGrid()[n - 1][0] = true;
-        Tile cornerTile3 = new Tile(n, m, k);
-        cornerTile1.getGrid()[0][m - 1] = true;
-        Tile cornerTile4 = new Tile(n, m, k);
-        cornerTile1.getGrid()[n - 1][m - 1] = true;
+        int prevPercent = 0;
         for (Tile tile : tiles) {
-            if (tile.equals(emptyTile) || tile.equals(cornerTile1) || tile.equals(cornerTile2) ||
-                    tile.equals(cornerTile3) || tile.equals(cornerTile4)) {
-                continue;
-            }
-            System.out.println(i);
-//            if (i == 2230) {
-//                System.out.println(tile);
-//            }
-            i++;
-            if (!tile.isMaximal()) {
+            if (!tile.isTileValid()) {
                 notMaximalTiles.add(tile);
-                System.out.println("not maximal");
             }
+            prevPercent = printPercent(++i, candidatesCount, prevPercent, progressBar);
         }
-        System.out.println(":" + notMaximalTiles.size());
+        progressBar.finish();
         tiles.removeAll(notMaximalTiles);
     }
 
-    public TreeSet<Tile> getTiles() {
+    private int printPercent(int i, int candidatesCount, int prevPercent, ProgressBar progressBar) {
+        int percent = ((i * 100) / candidatesCount);
+        if (percent != 0 && percent != prevPercent && percent % 2 == 0) {
+            progressBar.printProgress(i);
+            return percent;
+        }
+        return prevPercent;
+    }
+
+    public HashSet<Tile> getTiles() {
         return tiles;
+    }
+
+    public static void main(String[] args) {
+        new TileGenerator(5, 7, 3);
     }
 }
