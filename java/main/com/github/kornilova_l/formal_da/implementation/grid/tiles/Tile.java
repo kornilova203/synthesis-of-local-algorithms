@@ -136,7 +136,7 @@ public final class Tile {
         }
         if (expandedTile.canBeI(curCoordinate.x, curCoordinate.y)) { // it cell can be added to the tile
             Set<Coordinate> covered = expandedTile.getCovered(curCoordinate, canBeAddedToIS);
-            if (!covered.isEmpty()) {
+            if (covered != null) {
                 canBeAddedToIS.removeAll(covered);
                 if (canBeAddedToIS.isEmpty()) { // if covers all
                     return true;
@@ -176,16 +176,19 @@ public final class Tile {
     }
 
     /**
-     * Returns true if (x, y) covers at least one point in points
+     * Returns true if (x, y) covers at least one point in cells
      */
-    @NotNull
-    private Set<Coordinate> getCovered(Coordinate coordinate, Set<Coordinate> points) {
+    @Nullable
+    private Set<Coordinate> getCovered(Coordinate coordinate, Set<Coordinate> cells) {
         int x = coordinate.x;
         int y = coordinate.y;
-        Set<Coordinate> covered = new HashSet<>();
-        for (Coordinate point : points) {
-            if (Math.abs(x - point.x) + Math.abs(y - point.y) <= k) {
-                covered.add(point);
+        Set<Coordinate> covered = null;
+        for (Coordinate cell : cells) {
+            if (Math.abs(x - cell.x) + Math.abs(y - cell.y) <= k) {
+                if (covered == null) {
+                    covered = new HashSet<>();
+                }
+                covered.add(cell);
             }
         }
         return covered;
