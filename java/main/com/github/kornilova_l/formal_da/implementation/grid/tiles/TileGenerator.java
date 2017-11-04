@@ -3,14 +3,14 @@ package com.github.kornilova_l.formal_da.implementation.grid.tiles;
 import com.github.kornilova_l.util.ProgressBar;
 import com.google.common.collect.Iterables;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -57,6 +57,20 @@ public class TileGenerator {
         }
     }
 
+    @Nullable
+    public static Set<Tile> importFromFile(@NotNull File file) {
+        if (!file.exists() || !file.isFile()) {
+            throw new IllegalArgumentException("File does not exist or it is not a file");
+        }
+
+        try (Scanner scanner = new Scanner(new FileInputStream(file))) {
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private void printCandidatesFound(HashSet<Tile> candidateTiles) {
         int candidatesCount = candidateTiles.size();
         System.out.println("Found " + candidatesCount + " possible tile" + (candidatesCount == 1 ? "" : "s"));
@@ -67,12 +81,13 @@ public class TileGenerator {
      * Remove all tiles which does not have maximal IS
      */
     private void removeNotMaximal(HashSet<Tile> candidateTiles) throws InterruptedException {
+        ProgressBar progressBar = new ProgressBar(candidateTiles.size());
         int processorsCount = Runtime.getRuntime().availableProcessors();
         int partitionsCount = processorsCount * 8;
         ExecutorService executorService = Executors.newFixedThreadPool(processorsCount);
         Set<TileValidator> tileValidators = new HashSet<>();
         for (List<Tile> partition : Iterables.partition(candidateTiles, partitionsCount)) {
-            TileValidator validator = new TileValidator(partition);
+            TileValidator validator = new TileValidator(partition, progressBar);
             tileValidators.add(validator);
             executorService.submit(validator);
         }
@@ -83,15 +98,7 @@ public class TileGenerator {
         for (TileValidator tileValidator : tileValidators) {
             tiles.addAll(tileValidator.getValidTiles());
         }
-    }
-
-    private int printPercent(int i, int candidatesCount, int prevPercent, ProgressBar progressBar) {
-        int percent = ((i * 100) / candidatesCount);
-        if (percent != 0 && percent != prevPercent) {
-            progressBar.printProgress(i);
-            return percent;
-        }
-        return prevPercent;
+        progressBar.finish();
     }
 
     public HashSet<Tile> getTiles() {
@@ -101,6 +108,8 @@ public class TileGenerator {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(n).append(" ").append(m).append(" ").append(k).append("\n")
+                .append(tiles.size()).append("\n");
         for (Tile tile : tiles) {
             stringBuilder.append(tile).append("\n");
         }
@@ -125,15 +134,17 @@ public class TileGenerator {
     }
 
     public static void main(String[] args) {
-        new TileGenerator(5, 7, 3).exportToFile(new File("generated_tiles"));
+        new TileGenerator(5, 8, 3).exportToFile(new File("generated_tiles"));
     }
 
     private class TileValidator implements Runnable {
         private final HashSet<Tile> valid = new HashSet<>();
         private final List<Tile> candidateTiles;
+        private ProgressBar progressBar;
 
-        TileValidator(List<Tile> candidateTiles) {
+        TileValidator(List<Tile> candidateTiles, ProgressBar progressBar) {
             this.candidateTiles = candidateTiles;
+            this.progressBar = progressBar;
         }
 
         public HashSet<Tile> getValidTiles() {
@@ -147,6 +158,7 @@ public class TileGenerator {
                     if (tile.isTileValid()) {
                         valid.add(tile);
                     }
+                    progressBar.updateProgress(1);
                 }
             }
         }
