@@ -1,6 +1,7 @@
 package com.github.kornilova_l.formal_da.implementation.grid.tiles;
 
 import com.github.kornilova_l.util.ProgressBar;
+import com.google.common.collect.Iterables;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -9,41 +10,55 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Generates all possible combinations of tiles n x m in kth power of grid
  */
 @SuppressWarnings("WeakerAccess")
 public class TileGenerator {
-    private final HashSet<Tile> tiles = new HashSet<>();
     private int n;
     private int m;
     private int k;
+
+    private final HashSet<Tile> tiles = new HashSet<>();
 
     TileGenerator(int n, int m, int k) {
         this.n = n;
         this.m = m;
         this.k = k;
-        tiles.add(new Tile(n, m, k));
 
+        HashSet<Tile> candidateTiles = new HashSet<>();
+
+        candidateTiles.add(new Tile(n, m, k));
+
+        // TODO: make this recursive
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
                 HashSet<Tile> newTiles = new HashSet<>();
-                for (Tile tile : tiles) {
+                for (Tile tile : candidateTiles) {
                     if (tile.canBeI(i, j)) {
                         newTiles.add(new Tile(tile, i, j));
                     }
                 }
-                tiles.addAll(newTiles);
+                candidateTiles.addAll(newTiles);
                 newTiles.clear();
             }
         }
-        printCandidatesFound();
-        removeNotMaximal();
+        printCandidatesFound(candidateTiles);
+        try {
+            removeNotMaximal(candidateTiles);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void printCandidatesFound() {
-        int candidatesCount = tiles.size();
+    private void printCandidatesFound(HashSet<Tile> candidateTiles) {
+        int candidatesCount = candidateTiles.size();
         System.out.println("Found " + candidatesCount + " possible tile" + (candidatesCount == 1 ? "" : "s"));
         System.out.println("Remove tiles which cannot contain maximal independent set...");
     }
@@ -51,22 +66,23 @@ public class TileGenerator {
     /**
      * Remove all tiles which does not have maximal IS
      */
-    private void removeNotMaximal() {
-        int candidatesCount = tiles.size();
-        ProgressBar progressBar = new ProgressBar(candidatesCount);
-        HashSet<Tile> notMaximalTiles = new HashSet<>();
-        int i = 0;
-        int prevPercent = 0;
-        for (Tile tile : tiles) {
-            if (!tile.isTileValid()) {
-                notMaximalTiles.add(tile);
-                System.out.println(tile);
-            }
-            prevPercent = printPercent(++i, candidatesCount, prevPercent, progressBar);
+    private void removeNotMaximal(HashSet<Tile> candidateTiles) throws InterruptedException {
+        int processorsCount = Runtime.getRuntime().availableProcessors();
+        int partitionsCount = processorsCount * 8;
+        ExecutorService executorService = Executors.newFixedThreadPool(processorsCount);
+        Set<TileValidator> tileValidators = new HashSet<>();
+        for (List<Tile> partition : Iterables.partition(candidateTiles, partitionsCount)) {
+            TileValidator validator = new TileValidator(partition);
+            tileValidators.add(validator);
+            executorService.submit(validator);
         }
-        progressBar.finish();
-        tiles.removeAll(notMaximalTiles);
-        System.out.println(tiles.size() + " tiles was found");
+        executorService.shutdown();
+        while (!executorService.awaitTermination(24L, TimeUnit.HOURS)) {
+            System.out.println("Not yet. Still waiting for termination");
+        }
+        for (TileValidator tileValidator : tileValidators) {
+            tiles.addAll(tileValidator.getValidTiles());
+        }
     }
 
     private int printPercent(int i, int candidatesCount, int prevPercent, ProgressBar progressBar) {
@@ -109,6 +125,30 @@ public class TileGenerator {
     }
 
     public static void main(String[] args) {
-        new TileGenerator(6, 7, 3).exportToFile(new File("generated_tiles"));
+        new TileGenerator(5, 7, 3).exportToFile(new File("generated_tiles"));
+    }
+
+    private class TileValidator implements Runnable {
+        private final HashSet<Tile> valid = new HashSet<>();
+        private final List<Tile> candidateTiles;
+
+        TileValidator(List<Tile> candidateTiles) {
+            this.candidateTiles = candidateTiles;
+        }
+
+        public HashSet<Tile> getValidTiles() {
+            return valid;
+        }
+
+        @Override
+        public void run() {
+            synchronized (this) {
+                for (Tile tile : candidateTiles) {
+                    if (tile.isTileValid()) {
+                        valid.add(tile);
+                    }
+                }
+            }
+        }
     }
 }
