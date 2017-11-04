@@ -137,16 +137,14 @@ public final class Tile {
         if (expandedTile.canBeI(curCoordinate.x, curCoordinate.y)) { // it cell can be added to the tile
             Set<Coordinate> covered = expandedTile.getCovered(curCoordinate, canBeAddedToIS);
             if (!covered.isEmpty()) {
-                Set<Coordinate> canBeAddedToISCopy = new HashSet<>(canBeAddedToIS);
-                canBeAddedToISCopy.removeAll(covered);
-                if (canBeAddedToISCopy.isEmpty()) { // if covers all
+                canBeAddedToIS.removeAll(covered);
+                if (canBeAddedToIS.isEmpty()) { // if covers all
                     return true;
                 }
                 Tile newTile = new Tile(expandedTile, curCoordinate.x, curCoordinate.y);
-                boolean res = isTileValidRecursive(newTile, canBeAddedToISCopy, newTile.getNextBorderCoordinate(curCoordinate));
-                if (res) {
-                    return true;
-                }
+                boolean res = isTileValidRecursive(newTile, canBeAddedToIS, newTile.getNextBorderCoordinate(curCoordinate));
+                canBeAddedToIS.addAll(covered);
+                return res;
             }
         }
         return false;
