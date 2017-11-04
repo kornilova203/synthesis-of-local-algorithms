@@ -1,5 +1,6 @@
 package com.github.kornilova_l.formal_da.implementation.grid.tiles;
 
+import com.github.kornilova_l.formal_da.implementation.grid.tiles.Tile.Coordinate;
 import com.github.kornilova_l.util.ProgressBar;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,13 +55,29 @@ public class TileGenerator {
     }
 
     @Nullable
-    public static Set<Tile> importFromFile(@NotNull File file) {
+    public static HashSet<Tile> importFromFile(@NotNull File file) {
         if (!file.exists() || !file.isFile()) {
             throw new IllegalArgumentException("File does not exist or it is not a file");
         }
 
         try (Scanner scanner = new Scanner(new FileInputStream(file))) {
-
+            int n = scanner.nextInt();
+            int m = scanner.nextInt();
+            int k = scanner.nextInt();
+            int size = scanner.nextInt();
+            HashSet<Tile> tiles = new HashSet<>();
+            for (int i = 0; i < size; i++) {
+                Set<Coordinate> is = new HashSet<>();
+                for (int row = 0; row < n; row++) {
+                    for (int column = 0; column < m; column++) {
+                        if (scanner.nextInt() == 1) {
+                            is.add(new Coordinate(row, column));
+                        }
+                    }
+                }
+                tiles.add(new Tile(n, m, k, is));
+            }
+            return tiles;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -89,6 +106,7 @@ public class TileGenerator {
             System.out.println("Not yet. Still waiting for termination");
         }
         progressBar.finish();
+        System.out.println(validTiles.size() + " valid tiles");
     }
 
     public Set<Tile> getTiles() {
@@ -106,7 +124,8 @@ public class TileGenerator {
         return stringBuilder.toString();
     }
 
-    public void exportToFile(@NotNull File dir) {
+    @Nullable
+    public File exportToFile(@NotNull File dir) {
         if (!dir.exists() || !dir.isDirectory()) {
             throw new IllegalArgumentException("Argument is not a directory or does not exist");
         }
@@ -114,9 +133,11 @@ public class TileGenerator {
         File file = filePath.toFile();
         try (FileOutputStream outputStream = new FileOutputStream(file)) {
             outputStream.write(toString().getBytes());
+            return file;
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     private String getFileName() {
@@ -124,7 +145,8 @@ public class TileGenerator {
     }
 
     public static void main(String[] args) {
-        new TileGenerator(6, 7, 3).exportToFile(new File("generated_tiles"));
+        new TileGenerator(2, 2, 2).exportToFile(new File("generated_tiles"));
+        System.out.println(importFromFile(new File("generated_tiles/2-2-2-1509827230493.txt")));
     }
 
     private class TileValidator implements Runnable {

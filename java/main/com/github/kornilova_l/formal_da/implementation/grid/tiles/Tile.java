@@ -3,12 +3,23 @@ package com.github.kornilova_l.formal_da.implementation.grid.tiles;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 public final class Tile {
     private final boolean[][] grid;
+
+    Tile(int n, int m, int k, Set<Coordinate> is) {
+        this.n = n;
+        this.m = m;
+        this.k = k;
+        grid = new boolean[n][m];
+        for (Coordinate coordinate : is) {
+            grid[coordinate.x][coordinate.y] = true;
+        }
+    }
 
     int getN() {
         return n;
@@ -225,6 +236,11 @@ public final class Tile {
             }
         }
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(grid);
     }
 
     static class Coordinate {
