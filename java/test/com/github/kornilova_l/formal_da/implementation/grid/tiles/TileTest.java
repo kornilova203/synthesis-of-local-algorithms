@@ -32,10 +32,10 @@ class TileTest {
     @Test
     void isValidTest() { // may take some time
         Tile tile = new Tile(5, 6, 2);
-        assertFalse(tile.isTileValid());
+        assertFalse(tile.isValid());
 
         tile = new Tile(5, 7, 3);
-        assertTrue(tile.isTileValid());
+        assertTrue(tile.isValid());
     }
 
     @Test

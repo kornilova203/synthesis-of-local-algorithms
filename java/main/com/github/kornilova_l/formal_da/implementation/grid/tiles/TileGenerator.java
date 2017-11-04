@@ -1,7 +1,6 @@
 package com.github.kornilova_l.formal_da.implementation.grid.tiles;
 
 import com.github.kornilova_l.util.ProgressBar;
-import com.google.common.collect.Iterables;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,15 +8,12 @@ import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
- * Generates all possible combinations of tiles n x m in kth power of grid
+ * Generates all possible combinations of validTiles n x m in kth power of grid
  */
 @SuppressWarnings("WeakerAccess")
 public class TileGenerator {
@@ -25,21 +21,21 @@ public class TileGenerator {
     private int m;
     private int k;
 
-    private final HashSet<Tile> tiles = new HashSet<>();
+    private final Set<Tile> validTiles = ConcurrentHashMap.newKeySet();
 
     TileGenerator(int n, int m, int k) {
         this.n = n;
         this.m = m;
         this.k = k;
 
-        HashSet<Tile> candidateTiles = new HashSet<>();
+        ConcurrentLinkedQueue<Tile> candidateTiles = new ConcurrentLinkedQueue<>();
 
         candidateTiles.add(new Tile(n, m, k));
 
         // TODO: make this recursive
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                HashSet<Tile> newTiles = new HashSet<>();
+                Set<Tile> newTiles = new HashSet<>();
                 for (Tile tile : candidateTiles) {
                     if (tile.canBeI(i, j)) {
                         newTiles.add(new Tile(tile, i, j));
@@ -49,7 +45,7 @@ public class TileGenerator {
                 newTiles.clear();
             }
         }
-        printCandidatesFound(candidateTiles);
+        printCandidatesFound(candidateTiles.size());
         try {
             removeNotMaximal(candidateTiles);
         } catch (InterruptedException e) {
@@ -71,46 +67,40 @@ public class TileGenerator {
         return null;
     }
 
-    private void printCandidatesFound(HashSet<Tile> candidateTiles) {
-        int candidatesCount = candidateTiles.size();
+    private void printCandidatesFound(int candidatesCount) {
         System.out.println("Found " + candidatesCount + " possible tile" + (candidatesCount == 1 ? "" : "s"));
-        System.out.println("Remove tiles which cannot contain maximal independent set...");
+        System.out.println("Remove validTiles which cannot contain maximal independent set...");
     }
 
     /**
-     * Remove all tiles which does not have maximal IS
+     * Remove all validTiles which does not have maximal IS
      */
-    private void removeNotMaximal(HashSet<Tile> candidateTiles) throws InterruptedException {
+    private void removeNotMaximal(ConcurrentLinkedQueue<Tile> candidateTiles) throws InterruptedException {
         ProgressBar progressBar = new ProgressBar(candidateTiles.size());
         int processorsCount = Runtime.getRuntime().availableProcessors();
-        int partitionsCount = processorsCount * 8;
         ExecutorService executorService = Executors.newFixedThreadPool(processorsCount);
-        Set<TileValidator> tileValidators = new HashSet<>();
-        for (List<Tile> partition : Iterables.partition(candidateTiles, partitionsCount)) {
-            TileValidator validator = new TileValidator(partition, progressBar);
-            tileValidators.add(validator);
-            executorService.submit(validator);
+
+        for (int i = 0; i < processorsCount; i++) {
+            executorService.submit(new TileValidator(candidateTiles, progressBar));
         }
+
         executorService.shutdown();
         while (!executorService.awaitTermination(24L, TimeUnit.HOURS)) {
             System.out.println("Not yet. Still waiting for termination");
         }
-        for (TileValidator tileValidator : tileValidators) {
-            tiles.addAll(tileValidator.getValidTiles());
-        }
         progressBar.finish();
     }
 
-    public HashSet<Tile> getTiles() {
-        return tiles;
+    public Set<Tile> getTiles() {
+        return validTiles;
     }
 
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(n).append(" ").append(m).append(" ").append(k).append("\n")
-                .append(tiles.size()).append("\n");
-        for (Tile tile : tiles) {
+                .append(validTiles.size()).append("\n");
+        for (Tile tile : validTiles) {
             stringBuilder.append(tile).append("\n");
         }
         return stringBuilder.toString();
@@ -134,29 +124,25 @@ public class TileGenerator {
     }
 
     public static void main(String[] args) {
-        new TileGenerator(5, 8, 3).exportToFile(new File("generated_tiles"));
+        new TileGenerator(6, 7, 3).exportToFile(new File("generated_tiles"));
     }
 
     private class TileValidator implements Runnable {
-        private final HashSet<Tile> valid = new HashSet<>();
-        private final List<Tile> candidateTiles;
+        private ConcurrentLinkedQueue<Tile> candidateTiles;
         private ProgressBar progressBar;
 
-        TileValidator(List<Tile> candidateTiles, ProgressBar progressBar) {
+        TileValidator(ConcurrentLinkedQueue<Tile> candidateTiles, ProgressBar progressBar) {
             this.candidateTiles = candidateTiles;
             this.progressBar = progressBar;
         }
 
-        public HashSet<Tile> getValidTiles() {
-            return valid;
-        }
-
         @Override
         public void run() {
-            synchronized (this) {
-                for (Tile tile : candidateTiles) {
-                    if (tile.isTileValid()) {
-                        valid.add(tile);
+            while (!candidateTiles.isEmpty()) {
+                Tile tile = candidateTiles.poll();
+                if (tile != null) {
+                    if (tile.isValid()) {
+                        validTiles.add(tile);
                     }
                     progressBar.updateProgress(1);
                 }

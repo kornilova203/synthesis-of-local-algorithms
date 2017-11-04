@@ -104,7 +104,7 @@ public final class Tile {
      * This proves that internal tile exist but does not tell us that this particular
      * extended tile also exist.
      */
-    boolean isTileValid() {
+    boolean isValid() {
         Set<Coordinate> canBeAddedToIS = new HashSet<>();
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
