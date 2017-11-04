@@ -25,6 +25,7 @@ public class ProgressBar {
     public void finish() {
         timer.cancel();
         printProgress(total);
+        System.out.println();
     }
 
     public synchronized void printProgress(int current) {

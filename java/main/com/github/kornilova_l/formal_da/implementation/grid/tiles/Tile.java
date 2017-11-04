@@ -97,11 +97,10 @@ public final class Tile {
         StringBuilder stringBuilder = new StringBuilder();
         for (int j = 0; j < m; j++) {
             for (int i = 0; i < n; i++) {
-                stringBuilder.append(grid[i][j] ? 1 : 0).append(" ");
+                stringBuilder.append(grid[i][j] ? 1 : 0).append(i == n - 1 ? "" : " ");
             }
             stringBuilder.append("\n");
         }
-        stringBuilder.append("\n");
         return stringBuilder.toString();
     }
 

@@ -13,5 +13,8 @@ class TileGeneratorTest {
     void test() {
         TileGenerator tileGenerator = new TileGenerator(7, 5, 3);
         assertEquals(2079, tileGenerator.getTiles().size());
+
+        tileGenerator = new TileGenerator(5, 7, 3); // set of tiles should not depend on orientation
+        assertEquals(2079, tileGenerator.getTiles().size());
     }
 }

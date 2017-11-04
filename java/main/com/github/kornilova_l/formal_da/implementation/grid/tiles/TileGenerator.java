@@ -53,11 +53,12 @@ public class TileGenerator {
         }
         progressBar.finish();
         tiles.removeAll(notMaximalTiles);
+        System.out.println(tiles.size() + " tiles was found");
     }
 
     private int printPercent(int i, int candidatesCount, int prevPercent, ProgressBar progressBar) {
         int percent = ((i * 100) / candidatesCount);
-        if (percent != 0 && percent != prevPercent && percent % 2 == 0) {
+        if (percent != 0 && percent != prevPercent) {
             progressBar.printProgress(i);
             return percent;
         }
@@ -66,6 +67,15 @@ public class TileGenerator {
 
     public HashSet<Tile> getTiles() {
         return tiles;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Tile tile : tiles) {
+            stringBuilder.append(tile).append("\n");
+        }
+        return stringBuilder.toString();
     }
 
     public static void main(String[] args) {
