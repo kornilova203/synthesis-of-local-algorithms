@@ -67,7 +67,6 @@ public final class Tile {
      * @return true if grid[x][y] can be an element of an independent set
      */
     boolean canBeI(int x, int y) {
-        validate(x, y);
         if (grid[x][y]) { // if already I
             return true;
         }
@@ -83,13 +82,6 @@ public final class Tile {
             }
         }
         return true;
-    }
-
-    private void validate(int x, int y) {
-        if (x < 0 || x >= n ||
-                y < 0 || y >= m) {
-            throw new IllegalArgumentException("Coordinates out of range");
-        }
     }
 
     @Override
@@ -109,6 +101,8 @@ public final class Tile {
      * 1. Expand tile by k cells on each side
      * 2. Try to generate IS in extended tile
      * such that it will cover all uncovered cells in original tile.
+     * This proves that internal tile exist but does not tell us that this particular
+     * extended tile also exist.
      */
     boolean isTileValid() {
         Set<Coordinate> canBeAddedToIS = new HashSet<>();
@@ -140,15 +134,19 @@ public final class Tile {
         if (isTileValidRecursive(expandedTile, canBeAddedToIS, expandedTile.getNextBorderCoordinate(curCoordinate))) {
             return true;
         }
-        if (expandedTile.canBeI(curCoordinate.x, curCoordinate.y) && // it cell can be added to the tile
-                expandedTile.coversAny(curCoordinate, canBeAddedToIS)) {
-            Tile newTile = new Tile(expandedTile, curCoordinate.x, curCoordinate.y);
-            if (newTile.coversAll(canBeAddedToIS)) { // if we can generate expanded tile which covers all
-                return true;
-            }
-            boolean res = isTileValidRecursive(newTile, canBeAddedToIS, newTile.getNextBorderCoordinate(curCoordinate));
-            if (res) {
-                return true;
+        if (expandedTile.canBeI(curCoordinate.x, curCoordinate.y)) { // it cell can be added to the tile
+            Set<Coordinate> covered = expandedTile.getCovered(curCoordinate, canBeAddedToIS);
+            if (!covered.isEmpty()) {
+                Set<Coordinate> canBeAddedToISCopy = new HashSet<>(canBeAddedToIS);
+                canBeAddedToISCopy.removeAll(covered);
+                if (canBeAddedToISCopy.isEmpty()) { // if covers all
+                    return true;
+                }
+                Tile newTile = new Tile(expandedTile, curCoordinate.x, curCoordinate.y);
+                boolean res = isTileValidRecursive(newTile, canBeAddedToISCopy, newTile.getNextBorderCoordinate(curCoordinate));
+                if (res) {
+                    return true;
+                }
             }
         }
         return false;
@@ -182,15 +180,17 @@ public final class Tile {
     /**
      * Returns true if (x, y) covers at least one point in points
      */
-    private boolean coversAny(Coordinate coordinate, Set<Coordinate> points) {
+    @NotNull
+    private Set<Coordinate> getCovered(Coordinate coordinate, Set<Coordinate> points) {
         int x = coordinate.x;
         int y = coordinate.y;
+        Set<Coordinate> covered = new HashSet<>();
         for (Coordinate point : points) {
             if (Math.abs(x - point.x) + Math.abs(y - point.y) <= k) {
-                return true;
+                covered.add(point);
             }
         }
-        return false;
+        return covered;
     }
 
     private Set<Coordinate> changeCoordinatesForExpanded(Set<Coordinate> canBeAddedToIS, int k) {
@@ -221,15 +221,6 @@ public final class Tile {
                 if (grid[i][j] != tile.grid[i][j]) {
                     return false;
                 }
-            }
-        }
-        return true;
-    }
-
-    private boolean coversAll(Set<Coordinate> canBeAddedToIS) {
-        for (Coordinate point : canBeAddedToIS) {
-            if (canBeI(point.x, point.y)) {
-                return false;
             }
         }
         return true;
