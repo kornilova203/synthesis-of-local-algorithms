@@ -1,7 +1,13 @@
 package com.github.kornilova_l.formal_da.implementation.grid.tiles;
 
 import com.github.kornilova_l.util.ProgressBar;
+import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashSet;
 
 /**
@@ -10,8 +16,14 @@ import java.util.HashSet;
 @SuppressWarnings("WeakerAccess")
 public class TileGenerator {
     private final HashSet<Tile> tiles = new HashSet<>();
+    private int n;
+    private int m;
+    private int k;
 
     TileGenerator(int n, int m, int k) {
+        this.n = n;
+        this.m = m;
+        this.k = k;
         tiles.add(new Tile(n, m, k));
 
         for (int i = 0; i < n; i++) {
@@ -48,6 +60,7 @@ public class TileGenerator {
         for (Tile tile : tiles) {
             if (!tile.isTileValid()) {
                 notMaximalTiles.add(tile);
+                System.out.println(tile);
             }
             prevPercent = printPercent(++i, candidatesCount, prevPercent, progressBar);
         }
@@ -78,7 +91,24 @@ public class TileGenerator {
         return stringBuilder.toString();
     }
 
+    public void exportToFile(@NotNull File dir) {
+        if (!dir.exists() || !dir.isDirectory()) {
+            throw new IllegalArgumentException("Argument is not a directory or does not exist");
+        }
+        Path filePath = Paths.get(dir.toString(), getFileName());
+        File file = filePath.toFile();
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            outputStream.write(toString().getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getFileName() {
+        return String.format("%d-%d-%d-%d.txt", n, m, k, System.currentTimeMillis());
+    }
+
     public static void main(String[] args) {
-        new TileGenerator(5, 7, 3);
+        new TileGenerator(6, 7, 3).exportToFile(new File("generated_tiles"));
     }
 }

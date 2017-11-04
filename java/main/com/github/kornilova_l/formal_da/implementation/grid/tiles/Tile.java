@@ -87,9 +87,9 @@ public final class Tile {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (int j = 0; j < m; j++) {
-            for (int i = 0; i < n; i++) {
-                stringBuilder.append(grid[i][j] ? 1 : 0).append(i == n - 1 ? "" : " ");
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                stringBuilder.append(grid[i][j] ? 1 : 0).append(j == m - 1 ? "" : " ");
             }
             stringBuilder.append("\n");
         }
