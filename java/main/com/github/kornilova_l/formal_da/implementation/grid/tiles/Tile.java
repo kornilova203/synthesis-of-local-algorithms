@@ -10,6 +10,9 @@ import java.util.Set;
 
 public final class Tile {
     private final boolean[][] grid;
+    private final int n;
+    private final int m;
+    private final int k;
 
     Tile(int n, int m, int k, Set<Coordinate> is) {
         this.n = n;
@@ -21,6 +24,42 @@ public final class Tile {
         }
     }
 
+    public Tile(Tile tile, Part part) {
+        k = tile.k;
+        switch (part) {
+            case BOTTOM:
+            case TOP:
+                n = tile.n - 1;
+                m = tile.m;
+                break;
+            case LEFT:
+            case RIGHT:
+                n = tile.n;
+                m = tile.m - 1;
+                break;
+            default:
+                throw new IllegalArgumentException("Not known part");
+        }
+        grid = new boolean[n][m];
+        switch (part) {
+            case TOP:
+            case LEFT:
+                for (int i = 0; i < n; i++) {
+                    System.arraycopy(tile.grid[i], 0, grid[i], 0, m);
+                }
+                break;
+            case BOTTOM:
+                for (int i = 0; i < n; i++) {
+                    System.arraycopy(tile.grid[i + 1], 0, grid[i], 0, m);
+                }
+                break;
+            case RIGHT:
+                for (int i = 0; i < n; i++) {
+                    System.arraycopy(tile.grid[i], 1, grid[i], 0, m);
+                }
+        }
+    }
+
     int getN() {
         return n;
     }
@@ -28,10 +67,6 @@ public final class Tile {
     int getM() {
         return m;
     }
-
-    private final int n;
-    private final int m;
-    private final int k;
 
     /**
      * Create an empty tile
@@ -241,6 +276,17 @@ public final class Tile {
     @Override
     public int hashCode() {
         return Arrays.deepHashCode(grid);
+    }
+
+    public int getK() {
+        return k;
+    }
+
+    public static enum Part {
+        TOP,
+        BOTTOM,
+        LEFT,
+        RIGHT
     }
 
     static class Coordinate {
