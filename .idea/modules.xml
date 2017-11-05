@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/formal-distributed-algorithm.iml" filepath="$PROJECT_DIR$/.idea/formal-distributed-algorithm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/python_sat/python_sat.iml" filepath="$PROJECT_DIR$/python_sat/python_sat.iml" />
     </modules>
   </component>
 </project>
