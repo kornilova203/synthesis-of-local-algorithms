@@ -16,7 +16,7 @@ class ColouringProblemToDimacsTest {
     @Test
     void toDimacs() throws IOException {
         String expected = String.join("\n",
-                FileUtils.readLines(new File("java/test_resources/dimacs_2-2-1.txt"), (String) null)) + "\n";
+                FileUtils.readLines(new File("java/test_resources/dimacs_4-colouring_2-2-1.txt"), (String) null)) + "\n";
         String actual = ColouringProblemToDimacs.toDimacs(
                 new TileGraphBuilder(tiles32, tiles23, 2, 2, 1).getGraph(),
                 4
