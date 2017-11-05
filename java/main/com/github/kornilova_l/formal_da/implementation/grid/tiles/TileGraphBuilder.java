@@ -4,12 +4,14 @@ import com.github.kornilova_l.formal_da.implementation.grid.tiles.Tile.Part;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class TileGraphBuilder {
     private final int n;
     private final int m;
     private final int k;
+    private final HashMap<Tile, HashSet<Tile>> graph = new HashMap<>();
 
     /**
      * @param tiles1 tile.n == n + 1, tile.m == m
@@ -18,24 +20,42 @@ public class TileGraphBuilder {
      * @param m      internal tile m
      * @param k      of all tiles
      */
+    @SuppressWarnings("WeakerAccess")
     public TileGraphBuilder(Set<Tile> tiles1, Set<Tile> tiles2, int n, int m, int k) {
         this.n = n;
         this.m = m;
         this.k = k;
         validateTilesSize(tiles1, tiles2);
-        HashMap<Tile, HashSet<Tile>> graph = new HashMap<>();
         for (Tile tile : tiles1) {
             Tile top = new Tile(tile, Part.TOP);
             Tile bottom = new Tile(tile, Part.BOTTOM);
-            Set<Tile> neighbours = graph.computeIfAbsent(top, t -> new HashSet<>());
-            neighbours.add(bottom);
+            graph.computeIfAbsent(top, t -> new HashSet<>()).add(bottom);
+            graph.computeIfAbsent(bottom, t -> new HashSet<>()).add(top);
         }
         for (Tile tile : tiles2) {
             Tile left = new Tile(tile, Part.LEFT);
             Tile right = new Tile(tile, Part.RIGHT);
-            Set<Tile> neighbours = graph.computeIfAbsent(left, t -> new HashSet<>());
-            neighbours.add(right);
+            graph.computeIfAbsent(left, t -> new HashSet<>()).add(right);
+            graph.computeIfAbsent(right, t -> new HashSet<>()).add(left);
         }
+        if (graph.size() == 0) {
+            throw new IllegalArgumentException("Cannot construct graph");
+        }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public HashMap<Tile, HashSet<Tile>> getGraph() {
+        return graph;
+    }
+
+    static int countEdges(Map<Tile, HashSet<Tile>> graph) {
+        int res = 0;
+        for (Set<Tile> neighbours : graph.values()) {
+            res += neighbours.size();
+        }
+        assert res % 2 == 0;
+
+        return res / 2;
     }
 
     /**
