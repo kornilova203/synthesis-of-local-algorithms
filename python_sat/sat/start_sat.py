@@ -1,8 +1,9 @@
 import pycosat
+import sys
 
 
-def parse_clauses_from_file():
-    with open('../../dimacs/dimacs_4-colouring_1510037543766.txt') as f:
+def parse_clauses_from_file(file_name):
+    with open(file_name) as f:
         first_line = f.readline()
         var_count, clause_count = [int(x) for x in first_line.split()[2:4]]
         clauses = []
@@ -13,8 +14,13 @@ def parse_clauses_from_file():
 
 
 def main():
-    clauses = parse_clauses_from_file()
-    print(pycosat.solve(clauses))
+    clauses = parse_clauses_from_file(sys.argv[1])
+    res = pycosat.solve(clauses)
+    if isinstance(res, list):
+        print("OK")
+        print(" ".join([str(x) for x in res]))
+    else:
+        print(res)
 
 
 main()

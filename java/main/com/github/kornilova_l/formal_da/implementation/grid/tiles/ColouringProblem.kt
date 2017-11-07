@@ -6,6 +6,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.file.Paths
 import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * Solves colouring problem
@@ -13,31 +14,52 @@ import java.util.*
  * Starts python script which starts SAT solver
  */
 class ColouringProblem(graph: Map<Tile, HashSet<Tile>>, coloursCount: Int) {
+    /**
+     * Value is null if there is no proper colouring
+     */
+    private val colours: Map<Tile, Int>?
 
-    val colours: Map<Tile, Int>?
-        get() {
-            val builder = ProcessBuilder()
-            builder.redirectErrorStream(true)
-            val process: Process?
-            try {
-                process = builder.start()
-                process!!.waitFor()
-            } catch (e: IOException) {
-                e.printStackTrace()
-            } catch (e: InterruptedException) {
-                e.printStackTrace()
+    init {
+        var tempColours: Map<Tile, Int>? = null
+        val ids = assignIds(graph)
+        val dimacsFile = exportDimacs(graph, ids, coloursCount, File("dimacs/"))
+        val builder = ProcessBuilder("python",
+                File("python_sat/sat/start_sat.py").toString(),
+                dimacsFile!!.toPath().toAbsolutePath().toString())
+
+        builder.redirectErrorStream(true)
+        try {
+            val process = builder.start()
+            val scanner = Scanner(process.inputStream)
+            process!!.waitFor()
+            if (scanner.nextLine() == "OK") {
+                tempColours = getResult(scanner)
+            } else {
+                println("Something went wrong while running python script")
             }
-
-            return null
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } catch (e: InterruptedException) {
+            e.printStackTrace()
         }
+        dimacsFile.delete()
+        colours = tempColours
+    }
+
+    private fun getResult(scanner: Scanner): Map<Tile, Int> {
+        while (scanner.hasNextInt()) {
+            val tileColour = scanner.nextInt()
+            println(tileColour)
+        }
+        return HashMap()
+    }
 
     companion object {
 
-        fun toDimacs(graph: Map<Tile, HashSet<Tile>>, coloursCount: Int): String {
+        fun toDimacs(graph: Map<Tile, HashSet<Tile>>, ids: Map<Tile, Int>, coloursCount: Int): String {
             val stringBuilder = StringBuilder()
             val clausesCount = graph.size + countEdges(graph) * coloursCount
             stringBuilder.append("p cnf ").append(graph.size * coloursCount).append(" ").append(clausesCount).append("\n")
-            val ids = assignIds(graph)
 
             val visitedEdges = HashMap<Tile, HashSet<Tile>>() // to count each edge only ones
 
@@ -55,17 +77,19 @@ class ColouringProblem(graph: Map<Tile, HashSet<Tile>>, coloursCount: Int) {
             return stringBuilder.toString()
         }
 
-        fun exportDimacs(graph: Map<Tile, HashSet<Tile>>, coloursCount: Int, dir: File) {
+        fun exportDimacs(graph: Map<Tile, HashSet<Tile>>, ids: Map<Tile, Int>, coloursCount: Int, dir: File): File? {
             if (!dir.exists() || !dir.isDirectory) {
                 throw IllegalArgumentException("File must be a directory and must exist")
             }
             val filePath = Paths.get(dir.toString(), getFileName(coloursCount))
             try {
-                FileOutputStream(filePath.toFile()).use { outputStream -> outputStream.write(toDimacs(graph, coloursCount).toByteArray()) }
+                FileOutputStream(filePath.toFile())
+                        .use { outputStream -> outputStream.write(toDimacs(graph, ids, coloursCount).toByteArray()) }
+                return filePath.toFile()
             } catch (e: IOException) {
                 e.printStackTrace()
             }
-
+            return null
         }
 
         private fun getFileName(coloursCount: Int): String {
@@ -94,7 +118,7 @@ class ColouringProblem(graph: Map<Tile, HashSet<Tile>>, coloursCount: Int) {
             stringBuilder.append("\n")
         }
 
-        private fun assignIds(graph: Map<Tile, HashSet<Tile>>): Map<Tile, Int> {
+        fun assignIds(graph: Map<Tile, HashSet<Tile>>): Map<Tile, Int> {
             val ids = HashMap<Tile, Int>()
             for ((id, tile) in graph.keys.withIndex()) {
                 ids.put(tile, id)
