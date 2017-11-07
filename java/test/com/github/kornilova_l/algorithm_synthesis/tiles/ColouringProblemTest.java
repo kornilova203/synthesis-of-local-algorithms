@@ -1,6 +1,10 @@
 package com.github.kornilova_l.algorithm_synthesis.tiles;
 
-import com.github.kornilova_l.algorithm_synthesis.colouring.ColouringProblem;
+import com.github.kornilova_l.algorithm_synthesis.grid2D.colouring.ColouringProblem;
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile;
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator;
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGraphBuilder;
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileSet;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 

@@ -1,4 +1,4 @@
-package com.github.kornilova_l.algorithm_synthesis.tiles;
+package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles;
 
 import org.jetbrains.annotations.NotNull;
 

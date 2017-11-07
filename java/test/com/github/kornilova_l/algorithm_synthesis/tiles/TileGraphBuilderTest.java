@@ -1,12 +1,16 @@
 package com.github.kornilova_l.algorithm_synthesis.tiles;
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile;
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator;
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGraphBuilder;
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileSet;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static com.github.kornilova_l.algorithm_synthesis.tiles.TileGraphBuilder.countEdges;
+import static com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGraphBuilder.countEdges;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TileGraphBuilderTest {

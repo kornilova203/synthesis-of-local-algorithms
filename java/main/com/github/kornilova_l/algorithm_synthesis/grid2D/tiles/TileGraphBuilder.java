@@ -1,6 +1,6 @@
-package com.github.kornilova_l.algorithm_synthesis.tiles;
+package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles;
 
-import com.github.kornilova_l.algorithm_synthesis.tiles.Tile.Part;
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Part;
 
 import java.util.HashMap;
 import java.util.HashSet;

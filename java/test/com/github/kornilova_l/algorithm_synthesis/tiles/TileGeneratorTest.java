@@ -1,5 +1,8 @@
 package com.github.kornilova_l.algorithm_synthesis.tiles;
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile;
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator;
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileSet;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.Test;
 

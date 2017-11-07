@@ -1,4 +1,4 @@
-package com.github.kornilova_l.algorithm_synthesis.tiles;
+package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -64,7 +64,7 @@ public final class Tile {
      * @param m size
      * @param k power of graph
      */
-    Tile(int n, int m, int k) {
+    public Tile(int n, int m, int k) {
         grid = new boolean[n][m];
         this.k = k;
     }
@@ -72,7 +72,7 @@ public final class Tile {
     /**
      * Clone tile and change grid[x][y]
      */
-    Tile(Tile tile, int x, int y) {
+    public Tile(Tile tile, int x, int y) {
         k = tile.k;
         grid = new boolean[tile.getN()][tile.getM()];
         for (int i = 0; i < tile.getN(); i++) {
@@ -84,7 +84,7 @@ public final class Tile {
     /**
      * Clone and expand tile by k
      */
-    Tile(Tile tile) {
+    public Tile(Tile tile) {
         k = tile.k;
         int n = tile.getN() + k * 2;
         int m = tile.getM() + k * 2;
@@ -94,18 +94,18 @@ public final class Tile {
         }
     }
 
-    int getN() {
+    public int getN() {
         return grid.length;
     }
 
-    int getM() {
+    public int getM() {
         return grid[0].length;
     }
 
     /**
      * @return true if grid[x][y] can be an element of an independent set
      */
-    boolean canBeI(int x, int y) {
+    public boolean canBeI(int x, int y) {
         if (grid[x][y]) { // if already I
             return true;
         }
@@ -143,7 +143,7 @@ public final class Tile {
      * This proves that internal tile exist but does not tell us that this particular
      * extended tile also exist.
      */
-    boolean isValid() {
+    public boolean isValid() {
         Set<Coordinate> canBeAddedToIS = new HashSet<>();
         for (int i = 0; i < getN(); i++) {
             for (int j = 0; j < getM(); j++) {
@@ -194,7 +194,7 @@ public final class Tile {
      * or null if it was last tile
      */
     @Nullable
-    Coordinate getNextBorderCoordinate(@NotNull Coordinate curCoordinate) {
+    public Coordinate getNextBorderCoordinate(@NotNull Coordinate curCoordinate) {
         int x = curCoordinate.x;
         int y = curCoordinate.y;
         if (x == getN() - 1 && y == getM() - 1) { // if last coordinate
@@ -282,11 +282,11 @@ public final class Tile {
         RIGHT
     }
 
-    static class Coordinate {
+    public static class Coordinate {
         final int x;
         final int y;
 
-        Coordinate(int x, int y) {
+        public Coordinate(int x, int y) {
             this.x = x;
             this.y = y;
         }
