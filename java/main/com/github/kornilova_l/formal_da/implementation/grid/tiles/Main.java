@@ -8,7 +8,7 @@ public class Main {
     private static final Set<Tile> tiles58 = TileGenerator.importFromFile(new File("generated_tiles/5-8-3-1509826268928.txt"));
 
     public static void main(String[] args) {
-        ColouringProblemToDimacs.exportDimacs(
+        ColouringProblem.Companion.exportDimacs(
                 new TileGraphBuilder(tiles67, tiles58, 5, 7, 3).getGraph(),
                 4,
                 new File("dimacs/")

@@ -30,5 +30,6 @@
     </orderEntry>
     <orderEntry type="library" name="org.apache.commons:commons-collections4:4.0" level="project" />
     <orderEntry type="library" name="commons-io:commons-io:2.6" level="project" />
+    <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
   </component>
 </module>
