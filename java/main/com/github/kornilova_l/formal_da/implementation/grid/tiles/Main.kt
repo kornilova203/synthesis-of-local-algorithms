@@ -11,6 +11,7 @@ fun main(args: Array<String>) {
     //                4,
     //                new File("dimacs/")
     //        );
-    val colouringProblem = ColouringProblem(TileGraphBuilder(tiles67, tiles58, 5, 7, 3).graph, 4)
+    val colouringProblem = ColouringProblem(TileGraphBuilder(tiles67, tiles58, 5, 7, 3).graph, 4).colours
+    println(colouringProblem)
 }
 

@@ -1,6 +1,8 @@
 package com.github.kornilova_l.formal_da.implementation.grid.tiles
 
 import com.github.kornilova_l.formal_da.implementation.grid.tiles.TileGraphBuilder.countEdges
+import org.apache.commons.collections4.BidiMap
+import org.apache.commons.collections4.bidimap.DualHashBidiMap
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -17,7 +19,7 @@ class ColouringProblem(graph: Map<Tile, HashSet<Tile>>, coloursCount: Int) {
     /**
      * Value is null if there is no proper colouring
      */
-    private val colours: Map<Tile, Int>?
+    val colours: Map<Tile, Int>? // it is public because it is value
 
     init {
         var tempColours: Map<Tile, Int>? = null
@@ -33,7 +35,7 @@ class ColouringProblem(graph: Map<Tile, HashSet<Tile>>, coloursCount: Int) {
             val scanner = Scanner(process.inputStream)
             process!!.waitFor()
             if (scanner.nextLine() == "OK") {
-                tempColours = getResult(scanner)
+                tempColours = getResult(scanner, ids, coloursCount)
             } else {
                 println("Something went wrong while running python script")
             }
@@ -46,12 +48,45 @@ class ColouringProblem(graph: Map<Tile, HashSet<Tile>>, coloursCount: Int) {
         colours = tempColours
     }
 
-    private fun getResult(scanner: Scanner): Map<Tile, Int> {
-        while (scanner.hasNextInt()) {
-            val tileColour = scanner.nextInt()
-            println(tileColour)
+    private fun getResult(scanner: Scanner, ids: BidiMap<Tile, Int>, coloursCount: Int): Map<Tile, Int>? {
+        val resultColours = HashMap<Tile, Int>()
+        val possibleColours = HashMap<Tile, BooleanArray>()
+        for (tile in ids.keys) {
+            possibleColours.put(tile, BooleanArray(4))
         }
-        return HashMap()
+        while (scanner.hasNextInt()) {
+            val tileColourId = scanner.nextInt()
+            if (tileColourId < 0) { // all colours are false by default
+                continue
+            }
+            val tileId = getTileId(tileColourId, coloursCount)
+            val colourId = getColourId(tileColourId, coloursCount)
+            val tile = ids.getKey(tileId)
+            possibleColours[tile]!![colourId] = true // this should not produce NPE. If it does then fix the code
+        }
+        for (tile in possibleColours.keys) {
+            val colours = possibleColours[tile]
+            val tileColour: Int? = colours!!.indices.firstOrNull {
+                colours[it]
+            }
+            if (tileColour == null) {
+                System.err.println("Cannot find colour for tile:\n" + tile)
+                return null
+            }
+            resultColours[tile] = tileColour
+        }
+        return resultColours
+    }
+
+    /**
+     * @return one if {0, 1, .., coloursCount - 1}
+     */
+    private fun getColourId(tileColourId: Int, coloursCount: Int): Int {
+        return (tileColourId - 1) % coloursCount
+    }
+
+    private fun getTileId(tileColourId: Int, coloursCount: Int): Int {
+        return (tileColourId - 1) / coloursCount
     }
 
     companion object {
@@ -118,8 +153,8 @@ class ColouringProblem(graph: Map<Tile, HashSet<Tile>>, coloursCount: Int) {
             stringBuilder.append("\n")
         }
 
-        fun assignIds(graph: Map<Tile, HashSet<Tile>>): Map<Tile, Int> {
-            val ids = HashMap<Tile, Int>()
+        fun assignIds(graph: Map<Tile, HashSet<Tile>>): BidiMap<Tile, Int> {
+            val ids = DualHashBidiMap<Tile, Int>()
             for ((id, tile) in graph.keys.withIndex()) {
                 ids.put(tile, id)
             }
