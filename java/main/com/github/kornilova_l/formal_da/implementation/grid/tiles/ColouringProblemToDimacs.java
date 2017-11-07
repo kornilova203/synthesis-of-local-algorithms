@@ -1,5 +1,10 @@
 package com.github.kornilova_l.formal_da.implementation.grid.tiles;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -33,15 +38,39 @@ public class ColouringProblemToDimacs {
         return stringBuilder.toString();
     }
 
-    private static void addEdgeClauses(StringBuilder stringBuilder, Integer id1, Integer id2, int coloursCount) {
-        for (int i = 0; i < coloursCount; i++) {
-            stringBuilder.append("-").append(id1 * coloursCount + i).append(" -").append(id2 * coloursCount + i).append("\n");
+    public static void exportDimacs(Map<Tile, HashSet<Tile>> graph, int coloursCount, File dir) {
+        if (!dir.exists() || !dir.isDirectory()) {
+            throw new IllegalArgumentException("File must be a directory and must exist");
         }
+        Path filePath = Paths.get(dir.toString(), getFileName(coloursCount));
+        try (FileOutputStream outputStream = new FileOutputStream(filePath.toFile())) {
+            outputStream.write(toDimacs(graph, coloursCount).getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static String getFileName(int coloursCount) {
+        return "dimacs_" + coloursCount + "-colouring_" + System.currentTimeMillis() + ".txt";
+    }
+
+    private static void addEdgeClauses(StringBuilder stringBuilder, int id1, int id2, int coloursCount) {
+        for (int i = 0; i < coloursCount; i++) {
+            stringBuilder.append("-").append(getVarId(id1, coloursCount, i))
+                    .append(" -").append(getVarId(id2, coloursCount, i)).append("\n");
+        }
+    }
+
+    /**
+     * Id of any variable must not be 0
+     */
+    private static int getVarId(int vertexId, int coloursCount, int currentVar) {
+        return vertexId * coloursCount + currentVar + 1;
     }
 
     private static void addTileClause(StringBuilder stringBuilder, Integer id, int coloursCount) {
         for (int i = 0; i < coloursCount; i++) {
-            stringBuilder.append(id * coloursCount + i).append(" ");
+            stringBuilder.append(getVarId(id, coloursCount, i)).append(" ");
         }
         stringBuilder.deleteCharAt(stringBuilder.length() - 1);
         stringBuilder.append("\n");
