@@ -10,13 +10,9 @@ import java.util.Set;
 
 public final class Tile {
     private final boolean[][] grid;
-    private final int n;
-    private final int m;
     private final int k;
 
     Tile(int n, int m, int k, Set<Coordinate> is) {
-        this.n = n;
-        this.m = m;
         this.k = k;
         grid = new boolean[n][m];
         for (Coordinate coordinate : is) {
@@ -26,16 +22,17 @@ public final class Tile {
 
     public Tile(Tile tile, Part part) {
         k = tile.k;
+        int n, m;
         switch (part) {
             case BOTTOM:
             case TOP:
-                n = tile.n - 1;
-                m = tile.m;
+                n = tile.getN() - 1;
+                m = tile.getM();
                 break;
             case LEFT:
             case RIGHT:
-                n = tile.n;
-                m = tile.m - 1;
+                n = tile.getN();
+                m = tile.getM() - 1;
                 break;
             default:
                 throw new IllegalArgumentException("Not known part");
@@ -60,14 +57,6 @@ public final class Tile {
         }
     }
 
-    int getN() {
-        return n;
-    }
-
-    int getM() {
-        return m;
-    }
-
     /**
      * Create an empty tile
      *
@@ -77,8 +66,6 @@ public final class Tile {
      */
     Tile(int n, int m, int k) {
         grid = new boolean[n][m];
-        this.n = n;
-        this.m = m;
         this.k = k;
     }
 
@@ -86,12 +73,10 @@ public final class Tile {
      * Clone tile and change grid[x][y]
      */
     Tile(Tile tile, int x, int y) {
-        m = tile.m;
-        n = tile.n;
         k = tile.k;
-        grid = new boolean[n][m];
-        for (int i = 0; i < n; i++) {
-            System.arraycopy(tile.grid[i], 0, grid[i], 0, m);
+        grid = new boolean[tile.getN()][tile.getM()];
+        for (int i = 0; i < tile.getN(); i++) {
+            System.arraycopy(tile.grid[i], 0, grid[i], 0, tile.getM());
         }
         grid[x][y] = true;
     }
@@ -101,12 +86,20 @@ public final class Tile {
      */
     Tile(Tile tile) {
         k = tile.k;
-        n = tile.n + k * 2;
-        m = tile.m + k * 2;
+        int n = tile.getN() + k * 2;
+        int m = tile.getM() + k * 2;
         grid = new boolean[n][m];
         for (int i = k; i < n - k; i++) {
-            System.arraycopy(tile.grid[i - k], 0, grid[i], k, tile.m);
+            System.arraycopy(tile.grid[i - k], 0, grid[i], k, tile.getM());
         }
+    }
+
+    int getN() {
+        return grid.length;
+    }
+
+    int getM() {
+        return grid[0].length;
     }
 
     /**
@@ -116,8 +109,8 @@ public final class Tile {
         if (grid[x][y]) { // if already I
             return true;
         }
-        int endX = Math.min(n - 1, x + k);
-        int endY = Math.min(m - 1, y + k);
+        int endX = Math.min(getN() - 1, x + k);
+        int endY = Math.min(getM() - 1, y + k);
         for (int i = Math.max(0, x - k); i <= endX; i++) {
             for (int j = Math.max(0, y - k); j <= endY; j++) {
                 if (Math.abs(i - x) + Math.abs(j - y) <= k) {
@@ -133,9 +126,9 @@ public final class Tile {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                stringBuilder.append(grid[i][j] ? 1 : 0).append(j == m - 1 ? "" : " ");
+        for (int i = 0; i < getN(); i++) {
+            for (int j = 0; j < getM(); j++) {
+                stringBuilder.append(grid[i][j] ? 1 : 0).append(j == getM() - 1 ? "" : " ");
             }
             stringBuilder.append("\n");
         }
@@ -152,8 +145,8 @@ public final class Tile {
      */
     boolean isValid() {
         Set<Coordinate> canBeAddedToIS = new HashSet<>();
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
+        for (int i = 0; i < getN(); i++) {
+            for (int j = 0; j < getM(); j++) {
                 if (!grid[i][j] && canBeI(i, j)) {
                     canBeAddedToIS.add(new Coordinate(i, j));
                 }
@@ -204,14 +197,14 @@ public final class Tile {
     Coordinate getNextBorderCoordinate(@NotNull Coordinate curCoordinate) {
         int x = curCoordinate.x;
         int y = curCoordinate.y;
-        if (x == n - 1 && y == m - 1) { // if last coordinate
+        if (x == getN() - 1 && y == getM() - 1) { // if last coordinate
             return null;
         }
-        if (x < n - 1) { // if not the last in this row
+        if (x < getN() - 1) { // if not the last in this row
             x++;
-            if (y >= k && y < m - k) {
-                if (x >= k && x < n - k) { // if inside internal tile
-                    x = n - k;
+            if (y >= k && y < getM() - k) {
+                if (x >= k && x < getN() - k) { // if inside internal tile
+                    x = getN() - k;
                 }
             }
         } else {
@@ -260,11 +253,11 @@ public final class Tile {
             return false;
         }
         Tile tile = ((Tile) obj);
-        if (tile.n != n || tile.m != m) {
+        if (tile.getN() != getN() || tile.getM() != getM()) {
             throw new IllegalArgumentException("Size of tile is different");
         }
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
+        for (int i = 0; i < getN(); i++) {
+            for (int j = 0; j < getM(); j++) {
                 if (grid[i][j] != tile.grid[i][j]) {
                     return false;
                 }
@@ -282,7 +275,7 @@ public final class Tile {
         return k;
     }
 
-    public static enum Part {
+    public enum Part {
         TOP,
         BOTTOM,
         LEFT,
