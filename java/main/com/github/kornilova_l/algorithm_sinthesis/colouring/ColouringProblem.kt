@@ -20,10 +20,10 @@ class ColouringProblem(graph: Map<Tile, HashSet<Tile>>, coloursCount: Int) {
     /**
      * Value is null if there is no proper colouring
      */
-    val colours: Map<Tile, Int>? // it is public because it is value
+    val colouringFunction: ColouringFunction? // it is public because it is value
 
     init {
-        var tempColours: Map<Tile, Int>? = null
+        var tileColours: Map<Tile, Int>? = null
         val ids = assignIds(graph)
         val dimacsFile = exportDimacs(graph, ids, coloursCount, File("dimacs/"))
         val builder = ProcessBuilder("python",
@@ -36,7 +36,7 @@ class ColouringProblem(graph: Map<Tile, HashSet<Tile>>, coloursCount: Int) {
             val scanner = Scanner(process.inputStream)
             process!!.waitFor()
             if (scanner.nextLine() == "OK") {
-                tempColours = getResult(scanner, ids, coloursCount)
+                tileColours = getResult(scanner, ids, coloursCount)
             } else {
                 println("Something went wrong while running python script")
             }
@@ -46,7 +46,7 @@ class ColouringProblem(graph: Map<Tile, HashSet<Tile>>, coloursCount: Int) {
             e.printStackTrace()
         }
         dimacsFile.delete()
-        colours = tempColours
+        colouringFunction = if (tileColours == null) null else ColouringFunction(tileColours)
     }
 
     private fun getResult(scanner: Scanner, ids: BidiMap<Tile, Int>, coloursCount: Int): Map<Tile, Int>? {
@@ -57,7 +57,7 @@ class ColouringProblem(graph: Map<Tile, HashSet<Tile>>, coloursCount: Int) {
         }
         while (scanner.hasNextInt()) {
             val tileColourId = scanner.nextInt()
-            if (tileColourId < 0) { // all colours are false by default
+            if (tileColourId < 0) { // all colouringFunction are false by default
                 continue
             }
             val tileId = getTileId(tileColourId, coloursCount)

@@ -4,7 +4,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -12,10 +12,10 @@ class TileGeneratorTest {
     @Test
     void test() {
         TileGenerator tileGenerator = new TileGenerator(7, 5, 3);
-        assertEquals(2079, tileGenerator.getTiles().size());
+        assertEquals(2079, tileGenerator.getTileSet().size());
 
         tileGenerator = new TileGenerator(5, 7, 3); // set of tiles should not depend on orientation
-        assertEquals(2079, tileGenerator.getTiles().size());
+        assertEquals(2079, tileGenerator.getTileSet().size());
     }
 
     @Test
@@ -24,10 +24,10 @@ class TileGeneratorTest {
         File file = tileGenerator.exportToFile(new File("."));
         assertNotNull(file);
 
-        HashSet<Tile> tiles = TileGenerator.importFromFile(file);
+        Set<Tile> tiles = new TileSet(file).getTiles();
         assertNotNull(tiles);
 
-        assertTrue(CollectionUtils.isEqualCollection(tileGenerator.getTiles(), tiles));
+        assertTrue(CollectionUtils.isEqualCollection(tileGenerator.getTileSet().getTiles(), tiles));
 
         //noinspection ResultOfMethodCallIgnored
         file.delete();

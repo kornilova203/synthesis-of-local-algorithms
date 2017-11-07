@@ -1,104 +1,68 @@
 package com.github.kornilova_l.algorithm_sinthesis.tiles;
 
-import com.github.kornilova_l.algorithm_sinthesis.tiles.Tile.Coordinate;
 import com.github.kornilova_l.util.ProgressBar;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.*;
 
 /**
- * Generates all possible combinations of validTiles n x m in kth power of grid
+ * Generates all possible combinations of tileSet n x m in kth power of grid
  */
 @SuppressWarnings("WeakerAccess")
 public class TileGenerator {
+    @NotNull
+    private final TileSet tileSet;
     private int n;
     private int m;
     private int k;
 
-    private final Set<Tile> validTiles = ConcurrentHashMap.newKeySet();
-
-    TileGenerator(int n, int m, int k) {
+    public TileGenerator(int n, int m, int k) {
         this.n = n;
         this.m = m;
         this.k = k;
 
-        ConcurrentLinkedQueue<Tile> candidateTiles = new ConcurrentLinkedQueue<>();
+        ConcurrentLinkedQueue<Tile> candidateTiles = new ConcurrentLinkedQueue<>(); // get concurrently from here
 
-        candidateTiles.add(new Tile(n, m, k));
+        TileSet candidateTilesSet = new TileSet(n, m, k);
+        candidateTiles.addAll(candidateTilesSet.getTiles());
 
-        // TODO: make this recursive
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                Set<Tile> newTiles = new HashSet<>();
-                for (Tile tile : candidateTiles) {
-                    if (tile.canBeI(i, j)) {
-                        newTiles.add(new Tile(tile, i, j));
-                    }
-                }
-                candidateTiles.addAll(newTiles);
-                newTiles.clear();
-            }
-        }
         printCandidatesFound(candidateTiles.size());
+        Set<Tile> validTiles = ConcurrentHashMap.newKeySet(); // put concurrently here
         try {
-            removeNotMaximal(candidateTiles);
+            removeNotMaximal(candidateTiles, validTiles);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    @Nullable
-    public static HashSet<Tile> importFromFile(@NotNull File file) {
-        if (!file.exists() || !file.isFile()) {
-            throw new IllegalArgumentException("File does not exist or it is not a file");
+        if (validTiles.isEmpty()) {
+            throw new IllegalArgumentException("Cannot produce valid set of tiles");
+        } else {
+            this.tileSet = new TileSet(validTiles);
         }
-
-        try (Scanner scanner = new Scanner(new FileInputStream(file))) {
-            int n = scanner.nextInt();
-            int m = scanner.nextInt();
-            int k = scanner.nextInt();
-            int size = scanner.nextInt();
-            HashSet<Tile> tiles = new HashSet<>();
-            for (int i = 0; i < size; i++) {
-                Set<Coordinate> is = new HashSet<>();
-                for (int row = 0; row < n; row++) {
-                    for (int column = 0; column < m; column++) {
-                        if (scanner.nextInt() == 1) {
-                            is.add(new Coordinate(row, column));
-                        }
-                    }
-                }
-                tiles.add(new Tile(n, m, k, is));
-            }
-            return tiles;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     private void printCandidatesFound(int candidatesCount) {
         System.out.println("Found " + candidatesCount + " possible tile" + (candidatesCount == 1 ? "" : "s"));
-        System.out.println("Remove validTiles which cannot contain maximal independent set...");
+        System.out.println("Remove tiles which cannot contain maximal independent set...");
     }
 
     /**
-     * Remove all validTiles which does not have maximal IS
+     * Remove all tileSet which does not have maximal IS
      */
-    private void removeNotMaximal(ConcurrentLinkedQueue<Tile> candidateTiles) throws InterruptedException {
+    private void removeNotMaximal(ConcurrentLinkedQueue<Tile> candidateTiles,
+                                  Set<Tile> validTiles) throws InterruptedException {
         ProgressBar progressBar = new ProgressBar(candidateTiles.size());
         int processorsCount = Runtime.getRuntime().availableProcessors();
         ExecutorService executorService = Executors.newFixedThreadPool(processorsCount);
 
         for (int i = 0; i < processorsCount; i++) {
-            executorService.submit(new TileValidator(candidateTiles, progressBar));
+            executorService.submit(new TileValidator(candidateTiles, validTiles, progressBar));
         }
 
         executorService.shutdown();
@@ -109,19 +73,16 @@ public class TileGenerator {
         System.out.println(validTiles.size() + " valid tiles");
     }
 
-    public Set<Tile> getTiles() {
-        return validTiles;
+    @NotNull
+    public TileSet getTileSet() {
+        return tileSet;
     }
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(n).append(" ").append(m).append(" ").append(k).append("\n")
-                .append(validTiles.size()).append("\n");
-        for (Tile tile : validTiles) {
-            stringBuilder.append(tile).append("\n");
-        }
-        return stringBuilder.toString();
+        return String.valueOf(n) + " " + m + " " + k + "\n" +
+                tileSet.size() + "\n" +
+                tileSet.toString();
     }
 
     @Nullable
@@ -144,17 +105,14 @@ public class TileGenerator {
         return String.format("%d-%d-%d-%d.txt", n, m, k, System.currentTimeMillis());
     }
 
-    public static void main(String[] args) {
-        new TileGenerator(2, 2, 2).exportToFile(new File("generated_tiles"));
-        System.out.println(importFromFile(new File("generated_tiles/2-2-2-1509827230493.txt")));
-    }
-
     private class TileValidator implements Runnable {
         private ConcurrentLinkedQueue<Tile> candidateTiles;
+        private Set<Tile> validTiles;
         private ProgressBar progressBar;
 
-        TileValidator(ConcurrentLinkedQueue<Tile> candidateTiles, ProgressBar progressBar) {
+        TileValidator(ConcurrentLinkedQueue<Tile> candidateTiles, Set<Tile> validTiles, ProgressBar progressBar) {
             this.candidateTiles = candidateTiles;
+            this.validTiles = validTiles;
             this.progressBar = progressBar;
         }
 

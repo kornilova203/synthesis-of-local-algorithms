@@ -9,13 +9,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ColouringProblemTest {
-    private final Set<Tile> tiles32 = new TileGenerator(3, 2, 1).getTiles();
-    private final Set<Tile> tiles23 = new TileGenerator(2, 3, 1).getTiles();
+    private final TileSet tiles32 = new TileGenerator(3, 2, 1).getTileSet();
+    private final TileSet tiles23 = new TileGenerator(2, 3, 1).getTileSet();
 
     @Test
     void toDimacs() throws IOException {
@@ -23,7 +22,7 @@ class ColouringProblemTest {
         /* note: this test may fail because order of lines matters */
         String expected = String.join("\n",
                 FileUtils.readLines(new File("java/test_resources/dimacs_4-colouring_2-2-1.txt"), (String) null)) + "\n";
-        HashMap<Tile, HashSet<Tile>> graph = new TileGraphBuilder(tiles32, tiles23, 2, 2, 1).getGraph();
+        HashMap<Tile, HashSet<Tile>> graph = new TileGraphBuilder(tiles32, tiles23).getGraph();
         Map<Tile, Integer> ids = ColouringProblem.Companion.assignIds(graph);
         String actual = ColouringProblem.Companion.toDimacs(
                 graph, ids, 4
