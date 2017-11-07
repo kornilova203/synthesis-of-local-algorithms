@@ -1,4 +1,4 @@
-package com.github.kornilova_l.algorithm_sinthesis.tiles;
+package com.github.kornilova_l.algorithm_synthesis.tiles;
 
 import org.junit.jupiter.api.Test;
 
@@ -6,7 +6,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static com.github.kornilova_l.algorithm_sinthesis.tiles.TileGraphBuilder.countEdges;
+import static com.github.kornilova_l.algorithm_synthesis.tiles.TileGraphBuilder.countEdges;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TileGraphBuilderTest {

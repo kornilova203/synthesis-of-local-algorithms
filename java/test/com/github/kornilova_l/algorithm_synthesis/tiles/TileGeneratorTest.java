@@ -1,4 +1,4 @@
-package com.github.kornilova_l.algorithm_sinthesis.tiles;
+package com.github.kornilova_l.algorithm_synthesis.tiles;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.Test;

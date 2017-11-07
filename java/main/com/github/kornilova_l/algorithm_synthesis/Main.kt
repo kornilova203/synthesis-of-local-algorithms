@@ -1,8 +1,8 @@
-package com.github.kornilova_l.algorithm_sinthesis
+package com.github.kornilova_l.algorithm_synthesis
 
-import com.github.kornilova_l.algorithm_sinthesis.colouring.ColouringProblem
-import com.github.kornilova_l.algorithm_sinthesis.tiles.TileGraphBuilder
-import com.github.kornilova_l.algorithm_sinthesis.tiles.TileSet
+import com.github.kornilova_l.algorithm_synthesis.colouring.ColouringProblem
+import com.github.kornilova_l.algorithm_synthesis.tiles.TileGraphBuilder
+import com.github.kornilova_l.algorithm_synthesis.tiles.TileSet
 import java.io.File
 
 private val tiles67 = TileSet(File("generated_tiles/6-7-3-1509826576982.txt"))

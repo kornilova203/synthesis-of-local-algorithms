@@ -1,6 +1,6 @@
-package com.github.kornilova_l.algorithm_sinthesis.tiles;
+package com.github.kornilova_l.algorithm_synthesis.tiles;
 
-import com.github.kornilova_l.algorithm_sinthesis.tiles.Tile.Coordinate;
+import com.github.kornilova_l.algorithm_synthesis.tiles.Tile.Coordinate;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

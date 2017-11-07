@@ -1,6 +1,6 @@
-package com.github.kornilova_l.algorithm_sinthesis.tiles;
+package com.github.kornilova_l.algorithm_synthesis.tiles;
 
-import com.github.kornilova_l.algorithm_sinthesis.colouring.ColouringProblem;
+import com.github.kornilova_l.algorithm_synthesis.colouring.ColouringProblem;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 

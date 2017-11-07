@@ -1,6 +1,6 @@
-package com.github.kornilova_l.algorithm_sinthesis.tiles;
+package com.github.kornilova_l.algorithm_synthesis.tiles;
 
-import com.github.kornilova_l.algorithm_sinthesis.tiles.Tile.Part;
+import com.github.kornilova_l.algorithm_synthesis.tiles.Tile.Part;
 
 import java.util.HashMap;
 import java.util.HashSet;
