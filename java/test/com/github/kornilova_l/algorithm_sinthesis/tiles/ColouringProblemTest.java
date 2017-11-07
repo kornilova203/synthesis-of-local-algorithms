@@ -1,5 +1,6 @@
-package com.github.kornilova_l.formal_da.implementation.grid.tiles;
+package com.github.kornilova_l.algorithm_sinthesis.tiles;
 
+import com.github.kornilova_l.algorithm_sinthesis.colouring.ColouringProblem;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +19,8 @@ class ColouringProblemTest {
 
     @Test
     void toDimacs() throws IOException {
+        // TODO: compare set of strings
+        /* note: this test may fail because order of lines matters */
         String expected = String.join("\n",
                 FileUtils.readLines(new File("java/test_resources/dimacs_4-colouring_2-2-1.txt"), (String) null)) + "\n";
         HashMap<Tile, HashSet<Tile>> graph = new TileGraphBuilder(tiles32, tiles23, 2, 2, 1).getGraph();

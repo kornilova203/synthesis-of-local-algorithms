@@ -1,6 +1,6 @@
-package com.github.kornilova_l.formal_da.implementation.grid.tiles;
+package com.github.kornilova_l.algorithm_sinthesis.tiles;
 
-import com.github.kornilova_l.formal_da.implementation.grid.tiles.Tile.Part;
+import com.github.kornilova_l.algorithm_sinthesis.tiles.Tile.Part;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,7 +48,7 @@ public class TileGraphBuilder {
         return graph;
     }
 
-    static int countEdges(Map<Tile, HashSet<Tile>> graph) {
+    public static int countEdges(Map<Tile, HashSet<Tile>> graph) {
         int res = 0;
         for (Set<Tile> neighbours : graph.values()) {
             res += neighbours.size();

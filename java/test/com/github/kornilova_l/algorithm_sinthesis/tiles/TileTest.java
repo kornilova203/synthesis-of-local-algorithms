@@ -1,6 +1,6 @@
-package com.github.kornilova_l.formal_da.implementation.grid.tiles;
+package com.github.kornilova_l.algorithm_sinthesis.tiles;
 
-import com.github.kornilova_l.formal_da.implementation.grid.tiles.Tile.Coordinate;
+import com.github.kornilova_l.algorithm_sinthesis.tiles.Tile.Coordinate;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,8 +15,8 @@ class TileTest {
         assertFalse(tile.canBeI(4, 4));
 
         Tile testThrowsTile = new Tile(5, 6, 2);
-        assertThrows(IllegalArgumentException.class, () -> testThrowsTile.canBeI(5, 4));
-        assertThrows(IllegalArgumentException.class, () -> testThrowsTile.canBeI(4, 6));
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> testThrowsTile.canBeI(5, 4));
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> testThrowsTile.canBeI(4, 6));
 
         /* On diagonal: */
         assertFalse(tile.canBeI(3, 2));

@@ -1,4 +1,4 @@
-package com.github.kornilova_l.formal_da.implementation.grid.tiles;
+package com.github.kornilova_l.algorithm_sinthesis.tiles;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.Test;
@@ -28,5 +28,8 @@ class TileGeneratorTest {
         assertNotNull(tiles);
 
         assertTrue(CollectionUtils.isEqualCollection(tileGenerator.getTiles(), tiles));
+
+        //noinspection ResultOfMethodCallIgnored
+        file.delete();
     }
 }

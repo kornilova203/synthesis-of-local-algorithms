@@ -1,4 +1,4 @@
-package com.github.kornilova_l.formal_da.implementation.grid.tiles;
+package com.github.kornilova_l.algorithm_sinthesis.tiles;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

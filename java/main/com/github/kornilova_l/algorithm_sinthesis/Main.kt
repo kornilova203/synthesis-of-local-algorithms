@@ -1,5 +1,8 @@
-package com.github.kornilova_l.formal_da.implementation.grid.tiles
+package com.github.kornilova_l.algorithm_sinthesis
 
+import com.github.kornilova_l.algorithm_sinthesis.colouring.ColouringProblem
+import com.github.kornilova_l.algorithm_sinthesis.tiles.TileGenerator
+import com.github.kornilova_l.algorithm_sinthesis.tiles.TileGraphBuilder
 import java.io.File
 
 private val tiles67 = TileGenerator.importFromFile(File("generated_tiles/6-7-3-1509826576982.txt"))

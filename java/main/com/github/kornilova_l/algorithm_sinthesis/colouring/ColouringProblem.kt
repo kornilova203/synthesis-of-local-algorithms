@@ -1,6 +1,7 @@
-package com.github.kornilova_l.formal_da.implementation.grid.tiles
+package com.github.kornilova_l.algorithm_sinthesis.colouring
 
-import com.github.kornilova_l.formal_da.implementation.grid.tiles.TileGraphBuilder.countEdges
+import com.github.kornilova_l.algorithm_sinthesis.tiles.Tile
+import com.github.kornilova_l.algorithm_sinthesis.tiles.TileGraphBuilder.countEdges
 import org.apache.commons.collections4.BidiMap
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
 import java.io.File
