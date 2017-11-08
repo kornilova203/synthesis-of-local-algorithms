@@ -6,12 +6,12 @@ import java.util.*
 /**
  * Toroidal 2-dimensional grid
  */
-class Grid2D(file: File) {
+class Grid2D {
     val grid: Array<IntArray>
     val n: Int
     val m: Int
 
-    init {
+    constructor(file: File) {
         if (!file.isFile || !file.exists()) {
             throw IllegalArgumentException("File is not a file or does not exist")
         }
@@ -24,5 +24,22 @@ class Grid2D(file: File) {
                 grid[i][j] = scanner.nextInt()
             }
         }
+    }
+
+    constructor(grid: Array<IntArray>) {
+        this.grid = grid
+        n = grid.size
+        m = grid[0].size
+    }
+
+    override fun toString(): String {
+        val stringBuilder = StringBuilder()
+        for (i in 0 until grid.size) {
+            for (j in 0 until grid[0].size) {
+                stringBuilder.append(grid[i][j]).append(" ")
+            }
+            stringBuilder.append("\n")
+        }
+        return stringBuilder.toString()
     }
 }
