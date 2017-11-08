@@ -1,6 +1,5 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.grid
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.colouring.ColouringFunction
 import java.io.File
 import java.util.*
 
@@ -9,7 +8,6 @@ import java.util.*
  */
 class Grid2D(file: File) {
     val grid: Array<IntArray>
-    private var independentSet: Array<BooleanArray>? = null
     val n: Int
     val m: Int
 
@@ -26,23 +24,5 @@ class Grid2D(file: File) {
                 grid[i][j] = scanner.nextInt()
             }
         }
-    }
-
-    fun getIS(): Array<BooleanArray> {
-        if (independentSet == null) {
-            independentSet = IndependentSetAlgorithm(this, 1).independentSet
-        }
-        return independentSet ?: throw IllegalArgumentException("Cannot find IS on this grid")
-    }
-
-    /* TODO: find more convenient way to return colouring */
-    fun getColouring(colouringFunction: ColouringFunction): Array<IntArray> {
-        val colourGrid = Array(n) { IntArray(m) }
-        for (i in colourGrid.indices) {
-            for (j in colourGrid[0].indices) {
-//                colourGrid[i][j] = colouringFunction.getColour(this, i, j)
-            }
-        }
-        return colourGrid
     }
 }
