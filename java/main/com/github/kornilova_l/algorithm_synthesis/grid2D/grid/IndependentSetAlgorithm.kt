@@ -1,7 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.grid
 
 class IndependentSetAlgorithm(grid2d: Grid2D, power: Int) {
-    public val independentSet: Array<BooleanArray>
+    val independentSet: Array<BooleanArray>
     val n: Int = grid2d.n
     val m: Int = grid2d.m
 

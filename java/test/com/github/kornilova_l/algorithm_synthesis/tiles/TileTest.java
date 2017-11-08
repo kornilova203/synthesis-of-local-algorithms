@@ -1,8 +1,12 @@
 package com.github.kornilova_l.algorithm_synthesis.tiles;
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.Grid2D;
+import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm;
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile;
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Coordinate;
 import org.junit.jupiter.api.Test;
+
+import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -65,5 +69,23 @@ class TileTest {
                 tile.getNextBorderCoordinate(new Coordinate(1, 0)));
 
         assertNull(tile.getNextBorderCoordinate(new Coordinate(tile.getN() - 1, tile.getM() - 1)));
+    }
+
+    @Test
+    void tileFromArrayTest() {
+        Grid2D grid2D = new Grid2D(new File("java/test_resources/grids/01_grid_5-6.txt"));
+        boolean[][] independentSet = new IndependentSetAlgorithm(grid2D, 2).getIndependentSet();
+
+        Tile tile = new Tile(independentSet, 1, 3, 3, 5, 2);
+
+        assertEquals("0 0 0 0 0\n" +
+                "0 0 0 1 0\n" +
+                "0 1 0 0 0\n", tile.toString());
+
+        tile = new Tile(independentSet, 0, 0, 3, 5, 2);
+
+        assertEquals("0 0 0 0 0\n" +
+                "0 0 1 0 0\n" +
+                "1 0 0 0 0\n", tile.toString());
     }
 }

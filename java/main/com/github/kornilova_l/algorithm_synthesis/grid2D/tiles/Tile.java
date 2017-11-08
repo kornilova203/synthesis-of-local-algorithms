@@ -11,8 +11,12 @@ import java.util.Set;
 public final class Tile {
     private final boolean[][] grid;
     private final int k;
+    private final int n;
+    private final int m;
 
     Tile(int n, int m, int k, Set<Coordinate> is) {
+        this.n = n;
+        this.m = m;
         this.k = k;
         grid = new boolean[n][m];
         for (Coordinate coordinate : is) {
@@ -55,6 +59,8 @@ public final class Tile {
                     System.arraycopy(tile.grid[i], 1, grid[i], 0, m);
                 }
         }
+        this.n = n;
+        this.m = m;
     }
 
     /**
@@ -65,6 +71,8 @@ public final class Tile {
      * @param k power of graph
      */
     public Tile(int n, int m, int k) {
+        this.n = n;
+        this.m = m;
         grid = new boolean[n][m];
         this.k = k;
     }
@@ -74,6 +82,8 @@ public final class Tile {
      */
     public Tile(Tile tile, int x, int y) {
         k = tile.k;
+        this.n = tile.n;
+        this.m = tile.m;
         grid = new boolean[tile.getN()][tile.getM()];
         for (int i = 0; i < tile.getN(); i++) {
             System.arraycopy(tile.grid[i], 0, grid[i], 0, tile.getM());
@@ -86,21 +96,32 @@ public final class Tile {
      */
     public Tile(Tile tile) {
         k = tile.k;
-        int n = tile.getN() + k * 2;
-        int m = tile.getM() + k * 2;
+        n = tile.getN() + k * 2;
+        m = tile.getM() + k * 2;
         grid = new boolean[n][m];
         for (int i = k; i < n - k; i++) {
             System.arraycopy(tile.grid[i - k], 0, grid[i], k, tile.getM());
         }
     }
 
-//    /**
-//     * @param i center of a tile
-//     * @param j center of a tile
-//     */
-//    public Tile(Grid2D grid, int n, int m, int i, int j) {
-//
-//    }
+    public Tile(boolean[][] independentSet, int x, int y, int n, int m, int k) {
+        if (independentSet.length < n || independentSet[0].length < m) {
+            throw new IllegalArgumentException("Grid is too small");
+        }
+        this.n = n;
+        this.m = m;
+        this.k = k;
+        int sizeN = independentSet.length;
+        int sizeM = independentSet[0].length;
+        grid = new boolean[n][m];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                grid[i][j] =
+                        independentSet[(x - (n / 2) + i + sizeN) % sizeN][(y - (m / 2) + j + sizeM) % sizeM];
+            }
+        }
+    }
+
 
     public int getN() {
         return grid.length;
