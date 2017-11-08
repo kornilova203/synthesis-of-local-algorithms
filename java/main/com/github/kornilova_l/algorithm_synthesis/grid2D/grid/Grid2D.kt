@@ -30,7 +30,7 @@ class Grid2D(file: File) {
 
     fun getIS(): Array<BooleanArray> {
         if (independentSet == null) {
-            independentSet = IndependentSetAlgorithm(this).independentSet
+            independentSet = IndependentSetAlgorithm(this, 1).independentSet
         }
         return independentSet ?: throw IllegalArgumentException("Cannot find IS on this grid")
     }

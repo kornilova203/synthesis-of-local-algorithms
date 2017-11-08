@@ -7,9 +7,26 @@ import java.io.File
 internal class IndependentSetAlgorithmTest {
     @Test
     fun getIndependentSet() {
-        val independentSetAlgorithm = IndependentSetAlgorithm(Grid2D(File("java/test_resources/grids/01_grid_5-6.txt")))
-        val expected = File("java/test_resources/grids/01_is_5-6.txt").readText()
-        assertEquals(expected, independentSetAlgorithm.toString())
+        val isAlgorithm1 = IndependentSetAlgorithm(
+                Grid2D(File("java/test_resources/grids/01_grid_5-6.txt")),
+                1
+        )
+        val expected1 = File("java/test_resources/grids/01_is1_5-6.txt").readText()
+        assertEquals(expected1, isAlgorithm1.toString())
+
+        val isAlgorithm2 = IndependentSetAlgorithm(
+                Grid2D(File("java/test_resources/grids/01_grid_5-6.txt")),
+                2
+        )
+        val expected2 = File("java/test_resources/grids/01_is2_5-6.txt").readText()
+        assertEquals(expected2, isAlgorithm2.toString())
+
+        val isAlgorithm3 = IndependentSetAlgorithm(
+                Grid2D(File("java/test_resources/grids/01_grid_5-6.txt")),
+                3
+        )
+        val expected3 = File("java/test_resources/grids/01_is3_5-6.txt").readText()
+        assertEquals(expected3, isAlgorithm3.toString())
     }
 
 }
