@@ -1,19 +1,15 @@
 package com.github.kornilova_l.algorithm_synthesis.tiles;
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile;
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator;
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGraphBuilder;
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGraph;
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileSet;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
 
-import static com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGraphBuilder.countEdges;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TileGraphBuilderTest {
+class TileGraphTest {
     private final TileSet tiles32 = new TileGenerator(3, 2, 1).getTileSet();
     private final TileSet tiles23 = new TileGenerator(2, 3, 1).getTileSet();
     private final TileSet tiles67 = new TileSet(new File("generated_tiles/6-7-3-1509826576982.txt"));
@@ -21,13 +17,13 @@ class TileGraphBuilderTest {
 
     @Test
     void getGraph() {
-        HashMap<Tile, HashSet<Tile>> graph = new TileGraphBuilder(tiles32, tiles23).getGraph();
-        assertEquals(7, graph.size());
+        TileGraph tileGraph = new TileGraph(tiles32, tiles23);
+        assertEquals(7, tileGraph.getSize());
 
-        assertEquals(15, countEdges(graph));
+        assertEquals(15, tileGraph.getEdgeCount());
 
-        graph = new TileGraphBuilder(tiles67, tiles58).getGraph();
-        assertEquals(2079, graph.size());
+        tileGraph = new TileGraph(tiles67, tiles58);
+        assertEquals(2079, tileGraph.getSize());
     }
 
 }

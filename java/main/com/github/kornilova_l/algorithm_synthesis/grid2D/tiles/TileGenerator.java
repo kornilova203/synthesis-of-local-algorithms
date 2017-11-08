@@ -28,22 +28,22 @@ public class TileGenerator {
         this.m = m;
         this.k = k;
 
-        ConcurrentLinkedQueue<Tile> candidateTiles = new ConcurrentLinkedQueue<>(); // get concurrently from here
+        ConcurrentLinkedQueue<Tile> candidateTileIS = new ConcurrentLinkedQueue<>(); // get concurrently from here
 
         TileSet candidateTilesSet = new TileSet(n, m, k);
-        candidateTiles.addAll(candidateTilesSet.getTiles());
+        candidateTileIS.addAll(candidateTilesSet.getTileIS());
 
-        printCandidatesFound(candidateTiles.size());
-        Set<Tile> validTiles = ConcurrentHashMap.newKeySet(); // put concurrently here
+        printCandidatesFound(candidateTileIS.size());
+        Set<Tile> validTileIS = ConcurrentHashMap.newKeySet(); // put concurrently here
         try {
-            removeNotMaximal(candidateTiles, validTiles);
+            removeNotMaximal(candidateTileIS, validTileIS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if (validTiles.isEmpty()) {
+        if (validTileIS.isEmpty()) {
             throw new IllegalArgumentException("Cannot produce valid set of tiles");
         } else {
-            this.tileSet = new TileSet(validTiles);
+            this.tileSet = new TileSet(validTileIS);
         }
     }
 
@@ -55,14 +55,14 @@ public class TileGenerator {
     /**
      * Remove all tileSet which does not have maximal IS
      */
-    private void removeNotMaximal(ConcurrentLinkedQueue<Tile> candidateTiles,
-                                  Set<Tile> validTiles) throws InterruptedException {
-        ProgressBar progressBar = new ProgressBar(candidateTiles.size());
+    private void removeNotMaximal(ConcurrentLinkedQueue<Tile> candidateTileIS,
+                                  Set<Tile> validTileIS) throws InterruptedException {
+        ProgressBar progressBar = new ProgressBar(candidateTileIS.size());
         int processorsCount = Runtime.getRuntime().availableProcessors();
         ExecutorService executorService = Executors.newFixedThreadPool(processorsCount);
 
         for (int i = 0; i < processorsCount; i++) {
-            executorService.submit(new TileValidator(candidateTiles, validTiles, progressBar));
+            executorService.submit(new TileValidator(candidateTileIS, validTileIS, progressBar));
         }
 
         executorService.shutdown();
@@ -70,7 +70,7 @@ public class TileGenerator {
             System.out.println("Not yet. Still waiting for termination");
         }
         progressBar.finish();
-        System.out.println(validTiles.size() + " valid tiles");
+        System.out.println(validTileIS.size() + " valid tiles");
     }
 
     @NotNull
@@ -106,23 +106,23 @@ public class TileGenerator {
     }
 
     private class TileValidator implements Runnable {
-        private ConcurrentLinkedQueue<Tile> candidateTiles;
-        private Set<Tile> validTiles;
+        private ConcurrentLinkedQueue<Tile> candidateTileIS;
+        private Set<Tile> validTileIS;
         private ProgressBar progressBar;
 
-        TileValidator(ConcurrentLinkedQueue<Tile> candidateTiles, Set<Tile> validTiles, ProgressBar progressBar) {
-            this.candidateTiles = candidateTiles;
-            this.validTiles = validTiles;
+        TileValidator(ConcurrentLinkedQueue<Tile> candidateTileIS, Set<Tile> validTileIS, ProgressBar progressBar) {
+            this.candidateTileIS = candidateTileIS;
+            this.validTileIS = validTileIS;
             this.progressBar = progressBar;
         }
 
         @Override
         public void run() {
-            while (!candidateTiles.isEmpty()) {
-                Tile tile = candidateTiles.poll();
+            while (!candidateTileIS.isEmpty()) {
+                Tile tile = candidateTileIS.poll();
                 if (tile != null) {
                     if (tile.isValid()) {
-                        validTiles.add(tile);
+                        validTileIS.add(tile);
                     }
                     progressBar.updateProgress(1);
                 }

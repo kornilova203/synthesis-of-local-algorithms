@@ -27,10 +27,10 @@ class TileGeneratorTest {
         File file = tileGenerator.exportToFile(new File("."));
         assertNotNull(file);
 
-        Set<Tile> tiles = new TileSet(file).getTiles();
-        assertNotNull(tiles);
+        Set<Tile> tileIS = new TileSet(file).getTileIS();
+        assertNotNull(tileIS);
 
-        assertTrue(CollectionUtils.isEqualCollection(tileGenerator.getTileSet().getTiles(), tiles));
+        assertTrue(CollectionUtils.isEqualCollection(tileGenerator.getTileSet().getTileIS(), tileIS));
 
         //noinspection ResultOfMethodCallIgnored
         file.delete();

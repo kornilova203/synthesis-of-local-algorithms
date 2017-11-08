@@ -1,26 +1,45 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles;
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Part;
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
-public class TileGraphBuilder {
+public class TileGraph {
     private final HashMap<Tile, HashSet<Tile>> graph = new HashMap<>();
+    private final BidiMap<Tile, Integer> ids = new DualHashBidiMap<>();
+    private final int n;
+    private final int m;
+    private final int k;
 
     @SuppressWarnings("WeakerAccess")
-    public TileGraphBuilder(TileSet tileSet1, TileSet tileSet2) {
+    public TileGraph(TileSet tileSet1, TileSet tileSet2) {
         validateTileSets(tileSet1, tileSet2);
+        int n1 = tileSet1.getN();
+        int m1 = tileSet1.getM();
+        int n2 = tileSet2.getN();
+        int m2 = tileSet2.getM();
+        if (n1 > n2) {
+            n = n2;
+            m = m1;
+        } else {
+            n = n1;
+            m = m2;
+        }
 
-        for (Tile tile : tileSet1.getTiles()) { // get vertical neighbours
+        k = tileSet1.getK();
+
+        for (Tile tile : tileSet1.getTileIS()) { // get vertical neighbours
             Tile top = new Tile(tile, Part.TOP);
             Tile bottom = new Tile(tile, Part.BOTTOM);
             graph.computeIfAbsent(top, t -> new HashSet<>()).add(bottom);
             graph.computeIfAbsent(bottom, t -> new HashSet<>()).add(top);
         }
-        for (Tile tile : tileSet2.getTiles()) { // get horizontal neighbours
+        for (Tile tile : tileSet2.getTileIS()) { // get horizontal neighbours
             Tile left = new Tile(tile, Part.LEFT);
             Tile right = new Tile(tile, Part.RIGHT);
             graph.computeIfAbsent(left, t -> new HashSet<>()).add(right);
@@ -29,6 +48,45 @@ public class TileGraphBuilder {
         if (graph.size() == 0) {
             throw new IllegalArgumentException("Cannot construct graph");
         }
+
+        assignIds();
+    }
+
+    public int getEdgeCount() {
+        int res = 0;
+        for (Set<Tile> neighbours : graph.values()) {
+            res += neighbours.size();
+        }
+        assert res % 2 == 0;
+
+        return res / 2;
+    }
+
+    private void assignIds() {
+        int i = 0;
+        for (Tile tile : graph.keySet()) {
+            ids.put(tile, i++);
+        }
+    }
+
+    public int getId(Tile tile) {
+        return ids.get(tile);
+    }
+
+    public int getSize() {
+        return graph.size();
+    }
+
+    public int getN() {
+        return n;
+    }
+
+    public int getM() {
+        return m;
+    }
+
+    public int getK() {
+        return k;
     }
 
     private void validateTileSets(TileSet tileSet1, TileSet tileSet2) {
@@ -59,13 +117,8 @@ public class TileGraphBuilder {
         return graph;
     }
 
-    public static int countEdges(Map<Tile, HashSet<Tile>> graph) {
-        int res = 0;
-        for (Set<Tile> neighbours : graph.values()) {
-            res += neighbours.size();
-        }
-        assert res % 2 == 0;
-
-        return res / 2;
+    @NotNull
+    public Tile getKey(int tileId) {
+        return ids.getKey(tileId);
     }
 }

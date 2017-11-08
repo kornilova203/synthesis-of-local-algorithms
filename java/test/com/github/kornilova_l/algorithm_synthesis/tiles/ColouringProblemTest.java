@@ -1,18 +1,14 @@
 package com.github.kornilova_l.algorithm_synthesis.tiles;
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.colouring.ColouringProblem;
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile;
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator;
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGraphBuilder;
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGraph;
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileSet;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -26,10 +22,9 @@ class ColouringProblemTest {
         /* note: this test may fail because order of lines matters */
         String expected = String.join("\n",
                 FileUtils.readLines(new File("java/test_resources/dimacs_4-colouring_2-2-1.txt"), (String) null)) + "\n";
-        HashMap<Tile, HashSet<Tile>> graph = new TileGraphBuilder(tiles32, tiles23).getGraph();
-        Map<Tile, Integer> ids = ColouringProblem.Companion.assignIds(graph);
+        TileGraph graph = new TileGraph(tiles32, tiles23);
         String actual = ColouringProblem.Companion.toDimacs(
-                graph, ids, 4
+                graph, 4
         );
         assertEquals(expected, actual);
     }

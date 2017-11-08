@@ -1,7 +1,8 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.colouring
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGraphBuilder.countEdges
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileMap
 import org.apache.commons.collections4.BidiMap
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
 import java.io.File
@@ -16,16 +17,15 @@ import kotlin.collections.HashMap
  * Converts graph to dimacs format to solve n-colouring problem
  * Starts python script which starts SAT solver
  */
-class ColouringProblem(graph: Map<Tile, HashSet<Tile>>, coloursCount: Int) {
+class ColouringProblem(graph: TileGraph, coloursCount: Int) {
     /**
      * Value is null if there is no proper colouring
      */
     val colouringFunction: ColouringFunction? // it is public because it is value
 
     init {
-        var tileColours: Map<Tile, Int>? = null
-        val ids = assignIds(graph)
-        val dimacsFile = exportDimacs(graph, ids, coloursCount, File("dimacs/"))
+        var tileColours: TileMap<Int>? = null
+        val dimacsFile = exportDimacs(graph, coloursCount, File("dimacs/"))
         val builder = ProcessBuilder("python",
                 File("python_sat/sat/start_sat.py").toString(),
                 dimacsFile!!.toPath().toAbsolutePath().toString())
@@ -36,7 +36,7 @@ class ColouringProblem(graph: Map<Tile, HashSet<Tile>>, coloursCount: Int) {
             val scanner = Scanner(process.inputStream)
             process!!.waitFor()
             if (scanner.nextLine() == "OK") {
-                tileColours = getResult(scanner, ids, coloursCount)
+                tileColours = getResult(scanner, graph, coloursCount)
             } else {
                 println("Something went wrong while running python script")
             }
@@ -49,10 +49,10 @@ class ColouringProblem(graph: Map<Tile, HashSet<Tile>>, coloursCount: Int) {
         colouringFunction = if (tileColours == null) null else ColouringFunction(tileColours)
     }
 
-    private fun getResult(scanner: Scanner, ids: BidiMap<Tile, Int>, coloursCount: Int): Map<Tile, Int>? {
-        val resultColours = HashMap<Tile, Int>()
+    private fun getResult(scanner: Scanner, graph: TileGraph, coloursCount: Int): TileMap<Int>? {
+        val resultColours = TileMap<Int>(graph.n, graph.m, graph.k)
         val possibleColours = HashMap<Tile, BooleanArray>()
-        for (tile in ids.keys) {
+        for (tile in graph.graph.keys) {
             possibleColours.put(tile, BooleanArray(4))
         }
         while (scanner.hasNextInt()) {
@@ -62,7 +62,7 @@ class ColouringProblem(graph: Map<Tile, HashSet<Tile>>, coloursCount: Int) {
             }
             val tileId = getTileId(tileColourId, coloursCount)
             val colourId = getColourId(tileColourId, coloursCount)
-            val tile = ids.getKey(tileId)
+            val tile = graph.getKey(tileId)
             possibleColours[tile]!![colourId] = true // this should not produce NPE. If it does then fix the code
         }
         for (tile in possibleColours.keys) {
@@ -74,7 +74,7 @@ class ColouringProblem(graph: Map<Tile, HashSet<Tile>>, coloursCount: Int) {
                 System.err.println("Cannot find colour for tile:\n" + tile)
                 return null
             }
-            resultColours[tile] = tileColour
+            resultColours.put(tile, tileColour)
         }
         return resultColours
     }
@@ -92,35 +92,35 @@ class ColouringProblem(graph: Map<Tile, HashSet<Tile>>, coloursCount: Int) {
 
     companion object {
 
-        fun toDimacs(graph: Map<Tile, HashSet<Tile>>, ids: Map<Tile, Int>, coloursCount: Int): String {
+        fun toDimacs(graph: TileGraph, coloursCount: Int): String {
             val stringBuilder = StringBuilder()
-            val clausesCount = graph.size + countEdges(graph) * coloursCount
+            val clausesCount = graph.size + graph.edgeCount * coloursCount
             stringBuilder.append("p cnf ").append(graph.size * coloursCount).append(" ").append(clausesCount).append("\n")
 
             val visitedEdges = HashMap<Tile, HashSet<Tile>>() // to count each edge only ones
 
-            for (tile in graph.keys) {
-                addTileClause(stringBuilder, ids[tile], coloursCount)
-                val neighbours = graph[tile]
+            for (tile in graph.graph.keys) {
+                addTileClause(stringBuilder, graph.getId(tile), coloursCount)
+                val neighbours = graph.graph[tile]
                 for (neighbour in neighbours!!) { // null value should never happen. If it throws NPE -> find mistake
                     if (visitedEdges.computeIfAbsent(neighbour) { HashSet() }.contains(tile)) { // if this edge was visited
                         continue
                     }
                     visitedEdges.computeIfAbsent(tile) { HashSet() }.add(neighbour)
-                    addEdgeClauses(stringBuilder, ids[tile]!!, ids[neighbour]!!, coloursCount) // ids also must be not null
+                    addEdgeClauses(stringBuilder, graph.getId(tile), graph.getId(neighbour), coloursCount)
                 }
             }
             return stringBuilder.toString()
         }
 
-        fun exportDimacs(graph: Map<Tile, HashSet<Tile>>, ids: Map<Tile, Int>, coloursCount: Int, dir: File): File? {
+        fun exportDimacs(graph: TileGraph, coloursCount: Int, dir: File): File? {
             if (!dir.exists() || !dir.isDirectory) {
                 throw IllegalArgumentException("File must be a directory and must exist")
             }
             val filePath = Paths.get(dir.toString(), getFileName(coloursCount))
             try {
                 FileOutputStream(filePath.toFile())
-                        .use { outputStream -> outputStream.write(toDimacs(graph, ids, coloursCount).toByteArray()) }
+                        .use { outputStream -> outputStream.write(toDimacs(graph, coloursCount).toByteArray()) }
                 return filePath.toFile()
             } catch (e: IOException) {
                 e.printStackTrace()

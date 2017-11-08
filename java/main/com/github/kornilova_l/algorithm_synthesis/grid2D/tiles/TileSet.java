@@ -11,34 +11,34 @@ import java.util.Scanner;
 import java.util.Set;
 
 /**
- * Contains set of tiles of one size
+ * Contains set of tileIS of one size
  */
 public class TileSet {
     private final int n;
     private final int m;
     private final int k;
-    private final Set<Tile> tiles = new HashSet<>();
+    private final Set<Tile> tileIS = new HashSet<>();
 
     /**
-     * Generates set of possible valid tiles
+     * Generates set of possible valid tileIS
      */
     TileSet(int n, int m, int k) {
         this.n = n;
         this.m = m;
         this.k = k;
         // TODO: make this recursive
-        tiles.add(new Tile(n, m, k));
+        tileIS.add(new Tile(n, m, k));
 
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                Set<Tile> newTiles = new HashSet<>();
-                for (Tile tile : tiles) {
+                Set<Tile> newTileIS = new HashSet<>();
+                for (Tile tile : this.tileIS) {
                     if (tile.canBeI(i, j)) {
-                        newTiles.add(new Tile(tile, i, j));
+                        newTileIS.add(new Tile(tile, i, j));
                     }
                 }
-                tiles.addAll(newTiles);
-                newTiles.clear();
+                tileIS.addAll(newTileIS);
+                newTileIS.clear();
             }
         }
     }
@@ -61,7 +61,7 @@ public class TileSet {
                         }
                     }
                 }
-                tiles.add(new Tile(n, m, k, is));
+                tileIS.add(new Tile(n, m, k, is));
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -69,22 +69,22 @@ public class TileSet {
         }
     }
 
-    TileSet(Collection<Tile> tiles) {
-        Tile someTile = tiles.iterator().next();
+    TileSet(Collection<Tile> tileIS) {
+        Tile someTile = tileIS.iterator().next();
         n = someTile.getN();
         m = someTile.getM();
         k = someTile.getK();
-        for (Tile tile : tiles) {
-            addTile(tile); // check that all tiles have same size
+        for (Tile tile : tileIS) {
+            addTile(tile); // check that all tile have same size
         }
     }
 
     public int size() {
-        return tiles.size();
+        return tileIS.size();
     }
 
     boolean isEmpty() {
-        return tiles.isEmpty();
+        return tileIS.isEmpty();
     }
 
     int getN() {
@@ -100,10 +100,11 @@ public class TileSet {
     }
 
     /**
-     * Please update tiles using only {@link #addTile(Tile)} method
+     * Return clone of original set so
+     * it is not possible to add to set a tile of different size
      */
-    public Set<Tile> getTiles() {
-        return tiles;
+    public Set<Tile> getTileIS() {
+        return new HashSet<>(tileIS);
     }
 
     private void addTile(Tile tile) {
@@ -111,13 +112,13 @@ public class TileSet {
             throw new IllegalArgumentException("Tile must have the same parameters as tile set");
         }
 
-        tiles.add(tile);
+        this.tileIS.add(tile);
     }
 
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (Tile tile : tiles) {
+        for (Tile tile : this.tileIS) {
             stringBuilder.append(tile).append("\n");
         }
         return stringBuilder.toString();

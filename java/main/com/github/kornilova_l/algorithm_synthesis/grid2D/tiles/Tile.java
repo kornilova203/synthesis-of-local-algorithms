@@ -94,6 +94,14 @@ public final class Tile {
         }
     }
 
+//    /**
+//     * @param i center of a tile
+//     * @param j center of a tile
+//     */
+//    public Tile(Grid2D grid, int n, int m, int i, int j) {
+//
+//    }
+
     public int getN() {
         return grid.length;
     }
