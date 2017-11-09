@@ -36,7 +36,7 @@ class Grid2D {
         val stringBuilder = StringBuilder()
         for (i in 0 until grid.size) {
             for (j in 0 until grid[0].size) {
-                stringBuilder.append(grid[i][j]).append(" ")
+                stringBuilder.append(grid[i][j]).append("\t")
             }
             stringBuilder.append("\n")
         }

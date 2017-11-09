@@ -8,7 +8,7 @@ fun generateGrid(n: Int, m: Int): Grid2D {
     }
     val size = n * m
     val ids = LinkedList<Int>()
-    ids += 0..size
+    ids += 1 until size + 1
     Collections.shuffle(ids)
 
     val grid = Array(n) { IntArray(m) }

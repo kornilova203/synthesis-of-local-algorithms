@@ -27,6 +27,14 @@ internal class IndependentSetAlgorithmTest {
         )
         val expected3 = File("java/test_resources/grids/01_is3_5-6.txt").readText()
         assertEquals(expected3, isAlgorithm3.toString())
+
+        // TODO: following test fail because cell has id 0. Why?
+        val isAlgorithm4 = IndependentSetAlgorithm(
+                Grid2D(File("java/test_resources/grids/03_grid_8-8.txt")),
+                3
+        )
+        val expected4 = File("java/test_resources/grids/03_is3_8-8.txt").readText()
+        assertEquals(expected4, isAlgorithm4.toString())
     }
 
 }

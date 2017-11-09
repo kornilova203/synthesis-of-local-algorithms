@@ -6,6 +6,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileSet
 import org.junit.jupiter.api.Test
 import java.io.File
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 internal class ColouringFunctionTest {
     private val tiles67 = TileSet(File("generated_tiles/6-7-3-1509826576982.txt"))
@@ -20,19 +21,7 @@ internal class ColouringFunctionTest {
             val grid2D = generateGrid(8, 8)
             val graphColoured = colouringFunction?.getGraphColoured(grid2D) ?: continue
             assertNotNull(graphColoured)
-            val res = isColouringValid(graphColoured)
-            if (!res) {
-                println("Grid:")
-                println(grid2D)
-                for (i in 0 until graphColoured.size) {
-                    for (j in 0 until graphColoured[0].size) {
-                        print(graphColoured[i][j])
-                        print(" ")
-                    }
-                    println()
-                }
-                println()
-            }
+            assertTrue(isColouringValid(graphColoured))
         }
     }
 
