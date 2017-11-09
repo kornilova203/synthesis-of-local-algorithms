@@ -15,10 +15,10 @@ fun getRandomFourColouring() {
     val tileGraph = TileGraph(tiles67, tiles58)
     val colouringFunction = ColouringProblem(tileGraph, 4).colouringFunction
     val graphColoured = colouringFunction?.getGraphColoured(grid2D)
-    graphColoured?.forEach { arr ->
-        arr.forEach { colour ->
-            print(colour)
-            print(" ")
+    graphColoured!! // must not be null
+    for (i in 0 until graphColoured.size) {
+        for (j in 0 until graphColoured[0].size) {
+            print("${graphColoured[i][j]} ")
         }
         println()
     }
