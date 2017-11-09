@@ -1,40 +1,27 @@
-# Formal Distributed Algorithm
+# Synthesis of Local Algorithms
 
-Simulator of distributed algorithms in the port-numbering model.
+## What is a Local Algorithm?
+A _Distributed Algorithm_ is an algorithm which runs on a distributed system, that does not have a central coordinator.  
+A _Local Algorithm_ is a Distributed algorithm that runs in constant time, independently of the size of the network.
 
-Basic classes which must be implemented for any algorithm are in [simulator package](java/main/com/github/kornilova_l/formal_da/simulator).
+## What kind of problems do these algorithms solve?
+This research is focused on LCLs or locally checkable labeling problems in the LOCAL model of computation.  
+ Examples of such problems:
+ * maximal independent set
+ * maximal matching
+ * vertex colouring
+ * edge colouring
 
-## BMM algorithm
+## About Algorithm Synthesis
+The idea of the project is to use computer search to find new optimal local algorithms on 2-dimensional torus grids.
 
-The algorithm finds maximal matching in bipartite graph.
+The basic structure of synthesized algorithm is the following:
+1. Get specific normal form of the grid
+2. Find right state for each vertex/edge base on constant size neighbourhood of vertex/edge
 
-Implementation of BMM algorithm is [here](java/main/com/github/kornilova_l/formal_da/implementation/BMM).
+The goal of computer search is to find such normal form and radius of a neighbourhood so it is possible to find a mapping from a neighbourhood to right state for each vertex/edge.
 
-## VC3 algorithm
-
-The algorithm find 3-approximation of minimal vertex cover using BMM as subroutine.
-
-Implementation of VC3 algorithm is [here](java/main/com/github/kornilova_l/formal_da/implementation/VC3).
-
-## Run from command line
-
-```bash
-cd java/main
-mkdir out
-javac -d out -cp ../../.idea/lib/annotations-java8.jar com/github/kornilova_l/formal_da/**/*.java
-cd out
-```
-To run BMM and VC3 you should specify input file. Rules for input data can be found in [BmmAlgorithmRunner](java/main/com/github/kornilova_l/formal_da/implementation/BMM/BmmAlgorithmRunner.java) class and in [V3cAlgorithmRunner](java/main/com/github/kornilova_l/formal_da/implementation/VC3/Vc3AlgorithmRunner.java) class respectively. There are test data in [test_resources](test_resources) dir.
-
-### BMM
-```
-java com.github.kornilova_l.formal_da.BmmMain "../../../test_resources/BMM/01.txt"
-java com.github.kornilova_l.formal_da.BmmMain "../../../test_resources/BMM/02.txt"
-```
-
-### VC3
-```
-java com.github.kornilova_l.formal_da.Vc3Main "../../../test_resources/VC3/01.txt"
-java com.github.kornilova_l.formal_da.Vc3Main "../../../test_resources/VC3/02.txt"
-```
+## What has been done
+Reproduced some results of the paper [LCL problems on grids](https://users.ics.aalto.fi/suomela/doc/grid-lcl.pdf):  
+Found algorithm that solves 4-colouring on 2-dimensional torus grids.
 
