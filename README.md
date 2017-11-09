@@ -5,8 +5,8 @@ A _Distributed Algorithm_ is an algorithm which runs on a distributed system, th
 A _Local Algorithm_ is a Distributed algorithm that runs in constant time, independently of the size of the network.
 
 ## What kind of problems do these algorithms solve?
-This research is focused on LCLs or locally checkable labeling problems in the LOCAL model of computation.  
- Examples of such problems:
+This research is focused on LCLs or locally checkable labeling problems on 2-dimensional torus grids in the LOCAL model of computation.  
+ Examples of LCLs:
  * maximal independent set
  * maximal matching
  * vertex colouring
