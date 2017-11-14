@@ -12,8 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class TileGraphTest {
     private final TileSet tiles32 = new TileGenerator(3, 2, 1).getTileSet();
     private final TileSet tiles23 = new TileGenerator(2, 3, 1).getTileSet();
-    private final TileSet tiles67 = new TileSet(new File("generated_tiles/6-7-3-1509826576982.txt"));
-    private final TileSet tiles58 = new TileSet(new File("generated_tiles/5-8-3-1509826268928.txt"));
+    private final TileSet tiles67 = new TileSet(new File("generated_tiles/6-7-3.txt"));
+    private final TileSet tiles58 = new TileSet(new File("generated_tiles/5-8-3.txt"));
 
     @Test
     void getGraph() {

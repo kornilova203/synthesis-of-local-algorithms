@@ -24,13 +24,13 @@ class TileGeneratorTest {
     @Test
     void exportAndImportTest() {
         TileGenerator tileGenerator = new TileGenerator(5, 7, 3);
-        File file = tileGenerator.exportToFile(new File("."));
+        File file = tileGenerator.exportToFile(new File("."), true);
         assertNotNull(file);
 
-        Set<Tile> tileIS = new TileSet(file).getTileIS();
+        Set<Tile> tileIS = new TileSet(file).getPossiblyValidTiles();
         assertNotNull(tileIS);
 
-        assertTrue(CollectionUtils.isEqualCollection(tileGenerator.getTileSet().getTileIS(), tileIS));
+        assertTrue(CollectionUtils.isEqualCollection(tileGenerator.getTileSet().getPossiblyValidTiles(), tileIS));
 
         //noinspection ResultOfMethodCallIgnored
         file.delete();

@@ -33,13 +33,13 @@ public class TileGraph {
 
         k = tileSet1.getK();
 
-        for (Tile tile : tileSet1.getTileIS()) { // get vertical neighbours
+        for (Tile tile : tileSet1.getPossiblyValidTiles()) { // get vertical neighbours
             Tile top = new Tile(tile, Part.TOP);
             Tile bottom = new Tile(tile, Part.BOTTOM);
             graph.computeIfAbsent(top, t -> new HashSet<>()).add(bottom);
             graph.computeIfAbsent(bottom, t -> new HashSet<>()).add(top);
         }
-        for (Tile tile : tileSet2.getTileIS()) { // get horizontal neighbours
+        for (Tile tile : tileSet2.getPossiblyValidTiles()) { // get horizontal neighbours
             Tile left = new Tile(tile, Part.LEFT);
             Tile right = new Tile(tile, Part.RIGHT);
             graph.computeIfAbsent(left, t -> new HashSet<>()).add(right);

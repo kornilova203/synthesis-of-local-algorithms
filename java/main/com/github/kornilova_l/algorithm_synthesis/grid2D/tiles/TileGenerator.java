@@ -31,7 +31,7 @@ public class TileGenerator {
         ConcurrentLinkedQueue<Tile> candidateTileIS = new ConcurrentLinkedQueue<>(); // get concurrently from here
 
         TileSet candidateTilesSet = new TileSet(n, m, k);
-        candidateTileIS.addAll(candidateTilesSet.getTileIS());
+        candidateTileIS.addAll(candidateTilesSet.getPossiblyValidTiles());
 
         printCandidatesFound(candidateTileIS.size());
         Set<Tile> validTileIS = ConcurrentHashMap.newKeySet(); // put concurrently here
@@ -86,11 +86,11 @@ public class TileGenerator {
     }
 
     @Nullable
-    public File exportToFile(@NotNull File dir) {
+    public File exportToFile(@NotNull File dir, Boolean addTimestampToFileName) {
         if (!dir.exists() || !dir.isDirectory()) {
             throw new IllegalArgumentException("Argument is not a directory or does not exist");
         }
-        Path filePath = Paths.get(dir.toString(), getFileName());
+        Path filePath = Paths.get(dir.toString(), getFileName(addTimestampToFileName));
         File file = filePath.toFile();
         try (FileOutputStream outputStream = new FileOutputStream(file)) {
             outputStream.write(toString().getBytes());
@@ -101,8 +101,11 @@ public class TileGenerator {
         return null;
     }
 
-    private String getFileName() {
-        return String.format("%d-%d-%d-%d.txt", n, m, k, System.currentTimeMillis());
+    private String getFileName(Boolean addTimestamp) {
+        if (addTimestamp) {
+            return String.format("%d-%d-%d-%d.txt", n, m, k, System.currentTimeMillis());
+        }
+        return String.format("%d-%d-%d.txt", n, m, k);
     }
 
     private class TileValidator implements Runnable {

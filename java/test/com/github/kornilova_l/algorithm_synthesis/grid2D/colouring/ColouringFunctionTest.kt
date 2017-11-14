@@ -9,8 +9,8 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 internal class ColouringFunctionTest {
-    private val tiles67 = TileSet(File("generated_tiles/6-7-3-1509826576982.txt"))
-    private val tiles58 = TileSet(File("generated_tiles/5-8-3-1509826268928.txt"))
+    private val tiles67 = TileSet(File("generated_tiles/6-7-3.txt"))
+    private val tiles58 = TileSet(File("generated_tiles/5-8-3.txt"))
     private val tileGraph = TileGraph(tiles67, tiles58)
     private val colouringFunction = ColouringProblem(tileGraph, 4).colouringFunction
     private val iterationsCount = 1000
