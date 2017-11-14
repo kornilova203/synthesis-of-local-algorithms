@@ -1,7 +1,4 @@
-.idea/uiDesigner.xml
-.idea/inspectionProfiles/
-.idea/workspace.xml
-.idea/misc.xml
+.idea
 out/
 generated_tiles/
 dimacs/
