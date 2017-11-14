@@ -3,10 +3,10 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.colouring
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileSet
-import org.junit.jupiter.api.Test
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
 import java.io.File
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 internal class ColouringFunctionTest {
     private val tiles67 = TileSet(File("generated_tiles/6-7-3.txt"))

@@ -15,7 +15,6 @@ class ColouringFunction constructor(private val tileColours: TileMap<Int>) {
             for (j in independentSet[i].indices) {
                 val tile = Tile(independentSet, i, j, tileColours.n, tileColours.m, tileColours.k)
                 val colour = tileColours[tile]
-                colour ?: return null // if cannot find colour for tile
                 colouredGraph[i][j] = colour
             }
         }
