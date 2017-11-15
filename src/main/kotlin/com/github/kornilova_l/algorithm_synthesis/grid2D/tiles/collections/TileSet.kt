@@ -1,46 +1,21 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
+package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import java.io.File
 import java.io.FileInputStream
 import java.util.*
 
 /**
- * Contains set of possiblyValidTiles of one size
+ * Contains set of validTiles of one size
  */
 class TileSet {
     internal var n: Int = 0
     internal var m: Int = 0
     var k: Int = 0
-    val possiblyValidTiles = HashSet<Tile>()
+    val validTiles = HashSet<Tile>()
 
     internal val isEmpty: Boolean
-        get() = possiblyValidTiles.isEmpty()
-
-    /**
-     * Generates set of possibly-valid possiblyValidTiles
-     */
-    internal constructor(n: Int, m: Int, k: Int) {
-        this.n = n
-        this.m = m
-        this.k = k
-
-        /* It is meaningless to make following piece of code recursive
-         * because all candidate tiles must be placed in possiblyValidTiles set
-         * and it is not possible to reduce memory consumption using recursive method
-         */
-        possiblyValidTiles.add(Tile(n, m, k))
-
-        for (i in 0 until n) {
-            for (j in 0 until m) {
-                val newTileIS = this.possiblyValidTiles
-                        .filter { it.canBeI(i, j) }
-                        .map { Tile(it, i, j) }
-                        .toMutableSet()
-                possiblyValidTiles.addAll(newTileIS)
-                newTileIS.clear()
-            }
-        }
-    }
+        get() = validTiles.isEmpty()
 
     constructor(file: File) {
         if (!file.exists() || !file.isFile) {
@@ -60,7 +35,7 @@ class TileSet {
                         }
                     }
                 }
-                possiblyValidTiles.add(Tile(n, m, k, `is`))
+                validTiles.add(Tile(n, m, k, `is`))
             }
         }
         /* Still cannot understand why try-catch gives not-initialized error */
@@ -79,31 +54,52 @@ class TileSet {
         }
     }
 
-    fun size(): Int {
-        return possiblyValidTiles.size
-    }
+    fun size(): Int = validTiles.size
 
     /**
      * Return clone of original set so
      * it is not possible to add to set a tile of different size
      */
-    fun getPossiblyValidTiles(): Set<Tile> {
-        return HashSet(possiblyValidTiles)
-    }
+    fun getValidTiles(): Set<Tile> = HashSet(validTiles)
 
     private fun addTile(tile: Tile) {
         if (tile.k != k || tile.getM() != m || tile.getN() != n) {
             throw IllegalArgumentException("Tile must have the same parameters as tile set")
         }
 
-        this.possiblyValidTiles.add(tile)
+        this.validTiles.add(tile)
     }
 
     override fun toString(): String {
         val stringBuilder = StringBuilder()
-        for (tile in this.possiblyValidTiles) {
+        for (tile in this.validTiles) {
             stringBuilder.append(tile).append("\n")
         }
         return stringBuilder.toString()
     }
+}
+
+/**
+ * Generates set of possibly-valid validTiles
+ */
+fun generatePossiblyValidTiles(n: Int, m: Int, k: Int): HashSet<Tile> {
+
+    /* It is meaningless to make following piece of code recursive
+     * because all candidate tiles must be placed in possiblyValidTiles set
+     * and it is not possible to reduce memory consumption using recursive method
+     */
+    val possiblyValidTiles = HashSet<Tile>()
+    possiblyValidTiles.add(Tile(n, m, k))
+
+    for (i in 0 until n) {
+        for (j in 0 until m) {
+            val newTileIS = possiblyValidTiles
+                    .filter { it.canBeI(i, j) }
+                    .map { Tile(it, i, j) }
+                    .toMutableSet()
+            possiblyValidTiles.addAll(newTileIS)
+            newTileIS.clear()
+        }
+    }
+    return possiblyValidTiles
 }

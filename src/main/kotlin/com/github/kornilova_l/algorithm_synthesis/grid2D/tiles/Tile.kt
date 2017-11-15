@@ -48,24 +48,24 @@ class Tile {
         val n: Int
         val m: Int
         when (part) {
-            Tile.Part.BOTTOM, Tile.Part.TOP -> {
+            Tile.Part.S, Tile.Part.N -> {
                 n = tile.getN() - 1
                 m = tile.getM()
             }
-            Tile.Part.LEFT, Tile.Part.RIGHT -> {
+            Tile.Part.W, Tile.Part.E -> {
                 n = tile.getN()
                 m = tile.getM() - 1
             }
         }
         grid = Array(n) { BooleanArray(m) }
         when (part) {
-            Tile.Part.TOP, Tile.Part.LEFT -> for (i in 0 until n) {
+            Tile.Part.N, Tile.Part.W -> for (i in 0 until n) {
                 System.arraycopy(tile.grid[i], 0, grid[i], 0, m)
             }
-            Tile.Part.BOTTOM -> for (i in 0 until n) {
+            Tile.Part.S -> for (i in 0 until n) {
                 System.arraycopy(tile.grid[i + 1], 0, grid[i], 0, m)
             }
-            Tile.Part.RIGHT -> for (i in 0 until n) {
+            Tile.Part.E -> for (i in 0 until n) {
                 System.arraycopy(tile.grid[i], 1, grid[i], 0, m)
             }
         }
@@ -279,10 +279,10 @@ class Tile {
     }
 
     enum class Part {
-        TOP,
-        BOTTOM,
-        LEFT,
-        RIGHT
+        N,
+        S,
+        W,
+        E
     }
 
     class Coordinate(internal val x: Int, internal val y: Int) {

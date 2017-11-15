@@ -2,7 +2,7 @@ package com.github.kornilova_l.algorithm_synthesis.tiles
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.colouring.ColouringProblem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleTileGraph
 import org.apache.commons.io.FileUtils
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -22,7 +22,7 @@ internal class ColouringProblemTest {
         /* note: this test may fail because order of lines matters */
         val expected = join("\n",
                 FileUtils.readLines(File("src/test/resources/dimacs_4-colouring_2-2-1.txt"), null as String?)) + "\n"
-        val graph = TileGraph(tiles32, tiles23)
+        val graph = SimpleTileGraph(tiles32, tiles23)
         val actual = ColouringProblem.Companion.toDimacs(
                 graph, 4
         )

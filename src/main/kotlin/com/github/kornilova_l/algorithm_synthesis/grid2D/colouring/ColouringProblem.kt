@@ -1,10 +1,8 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.colouring
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGraph
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileMap
-import org.apache.commons.collections4.BidiMap
-import org.apache.commons.collections4.bidimap.DualHashBidiMap
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleTileGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileMap
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -17,7 +15,7 @@ import kotlin.collections.HashMap
  * Converts graph to dimacs format to solve n-colouring problem
  * Starts python script which starts SAT solver
  */
-class ColouringProblem(graph: TileGraph, coloursCount: Int) {
+class ColouringProblem(graph: SimpleTileGraph, coloursCount: Int) {
     /**
      * Value is null if there is no proper colouring
      */
@@ -49,7 +47,7 @@ class ColouringProblem(graph: TileGraph, coloursCount: Int) {
         colouringFunction = if (tileColours == null) null else ColouringFunction(tileColours)
     }
 
-    private fun getResult(scanner: Scanner, graph: TileGraph, coloursCount: Int): TileMap<Int>? {
+    private fun getResult(scanner: Scanner, graph: SimpleTileGraph, coloursCount: Int): TileMap<Int>? {
         val resultColours = TileMap<Int>(graph.n, graph.m, graph.k)
         val possibleColours = HashMap<Tile, BooleanArray>()
         for (tile in graph.graph.keys) {
@@ -92,7 +90,7 @@ class ColouringProblem(graph: TileGraph, coloursCount: Int) {
 
     companion object {
 
-        fun toDimacs(graph: TileGraph, coloursCount: Int): String {
+        fun toDimacs(graph: SimpleTileGraph, coloursCount: Int): String {
             val stringBuilder = StringBuilder()
             val clausesCount = graph.size + graph.edgeCount * coloursCount
             stringBuilder.append("p cnf ").append(graph.size * coloursCount).append(" ").append(clausesCount).append("\n")
@@ -113,7 +111,7 @@ class ColouringProblem(graph: TileGraph, coloursCount: Int) {
             return stringBuilder.toString()
         }
 
-        fun exportDimacs(graph: TileGraph, coloursCount: Int, dir: File): File? {
+        fun exportDimacs(graph: SimpleTileGraph, coloursCount: Int, dir: File): File? {
             if (!dir.exists() || !dir.isDirectory) {
                 throw IllegalArgumentException("File must be a directory and must exist")
             }
@@ -142,9 +140,8 @@ class ColouringProblem(graph: TileGraph, coloursCount: Int) {
         /**
          * Id of any variable must not be 0
          */
-        private fun getVarId(vertexId: Int, coloursCount: Int, currentVar: Int): Int {
-            return vertexId * coloursCount + currentVar + 1
-        }
+        private fun getVarId(vertexId: Int, coloursCount: Int, currentVar: Int): Int =
+                vertexId * coloursCount + currentVar + 1
 
         private fun addTileClause(stringBuilder: StringBuilder, id: Int?, coloursCount: Int) {
             for (i in 0 until coloursCount) {
@@ -152,14 +149,6 @@ class ColouringProblem(graph: TileGraph, coloursCount: Int) {
             }
             stringBuilder.deleteCharAt(stringBuilder.length - 1)
             stringBuilder.append("\n")
-        }
-
-        fun assignIds(graph: Map<Tile, HashSet<Tile>>): BidiMap<Tile, Int> {
-            val ids = DualHashBidiMap<Tile, Int>()
-            for ((id, tile) in graph.keys.withIndex()) {
-                ids.put(tile, id)
-            }
-            return ids
         }
     }
 }

@@ -1,8 +1,8 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.colouring
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGraph
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileSet
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleTileGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -11,7 +11,7 @@ import java.io.File
 internal class ColouringFunctionTest {
     private val tiles67 = TileSet(File("generated_tiles/6-7-3.txt"))
     private val tiles58 = TileSet(File("generated_tiles/5-8-3.txt"))
-    private val tileGraph = TileGraph(tiles67, tiles58)
+    private val tileGraph = SimpleTileGraph(tiles67, tiles58)
     private val colouringFunction = ColouringProblem(tileGraph, 4).colouringFunction
     private val iterationsCount = 1000
 

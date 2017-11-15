@@ -1,5 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.generatePossiblyValidTiles
 import com.github.kornilova_l.util.ProgressBar
 import java.io.File
 import java.io.FileOutputStream
@@ -20,8 +22,8 @@ class TileGenerator(private val n: Int, private val m: Int, private val k: Int) 
 
         val candidateTileIS = ConcurrentLinkedQueue<Tile>() // get concurrently from here
 
-        val candidateTilesSet = TileSet(n, m, k)
-        candidateTileIS.addAll(candidateTilesSet.possiblyValidTiles)
+        val candidateTilesSet = generatePossiblyValidTiles(n, m, k)
+        candidateTileIS.addAll(candidateTilesSet)
 
         printCandidatesFound(candidateTileIS.size)
         val validTileIS = ConcurrentHashMap.newKeySet<Tile>() // put concurrently here
