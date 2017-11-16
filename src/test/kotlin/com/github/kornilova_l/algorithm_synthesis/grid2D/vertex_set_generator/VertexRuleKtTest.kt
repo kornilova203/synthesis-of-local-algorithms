@@ -25,6 +25,7 @@ class VertexRuleKtTest {
 
     @Test
     fun reverseRulesTest() {
+        assertEquals(2, hashSetOf(VertexRule(1), VertexRule(2), VertexRule(1)).size)
         assertEquals(30, reverseRules(hashSetOf(VertexRule(1), VertexRule(2), VertexRule(1))).size)
     }
 
