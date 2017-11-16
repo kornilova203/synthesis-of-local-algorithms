@@ -1,10 +1,11 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileDirectedGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileDirectedGraph.Node
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters.getParametersSet
 import java.io.File
-import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Try to find tile size such that it is possible to get labels so
@@ -31,20 +32,23 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
     return null
 }
 
-fun toDimacs(graph: TileDirectedGraph, vertexRules: Set<VertexRule>): List<List<Int>> {
-    val clauses = LinkedList<List<Int>>()
+fun toDimacs(graph: TileDirectedGraph, rules: Set<VertexRule>): List<List<Int>> {
+    val revertedRules = reverseRules(rules)
+    val clauses = ArrayList<List<Int>>()
     for (node in graph.graph.values) {
-        for (rule in vertexRules) {
-            val clause = LinkedList<Int>()
-            for (position in positions) {
-                if (rule.isIncluded(position)) {
-                    node.neighbours[position]!!.mapTo(clause) { graph.getId(it)!! }
-                } else {
-                    node.neighbours[position]!!.mapTo(clause) { -graph.getId(it)!! }
-                }
-            }
-            clauses.add(clause)
-        }
+        revertedRules.mapTo(clauses) { formClause(node, it, graph) }
     }
     return clauses
+}
+
+private fun formClause(node: Node, reversedRule: VertexRule, graph: TileDirectedGraph): List<Int> {
+    val clause = ArrayList<Int>()
+    for (position in positions) {
+        if (reversedRule.isIncluded(position)) { // if a position is included by reversed rule then it should be excluded
+            node.neighbours[position]!!.mapTo(clause) { -graph.getId(it)!! }
+        } else { // and vise versa
+            node.neighbours[position]!!.mapTo(clause) { graph.getId(it)!! }
+        }
+    }
+    return clause
 }
