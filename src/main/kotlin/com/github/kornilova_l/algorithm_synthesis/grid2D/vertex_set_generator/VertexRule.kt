@@ -28,7 +28,21 @@ val positionIndexes: BidiMap<POSITION, Int> = DualHashBidiMap()
 val positionLetters: BidiMap<POSITION, Char> = DualHashBidiMap()
 val positions = hashSetOf(POSITION.X, POSITION.N, POSITION.E, POSITION.S, POSITION.W)
 
-class VertexRule(id: Int) {
+/**
+ * @return new set which contains all possible rules but without
+ * the rules which are given as a parameter. Size of new set is 32 - rules.size()
+ */
+fun reverseRules(rules: Set<VertexRule>): Set<VertexRule> {
+    val ids = HashSet<Int>() // convert rules to ids for convenient compare
+    rules.mapTo(ids) { it.id }
+
+    val reversedRules = HashSet<VertexRule>()
+    (0..31).filter { !ids.contains(it) }
+            .forEach { reversedRules.add(VertexRule(it)) }
+    return reversedRules
+}
+
+class VertexRule(val id: Int) {
     val array = Array(32, { false })
 
     init {
@@ -51,6 +65,8 @@ class VertexRule(id: Int) {
         }
         return stringBuilder.toString()
     }
+
+    override fun toString(): String = toHumanReadableSting()
 
     companion object {
         init {

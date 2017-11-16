@@ -23,4 +23,9 @@ class VertexRuleKtTest {
         assertFalse(VertexRule(1).isIncluded(POSITION.N))
     }
 
+    @Test
+    fun reverseRulesTest() {
+        assertEquals(30, reverseRules(hashSetOf(VertexRule(1), VertexRule(2), VertexRule(1))).size)
+    }
+
 }
