@@ -1,15 +1,16 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
-import java.util.HashSet
-import kotlin.collections.HashMap
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.POSITION
+import org.apache.commons.collections4.bidimap.DualHashBidiMap
 
 /**
  * Constructs graph of tiles.
  * This implementation saves orientation of edges
  */
 class TileDirectedGraph(tileSet1: TileSet, tileSet2: TileSet) : TileGraph(tileSet1, tileSet2) {
-    private val graph: HashMap<Tile, Node> = HashMap()
+    val graph: HashMap<Tile, Node> = HashMap()
+    private val ids = DualHashBidiMap<Tile, Int>()
     override val size: Int
         get() = graph.size
     override val edgeCount: Int
@@ -24,29 +25,43 @@ class TileDirectedGraph(tileSet1: TileSet, tileSet2: TileSet) : TileGraph(tileSe
         for (tile in this.tileSet1.validTiles) { // get vertical neighbours
             val north = Tile(tile, Tile.Part.N)
             val south = Tile(tile, Tile.Part.S)
-            graph.computeIfAbsent(north) { Node() }.S.add(south)
-            graph.computeIfAbsent(south) { Node() }.N.add(north)
+            graph.computeIfAbsent(north) { Node(north) }.neighbours[POSITION.S]!!.add(south)
+            graph.computeIfAbsent(south) { Node(south) }.neighbours[POSITION.N]!!.add(north)
         }
         for (tile in this.tileSet2.validTiles) { // get horizontal neighbours
             val west = Tile(tile, Tile.Part.W)
             val east = Tile(tile, Tile.Part.E)
-            graph.computeIfAbsent(west) { Node() }.E.add(east)
-            graph.computeIfAbsent(east) { Node() }.W.add(west)
+            graph.computeIfAbsent(west) { Node(west) }.neighbours[POSITION.E]!!.add(east)
+            graph.computeIfAbsent(east) { Node(east) }.neighbours[POSITION.W]!!.add(west)
         }
         if (graph.size == 0) {
             throw IllegalArgumentException("Cannot construct graph")
         }
 
-//        assignIds()
+        assignIds()
     }
 
+    private fun assignIds() {
+        for ((tile, i) in graph.keys.withIndex()) {
+            ids.put(i, tile)
+        }
+    }
+
+    fun getId(tile: Tile): Int? = ids[tile]
+
     @Suppress("PropertyName")
-    private class Node {
-        val N: HashSet<Tile> = HashSet()
-        val E: HashSet<Tile> = HashSet()
-        val S: HashSet<Tile> = HashSet()
-        val W: HashSet<Tile> = HashSet()
+    class Node(tile: Tile) {
+        val neighbours = HashMap<POSITION, HashSet<Tile>>()
         val edgeCount: Int
-            get() = N.size + E.size + S.size + W.size
+            get() = neighbours.values.sumBy { it.size } - 1 // remove itself
+
+        init {
+            neighbours[POSITION.N] = HashSet()
+            neighbours[POSITION.E] = HashSet()
+            neighbours[POSITION.S] = HashSet()
+            neighbours[POSITION.W] = HashSet()
+            neighbours[POSITION.X] = HashSet()
+            neighbours[POSITION.X]!!.add(tile)
+        }
     }
 }
