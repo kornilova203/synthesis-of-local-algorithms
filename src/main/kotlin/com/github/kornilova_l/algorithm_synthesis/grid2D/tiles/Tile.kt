@@ -20,11 +20,9 @@ class Tile {
         get() {
             val canBeAddedToIS = HashSet<Coordinate>()
             for (i in 0 until getN()) {
-                for (j in 0 until getM()) {
-                    if (!grid[i][j] && canBeI(i, j)) {
-                        canBeAddedToIS.add(Coordinate(i, j))
-                    }
-                }
+                (0 until getM())
+                        .filter { !grid[i][it] && canBeI(i, it) }
+                        .mapTo(canBeAddedToIS) { Coordinate(i, it) }
             }
             return if (canBeAddedToIS.isEmpty()) {
                 true
@@ -132,13 +130,9 @@ class Tile {
     }
 
 
-    fun getN(): Int {
-        return grid.size
-    }
+    fun getN(): Int = grid.size
 
-    fun getM(): Int {
-        return grid[0].size
-    }
+    fun getM(): Int = grid[0].size
 
     /**
      * @return true if grid[x][y] can be an element of an independent set
@@ -150,13 +144,9 @@ class Tile {
         val endX = Math.min(getN() - 1, x + k)
         val endY = Math.min(getM() - 1, y + k)
         for (i in Math.max(0, x - k)..endX) {
-            for (j in Math.max(0, y - k)..endY) {
-                if (Math.abs(i - x) + Math.abs(j - y) <= k) {
-                    if (grid[i][j]) {
-                        return false
-                    }
-                }
-            }
+            (Math.max(0, y - k)..endY)
+                    .filter { Math.abs(i - x) + Math.abs(it - y) <= k && grid[i][it] }
+                    .forEach { return false }
         }
         return true
     }
@@ -243,12 +233,13 @@ class Tile {
         return covered
     }
 
+    /**
+     * Add k to each coordinate
+     */
     private fun changeCoordinatesForExpanded(canBeAddedToIS: Set<Coordinate>, k: Int): MutableSet<Coordinate> {
-        val res = HashSet<Coordinate>()
-        for (coordinate in canBeAddedToIS) {
-            res.add(Coordinate(coordinate.x + k, coordinate.y + k))
-        }
-        return res
+        return canBeAddedToIS
+                .map { Coordinate(it.x + k, it.y + k) }
+                .toMutableSet()
     }
 
     /**
@@ -265,18 +256,14 @@ class Tile {
             throw IllegalArgumentException("Size of tile is different")
         }
         for (i in 0 until getN()) {
-            for (j in 0 until getM()) {
-                if (grid[i][j] != other.grid[i][j]) {
-                    return false
-                }
-            }
+            (0 until getM())
+                    .filter { grid[i][it] != other.grid[i][it] }
+                    .forEach { return false }
         }
         return true
     }
 
-    override fun hashCode(): Int {
-        return Arrays.deepHashCode(grid)
-    }
+    override fun hashCode(): Int = Arrays.deepHashCode(grid)
 
     enum class Part {
         N,
@@ -287,14 +274,18 @@ class Tile {
 
     class Coordinate(internal val x: Int, internal val y: Int) {
 
-        override fun toString(): String {
-            return "($x, $y)"
-        }
+        override fun toString(): String = "($x, $y)"
 
         override fun equals(other: Any?): Boolean {
             return if (other !is Coordinate) {
                 false
             } else x == other.x && y == other.y
+        }
+
+        override fun hashCode(): Int {
+            var result = x
+            result = 31 * result + y
+            return result
         }
     }
 }

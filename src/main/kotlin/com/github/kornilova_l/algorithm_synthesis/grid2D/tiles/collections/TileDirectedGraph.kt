@@ -49,6 +49,8 @@ class TileDirectedGraph(tileSet1: TileSet, tileSet2: TileSet) : TileGraph(tileSe
 
     fun getId(tile: Tile): Int? = ids[tile]
 
+    fun getTile(id: Int): Tile? = ids.getKey(id)
+
     @Suppress("PropertyName")
     class Node(tile: Tile) {
         val neighbours = HashMap<POSITION, HashSet<Tile>>()

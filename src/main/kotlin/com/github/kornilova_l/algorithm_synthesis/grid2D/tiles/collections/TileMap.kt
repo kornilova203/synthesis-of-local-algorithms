@@ -14,9 +14,7 @@ class TileMap<Val>(val n: Int, val m: Int, val k: Int) {
     internal val isEmpty: Boolean
         get() = tiles.isEmpty()
 
-    fun size(): Int {
-        return tiles.size
-    }
+    fun size(): Int = tiles.size
 
     fun put(key: Tile, value: Val) {
         if (key.k != k || key.getM() != m || key.getN() != n) {
@@ -26,7 +24,5 @@ class TileMap<Val>(val n: Int, val m: Int, val k: Int) {
         tiles.put(key, value)
     }
 
-    operator fun get(tile: Tile): Val {
-        return tiles[tile]!!
-    }
+    operator fun get(tile: Tile): Val = tiles[tile]!!
 }

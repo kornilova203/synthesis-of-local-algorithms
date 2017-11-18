@@ -1,13 +1,42 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
-import java.io.File
-
-private val tiles67 = TileSet(File("generated_tiles/6-7-3.txt"))
-private val tiles58 = TileSet(File("generated_tiles/5-8-3.txt"))
+import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.VertexRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.getLabelingFunction
 
 fun main(args: Array<String>) {
-    val tileGenerator = TileGenerator(6, 7, 3)
+    /* independent set */
+    val labelingFunction = getLabelingFunction(hashSetOf(
+            VertexRule("X"),
+            VertexRule("N"),
+            VertexRule("E"),
+            VertexRule("S"),
+            VertexRule("W"),
+            VertexRule("NE"),
+            VertexRule("NS"),
+            VertexRule("NW"),
+            VertexRule("ES"),
+            VertexRule("EW"),
+            VertexRule("SW"),
+            VertexRule("NES"),
+            VertexRule("NEW"),
+            VertexRule("NSW"),
+            VertexRule("ESW"),
+            VertexRule("NESW")
+    ))
+    if (labelingFunction == null) {
+        println("not found")
+    } else {
+        println("found")
+        val grid = generateGrid(6, 7)
+        val labeledGrid = labelingFunction.getLabels(grid)
+        println(grid)
+        for (i in 0 until labeledGrid!!.size) {
+            (0 until labeledGrid[0].size)
+                    .map { if (labeledGrid[i][it]) 1 else 0 }
+                    .forEach { print("$it ") }
+            println()
+        }
+    }
 }
 

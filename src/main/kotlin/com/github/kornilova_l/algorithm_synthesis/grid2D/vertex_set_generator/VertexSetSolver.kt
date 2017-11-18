@@ -35,7 +35,9 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
             val graph = TileDirectedGraph(tileSet1, tileSet2)
             val clauses = toDimacs(graph, vertexRules)
             val solution = solveWithSatSolver(clauses, graph.size)
-            println(solution)
+            if (solution != null) { // solution found
+                return LabelingFunction(solution, graph)
+            }
         }
     }
     return null
@@ -62,14 +64,9 @@ private fun solveWithSatSolver(clauses: Set<Set<Int>>, varCount: Int): List<Int>
         writer.close()
         val scanner = Scanner(process.inputStream)
         process!!.waitFor()
-        while (scanner.hasNextLine()) {
-            println(scanner.nextLine())
+        if (scanner.nextLine() == "OK") {
+            return parseResult(scanner)
         }
-//        if (scanner.nextLine() == "OK") {
-//            return parseResult(scanner)
-//        } else {
-//            println("Something went wrong while running python script")
-//        }
     } catch (e: IOException) {
         e.printStackTrace()
     } catch (e: InterruptedException) {
