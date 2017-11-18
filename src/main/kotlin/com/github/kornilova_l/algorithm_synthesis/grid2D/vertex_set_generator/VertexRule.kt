@@ -43,15 +43,31 @@ fun reverseRules(rules: Set<VertexRule>): Set<VertexRule> {
     return reversedRules
 }
 
-class VertexRule(val id: Int) {
-    val array = Array(32, { false })
+fun getBit(num: Int, position: Int): Boolean = (num shr position).toByte() and 1 == 1.toByte()
 
-    init {
+class VertexRule {
+    val array = Array(32, { false })
+    val id: Int
+
+    constructor(id: Int) {
+        this.id = id
         if (id >= 32) {
             throw IllegalArgumentException("Id must be smaller than 32")
         }
         (0..4).filter { getBit(id, it) }
                 .forEach { array[it] = true }
+    }
+
+    constructor(rule: String) {
+        var id = 0
+        for (i in 0 until rule.length) {
+            val c = rule[i]
+            val position = positionLetters.getKey(c)!!
+            val index = positionIndexes[position]!!
+            array[index] = true
+            id += Math.pow(2.toDouble(), index.toDouble()).toInt()
+        }
+        this.id = id
     }
 
     fun isIncluded(position: POSITION): Boolean = array[positionIndexes[position]!!]
@@ -96,7 +112,5 @@ class VertexRule(val id: Int) {
             positionLetters[POSITION.S] = 'S'
             positionLetters[POSITION.W] = 'W'
         }
-
-        private fun getBit(num: Int, position: Int): Boolean = (num shr position).toByte() and 1 == 1.toByte()
     }
 }

@@ -42,8 +42,8 @@ class TileDirectedGraph(tileSet1: TileSet, tileSet2: TileSet) : TileGraph(tileSe
     }
 
     private fun assignIds() {
-        for ((tile, i) in graph.keys.withIndex()) {
-            ids.put(i, tile)
+        for ((i, tile) in graph.keys.withIndex()) {
+            ids.put(tile, i + 1) // ids must be positive
         }
     }
 
@@ -63,5 +63,7 @@ class TileDirectedGraph(tileSet1: TileSet, tileSet2: TileSet) : TileGraph(tileSe
             neighbours[POSITION.X] = HashSet()
             neighbours[POSITION.X]!!.add(tile)
         }
+
+        override fun toString(): String = neighbours[POSITION.X]?.toString()?:""
     }
 }

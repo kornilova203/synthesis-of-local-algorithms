@@ -13,8 +13,21 @@ def parse_clauses_from_file(file_name):
         return clauses
 
 
+def parse_clauses_from_stdin():
+    first_line = sys.stdin.readline()
+    var_count, clause_count = [int(x) for x in first_line.split()[2:4]]
+    clauses = []
+    for line in sys.stdin:
+        clauses.append([int(x) for x in line.split()])
+    assert clause_count == len(clauses)
+    return clauses
+
+
 def main():
-    clauses = parse_clauses_from_file(sys.argv[1])
+    if len(sys.argv) == 2:
+        clauses = parse_clauses_from_file(sys.argv[1])
+    else:
+        clauses = parse_clauses_from_stdin()
     res = pycosat.solve(clauses)
     if isinstance(res, list):
         print("OK")
