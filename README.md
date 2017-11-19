@@ -31,10 +31,10 @@ The goal of computer search is to find such normal form and radius of a neighbou
  
  A set of rules is a _problem_. For example following rules describe maximal independent set:  
  `X, N, E, S, W, NE, NS, NW, ES, EW, SW, NES, NEW, NSW, ESW, NESW`  
- It means that 1-radius neighbourhood of _any_ vertex must contain one of the following combinations:  
+ It means that 1-radius neighbourhood of _any_ vertex must be one of the following combinations:  
  ![](images/is_rules.png)
  
  
-Using normal of grid and a SAT solver we can find a mapping from local neighbourhood to vertex label, so each vertex will belong to one of the rules described above:  
+Using normal form of grid and a SAT solver we can find a mapping from local neighbourhood to vertex label, so each vertex will belong to one of the rules described above:  
 ![independent set](images/is.png)  
-And this is not surprising because normal form of grid is used to find a mapping and normal form already contains maximal independent set.
+And this is not surprising because normal form of grid already contains maximal independent set.
