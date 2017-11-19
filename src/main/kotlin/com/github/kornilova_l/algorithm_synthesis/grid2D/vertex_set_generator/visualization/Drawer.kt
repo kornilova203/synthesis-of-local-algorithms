@@ -6,7 +6,7 @@ import java.io.File
 import javax.imageio.ImageIO
 
 val blue = Color(51, 99, 255)
-val gray = Color(190, 190, 190)
+val gray = Color(220, 220, 220)
 val white = Color(255, 255, 255)
 val cellWidth = 15
 val gap = 7

@@ -40,4 +40,4 @@ Using normal form of grid and a SAT solver we can find a mapping from local neig
 This is not surprising because normal form of grid already contains maximal independent set.
 
 Dominating set:  
-![dominating set](images/inverted_is.png)
+![dominating set](images/dominating_set.png)

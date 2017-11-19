@@ -8,10 +8,10 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.ru
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.visualization.drawLabels
 
 fun main(args: Array<String>) {
-//    val labelingFunction = independentSet()
+    val labelingFunction = independentSet()
 //    val labelingFunction = test()
 //    val labelingFunction = gameOfLife()
-    val labelingFunction = invertedIndependentSet()
+//    val labelingFunction = invertedIndependentSet()
 
     if (labelingFunction == null) {
         println("not found")
