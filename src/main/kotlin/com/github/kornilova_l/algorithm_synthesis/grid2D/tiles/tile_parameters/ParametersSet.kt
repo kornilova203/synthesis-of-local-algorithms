@@ -7,15 +7,12 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters
  */
 fun getParametersSet(difficulty: Int): Set<Parameters> {
     if (difficulty == 1) {
-        val parameters = HashSet<Parameters>()
-        for(n in 1..8) {
-            for(m in n..8) {
-                for (k in 1..5) {
-                    if (k < (m * n) / 5 - 4) { // if too difficult
-                        continue
-                    }
-                    parameters.add(Parameters(n, m, k))
-                }
+        val parameters = java.util.TreeSet<Parameters>()
+        for (n in 1..8) {
+            for (m in n..8) {
+                (1..5)
+                        .filter { it >= (m * n) / 5 - 4 } // if not too difficult
+                        .mapTo(parameters) { Parameters(n, m, it) }
             }
         }
         return parameters
@@ -33,4 +30,23 @@ fun main(args: Array<String>) {
     printParameters(getParametersSet(1))
 }
 
-data class Parameters(val n: Int, val m: Int, val k: Int)
+class Parameters(val n: Int, val m: Int, val k: Int) : Comparable<Parameters> {
+    override fun compareTo(other: Parameters): Int {
+        val bigger = Math.max(n, m)
+        val smaller = Math.min(n, m)
+        val oBigger = Math.max(other.n, other.m)
+        val oSmaller = Math.min(other.n, other.m)
+        if (bigger == oBigger) {
+            if (smaller == oSmaller) {
+                if (k == other.k) {
+                    return 0
+                }
+                return if (k < other.k) -1 else 1
+            }
+            return if (smaller < oSmaller) -1 else 1
+        }
+        return if (bigger < oBigger) -1 else 1
+    }
+
+    override fun toString(): String = "n: $n, m: $m, k: $k"
+}
