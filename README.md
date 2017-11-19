@@ -21,7 +21,20 @@ The basic structure of synthesized algorithm is the following:
 
 The goal of computer search is to find such normal form and radius of a neighbourhood so it is possible to find a mapping from a neighbourhood to right state for each vertex/edge.
 
-## What has been done
-Reproduced some results of the paper [LCL problems on grids](https://users.ics.aalto.fi/suomela/doc/grid-lcl.pdf):  
-Found algorithm that solves 4-colouring on 2-dimensional torus grids.
-
+## Vertex labeling problem  
+ In this project I use computer search to find algorithms that produce binary vertex labels {0, 1}. Particularly, I study problems for which the feasibility of a solution can be verified by looking at 1-radius neighbourhood of each vertex.
+ 
+ Consider following vertex _v_ on 2-dimensional torus grid:  
+ ![](images/xnesw.png)  
+ It has 4 neighbours and it knows direction of north, east, west and south.  
+ We can create a rule that specifies which vertices in the neighbourhood will have label 1. For example if rule is `NE` then neighbours on north and east will have label 1, vertex _v_ and neighbours on west and south will have label 0.
+ 
+ A set of rules is a _problem_. For example following rules describe maximal independent set:  
+ `X, N, E, S, W, NE, NS, NW, ES, EW, SW, NES, NEW, NSW, ESW, NESW`  
+ It means that 1-radius neighbourhood of _any_ vertex must contain one of the following combinations:  
+ ![](images/is_rules.png)
+ 
+ 
+Using normal of grid and a SAT solver we can find a mapping from local neighbourhood to vertex label, so each vertex will belong to one of the rules described above:  
+![independent set](images/is.png)  
+And this is not surprising because normal form of grid is used to find a mapping and normal form already contains maximal independent set.

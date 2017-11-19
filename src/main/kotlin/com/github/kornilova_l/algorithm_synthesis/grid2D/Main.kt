@@ -3,6 +3,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.getLabelingFunction
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.visualization.drawLabels
 
 fun main(args: Array<String>) {
     /* independent set */
@@ -28,7 +29,7 @@ fun main(args: Array<String>) {
         println("not found")
     } else {
         println("found")
-        val grid = generateGrid(6, 7)
+        val grid = generateGrid(10, 10)
         val labeledGrid = labelingFunction.getLabels(grid)
         println(grid)
         for (i in 0 until labeledGrid!!.size) {
@@ -37,6 +38,7 @@ fun main(args: Array<String>) {
                     .forEach { print("$it ") }
             println()
         }
+        drawLabels(labeledGrid)
     }
 }
 
