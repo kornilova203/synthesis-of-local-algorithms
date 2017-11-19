@@ -80,13 +80,9 @@ class ColouringProblem(graph: SimpleTileGraph, coloursCount: Int) {
     /**
      * @return one if {0, 1, .., coloursCount - 1}
      */
-    private fun getColourId(tileColourId: Int, coloursCount: Int): Int {
-        return (tileColourId - 1) % coloursCount
-    }
+    private fun getColourId(tileColourId: Int, coloursCount: Int): Int = (tileColourId - 1) % coloursCount
 
-    private fun getTileId(tileColourId: Int, coloursCount: Int): Int {
-        return (tileColourId - 1) / coloursCount
-    }
+    private fun getTileId(tileColourId: Int, coloursCount: Int): Int = (tileColourId - 1) / coloursCount
 
     companion object {
 
@@ -108,6 +104,7 @@ class ColouringProblem(graph: SimpleTileGraph, coloursCount: Int) {
                     addEdgeClauses(stringBuilder, graph.getId(tile), graph.getId(neighbour), coloursCount)
                 }
             }
+            stringBuilder.deleteCharAt(stringBuilder.length - 1)
             return stringBuilder.toString()
         }
 
@@ -126,9 +123,8 @@ class ColouringProblem(graph: SimpleTileGraph, coloursCount: Int) {
             return null
         }
 
-        private fun getFileName(coloursCount: Int): String {
-            return "dimacs_" + coloursCount + "-colouring_" + System.currentTimeMillis() + ".txt"
-        }
+        private fun getFileName(coloursCount: Int): String =
+                "dimacs_" + coloursCount + "-colouring_" + System.currentTimeMillis() + ".txt"
 
         private fun addEdgeClauses(stringBuilder: StringBuilder, vertex1Id: Int, vertex2Id: Int, coloursCount: Int) {
             for (i in 0 until coloursCount) {
