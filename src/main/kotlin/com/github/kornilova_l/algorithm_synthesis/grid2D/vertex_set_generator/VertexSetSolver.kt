@@ -5,6 +5,10 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileD
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileDirectedGraph.Node
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters.getParametersSet
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.positions
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.reverseRules
 import java.io.BufferedWriter
 import java.io.File
 import java.io.IOException

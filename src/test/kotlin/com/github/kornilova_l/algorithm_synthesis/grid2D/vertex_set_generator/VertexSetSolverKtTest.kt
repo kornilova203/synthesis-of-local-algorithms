@@ -3,6 +3,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileDirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import org.junit.Assert.*
 import org.junit.Test
 import java.io.File
@@ -59,7 +60,7 @@ class VertexSetSolverKtTest {
     }
 
     @Test
-    fun getLabelingFunctionTest() {
+    fun labelingFunctionForIS() {
         val iterations = 1000
         val independentSetRules = hashSetOf(
                 VertexRule("X"),
@@ -86,6 +87,37 @@ class VertexSetSolverKtTest {
             val labeledGrid = labelingFunction!!.getLabels(grid)
             assertNotNull(labeledGrid)
             assertTrue(isRight(labeledGrid!!, independentSetRules))
+        }
+    }
+
+    @Test
+    fun labelingFunctionForInvertedIS() {
+        val iterations = 1000
+        val invertedISRules = hashSetOf(
+                VertexRule("X"),
+                VertexRule("XN"),
+                VertexRule("XE"),
+                VertexRule("XS"),
+                VertexRule("XW"),
+                VertexRule("XNE"),
+                VertexRule("XNS"),
+                VertexRule("XNW"),
+                VertexRule("XES"),
+                VertexRule("XEW"),
+                VertexRule("XSW"),
+                VertexRule("XNES"),
+                VertexRule("XNEW"),
+                VertexRule("XNSW"),
+                VertexRule("XESW"),
+                VertexRule("NESW")
+        )
+        val labelingFunction = getLabelingFunction(invertedISRules)
+        assertNotNull(labelingFunction)
+        for (i in 0 until iterations) {
+            val grid = generateGrid(10, 10)
+            val labeledGrid = labelingFunction!!.getLabels(grid)
+            assertNotNull(labeledGrid)
+            assertTrue(isRight(labeledGrid!!, invertedISRules))
         }
     }
 

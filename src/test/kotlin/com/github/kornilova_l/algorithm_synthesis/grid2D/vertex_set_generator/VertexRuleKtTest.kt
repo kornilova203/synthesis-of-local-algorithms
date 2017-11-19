@@ -1,5 +1,8 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.reverseRules
 import org.junit.Assert.*
 import org.junit.Test
 
