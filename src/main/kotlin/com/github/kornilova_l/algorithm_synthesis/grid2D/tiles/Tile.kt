@@ -1,5 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import java.util.*
 
 class Tile {
@@ -69,6 +70,30 @@ class Tile {
         }
         this.n = n
         this.m = m
+    }
+
+    constructor(tile: Tile, position: POSITION) {
+        k = tile.k
+        n = tile.n - 2
+        m = tile.m - 2
+        grid = Array(n) { BooleanArray(m) }
+        when (position) {
+            POSITION.N -> for (i in 0 until n) {
+                System.arraycopy(tile.grid[i], 1, grid[i], 0, m)
+            }
+            POSITION.E -> for (i in 0 until n) {
+                System.arraycopy(tile.grid[i + 1], 2, grid[i], 0, m)
+            }
+            POSITION.S -> for (i in 0 until n) {
+                System.arraycopy(tile.grid[i + 2], 1, grid[i], 0, m)
+            }
+            POSITION.W -> for (i in 0 until n) {
+                System.arraycopy(tile.grid[i + 1], 0, grid[i], 0, m)
+            }
+            POSITION.X -> for (i in 0 until n) {
+                System.arraycopy(tile.grid[i + 1], 1, grid[i], 0, m)
+            }
+        }
     }
 
     /**

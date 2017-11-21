@@ -12,6 +12,9 @@ class TileSet {
     internal var n: Int = 0
     internal var m: Int = 0
     var k: Int = 0
+    /**
+     * Do not modify this set externally
+     */
     val validTiles = HashSet<Tile>()
 
     internal val isEmpty: Boolean
@@ -55,12 +58,6 @@ class TileSet {
     }
 
     fun size(): Int = validTiles.size
-
-    /**
-     * Return clone of original set so
-     * it is not possible to add to set a tile of different size
-     */
-    fun getValidTiles(): Set<Tile> = HashSet(validTiles)
 
     private fun addTile(tile: Tile) {
         if (tile.k != k || tile.getM() != m || tile.getN() != n) {

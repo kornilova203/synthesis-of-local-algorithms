@@ -23,10 +23,10 @@ internal class TileGeneratorTest {
         val file = tileGenerator.exportToFile(File("."), true)
         assertNotNull(file)
 
-        val tileIS = TileSet(file!!).getValidTiles()
+        val tileIS = TileSet(file!!).validTiles
         assertNotNull(tileIS)
 
-        assertTrue(CollectionUtils.isEqualCollection(tileGenerator.tileSet.getValidTiles(), tileIS))
+        assertTrue(CollectionUtils.isEqualCollection(tileGenerator.tileSet.validTiles, tileIS))
 
 
         file.delete()
