@@ -8,7 +8,7 @@ import org.apache.commons.collections4.bidimap.DualHashBidiMap
  * Constructs graph of tiles.
  * This implementation saves orientation of edges
  */
-class TileDirectedGraph(tileSet1: TileSet, tileSet2: TileSet) : TileGraph(tileSet1, tileSet2) {
+class DirectedTileGraph(tileSet1: TileSet, tileSet2: TileSet) : TileGraph(tileSet1, tileSet2) {
     val graph: HashMap<Tile, Node> = HashMap()
     private val ids = DualHashBidiMap<Tile, Int>()
     override val size: Int

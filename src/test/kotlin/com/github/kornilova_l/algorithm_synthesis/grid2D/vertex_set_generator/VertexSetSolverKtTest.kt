@@ -1,7 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileDirectedGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedTileGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import org.junit.Assert.*
@@ -13,7 +13,7 @@ class VertexSetSolverKtTest {
     fun toDimacsTest() {
         var file1 = File("generated_tiles/3-2-1.txt")
         var file2 = File("generated_tiles/2-3-1.txt")
-        var graph = TileDirectedGraph(TileSet(file1), TileSet(file2))
+        var graph = DirectedTileGraph(TileSet(file1), TileSet(file2))
         var clauses = toDimacs(graph, hashSetOf(VertexRule(1)))
 //        println(clauses.joinToString("", "", transform={ "${it.joinToString(" ", "")}\n" }))
         var expected = parseClauses(File("src/test/resources/vertexSetSolver/to_dimacs_2_2_1.txt").readText())
@@ -21,7 +21,7 @@ class VertexSetSolverKtTest {
 
         file1 = File("generated_tiles/2-2-1.txt")
         file2 = File("generated_tiles/1-3-1.txt")
-        graph = TileDirectedGraph(TileSet(file1), TileSet(file2))
+        graph = DirectedTileGraph(TileSet(file1), TileSet(file2))
         clauses = toDimacs(graph, hashSetOf(VertexRule(1)))
 //        println(clauses.joinToString("", "", transform={ "${it.joinToString(" ", "")}\n" }))
         expected = parseClauses(File("src/test/resources/vertexSetSolver/to_dimacs_1_2_1.txt").readText())
@@ -43,7 +43,7 @@ class VertexSetSolverKtTest {
     fun requireNeighboursEqualTest() {
         val file1 = File("generated_tiles/2-2-1.txt")
         val file2 = File("generated_tiles/1-3-1.txt")
-        val graph = TileDirectedGraph(TileSet(file1), TileSet(file2))
+        val graph = DirectedTileGraph(TileSet(file1), TileSet(file2))
         val simplifiedGraph = getSimplifiedGraph(graph)
         val clauses = HashSet<Set<Int>>()
         for (tile in graph.graph.keys) {

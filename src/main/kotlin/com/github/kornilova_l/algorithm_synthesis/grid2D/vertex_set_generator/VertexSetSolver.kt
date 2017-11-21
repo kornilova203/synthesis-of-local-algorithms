@@ -1,8 +1,8 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileDirectedGraph
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileDirectedGraph.Node
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedTileGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedTileGraph.Node
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters.getParametersSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
@@ -36,7 +36,7 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
         if (file1.exists() && file2.exists()) {
             val tileSet1 = TileSet(file1)
             val tileSet2 = TileSet(file2)
-            val graph = TileDirectedGraph(tileSet1, tileSet2)
+            val graph = DirectedTileGraph(tileSet1, tileSet2)
             val clauses = toDimacs(graph, vertexRules)
             val solution = solveWithSatSolver(clauses, graph.size)
             if (solution != null) { // solution found
@@ -87,7 +87,7 @@ fun parseResult(scanner: Scanner): List<Int> {
     return res
 }
 
-fun toDimacs(graph: TileDirectedGraph, rules: Set<VertexRule>): Set<Set<Int>> {
+fun toDimacs(graph: DirectedTileGraph, rules: Set<VertexRule>): Set<Set<Int>> {
     val reversedRules = reverseRules(rules)
     val clauses = HashSet<Set<Int>>()
     val simplifiedGraph = getSimplifiedGraph(graph) // each node has at most 1 neighbour on each side
@@ -110,7 +110,7 @@ fun toDimacs(graph: TileDirectedGraph, rules: Set<VertexRule>): Set<Set<Int>> {
  * For each node select a leader among neighbours on each side
  * This is needed to simplify clauses
  */
-internal fun getSimplifiedGraph(graph: TileDirectedGraph): HashMap<Tile, Map<POSITION, Tile>> {
+internal fun getSimplifiedGraph(graph: DirectedTileGraph): HashMap<Tile, Map<POSITION, Tile>> {
     val simplifiedGraph = HashMap<Tile, Map<POSITION, Tile>>()
     for (node in graph.graph.values) {
         val simplifiedNeighbours = HashMap<POSITION, Tile>()
@@ -131,7 +131,7 @@ internal fun getSimplifiedGraph(graph: TileDirectedGraph): HashMap<Tile, Map<POS
  * For each set of neighbours (N, E, S, W) require that they all are equal to
  * leader neighbour in simplifiedNode
  */
-fun requireNeighboursEqual(node: Node, graph: TileDirectedGraph, simplifiedNode: Map<POSITION, Tile>): Set<Set<Int>> {
+fun requireNeighboursEqual(node: Node, graph: DirectedTileGraph, simplifiedNode: Map<POSITION, Tile>): Set<Set<Int>> {
     val clausesForEqualNeighbours = HashSet<Set<Int>>()
     for (position in positions) {
         val k = node.neighbours[position]!!.size
@@ -155,7 +155,7 @@ fun twoNotEqual(id1: Int, id2: Int): Set<Set<Int>> {
 /**
  * @return null if reversedRule can never be true for this node
  */
-private fun formClause(node: Map<POSITION, Tile>, reversedRule: VertexRule, graph: TileDirectedGraph): Set<Int>? {
+private fun formClause(node: Map<POSITION, Tile>, reversedRule: VertexRule, graph: DirectedTileGraph): Set<Int>? {
     val clause = HashSet<Int>()
     for (position in positions) {
         var mul = 1

@@ -3,7 +3,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.Grid2D
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileDirectedGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedTileGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileMap
 
 
@@ -14,7 +14,7 @@ class LabelingFunction {
         this.tileLabels = tileLabels
     }
 
-    constructor(solution: List<Int>, graph: TileDirectedGraph) {
+    constructor(solution: List<Int>, graph: DirectedTileGraph) {
         tileLabels = TileMap(graph.n, graph.m, graph.k)
         for (index in solution) {
             val id = Math.abs(index)
