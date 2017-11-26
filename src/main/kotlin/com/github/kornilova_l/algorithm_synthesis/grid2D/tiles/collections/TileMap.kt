@@ -11,9 +11,6 @@ import java.util.HashMap
 class TileMap<Val>(val n: Int, val m: Int, val k: Int) {
     private val tiles = HashMap<Tile, Val>()
 
-    internal val isEmpty: Boolean
-        get() = tiles.isEmpty()
-
     fun size(): Int = tiles.size
 
     fun put(key: Tile, value: Val) {

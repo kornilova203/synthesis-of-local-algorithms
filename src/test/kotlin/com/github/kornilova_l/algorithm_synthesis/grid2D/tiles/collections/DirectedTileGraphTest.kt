@@ -8,9 +8,14 @@ import java.io.File
 class DirectedTileGraphTest {
     @Test
     fun graphSize() {
-        val tileSet = TileSet(File("generated_tiles/4-4-1.txt"))
-        val graph = DirectedTileGraph(tileSet)
+        var tileSet = TileSet(File("generated_tiles/4-4-1.txt"))
+        var graph = DirectedTileGraph(tileSet)
         assertEquals(7, graph.size)
-        assertEquals(tileSet.validTiles.size * 4, graph.edgeCount)
+        assertEquals(392, graph.edgeCount)
+
+        tileSet = TileSet(File("generated_tiles/3-3-1.txt"))
+        graph = DirectedTileGraph(tileSet)
+        assertEquals(2, graph.size)
+        assertEquals((15 + 1) * 4, graph.edgeCount)
     }
 }

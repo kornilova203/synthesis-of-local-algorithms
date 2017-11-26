@@ -8,7 +8,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters
 fun getParametersSet(difficulty: Int): Set<Parameters> {
     if (difficulty == 1) {
         val parameters = java.util.TreeSet<Parameters>()
-        for (n in 1..8) {
+        for (n in 3..8) {
             for (m in n..8) {
                 (1..5)
                         .filter { it >= (m * n) / 5 - 4 } // if not too difficult

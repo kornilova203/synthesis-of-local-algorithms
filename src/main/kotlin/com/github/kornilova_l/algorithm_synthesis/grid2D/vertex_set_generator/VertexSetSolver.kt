@@ -1,11 +1,9 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedTileGraph
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedTileGraph.Node
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedTileGraph.Neighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters.getParametersSet
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.positions
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.reverseRules
@@ -15,7 +13,6 @@ import java.io.IOException
 import java.io.OutputStreamWriter
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 
 
@@ -31,17 +28,13 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
         val n = parameters.n
         val m = parameters.m
         val k = parameters.k
-        val file1 = File("generated_tiles/${n + 1}-$m-$k.txt")
-        val file2 = File("generated_tiles/$n-${m + 1}-$k.txt")
-        if (file1.exists() && file2.exists()) {
-            val tileSet1 = TileSet(file1)
-            val tileSet2 = TileSet(file2)
-            val graph = DirectedTileGraph(tileSet1, tileSet2)
-            val clauses = toDimacs(graph, vertexRules)
-            val solution = solveWithSatSolver(clauses, graph.size)
-            if (solution != null) { // solution found
-                return LabelingFunction(solution, graph)
-            }
+        val file = File("generated_tiles/$n-$m-$k.txt")
+        val tileSet = TileSet(file)
+        val graph = DirectedTileGraph(tileSet)
+        val clauses = toDimacs(graph, vertexRules)
+        val solution = solveWithSatSolver(clauses, graph.size)
+        if (solution != null) { // solution found
+            return LabelingFunction(solution, graph)
         }
     }
     return null
@@ -90,84 +83,31 @@ fun parseResult(scanner: Scanner): List<Int> {
 fun toDimacs(graph: DirectedTileGraph, rules: Set<VertexRule>): Set<Set<Int>> {
     val reversedRules = reverseRules(rules)
     val clauses = HashSet<Set<Int>>()
-    val simplifiedGraph = getSimplifiedGraph(graph) // each node has at most 1 neighbour on each side
-    for (tile in graph.graph.keys) {
-        val node = graph.graph[tile]!!
-
-        val clausesForEqualNeighbours = requireNeighboursEqual(node, graph, simplifiedGraph[tile]!!)
-        clauses.addAll(clausesForEqualNeighbours)
-        for (reversedRule in reversedRules) {
-            val clause = formClause(simplifiedGraph[tile]!!, reversedRule, graph)
-            if (clause != null) {
-                clauses.add(clause)
-            }
-        }
-    }
+    graph.graph.values
+            .forEach { it.forEach { clauses.addAll(formClause(it, reversedRules, graph)) } }
     return clauses
 }
 
-/**
- * For each node select a leader among neighbours on each side
- * This is needed to simplify clauses
- */
-internal fun getSimplifiedGraph(graph: DirectedTileGraph): HashMap<Tile, Map<POSITION, Tile>> {
-    val simplifiedGraph = HashMap<Tile, Map<POSITION, Tile>>()
-    for (node in graph.graph.values) {
-        val simplifiedNeighbours = HashMap<POSITION, Tile>()
+private fun formClause(neighbourhood: Neighbourhood, reversedRules: Set<VertexRule>, graph: DirectedTileGraph): Set<Set<Int>> {
+    val clauses = HashSet<Set<Int>>()
+    for (reversedRule in reversedRules) {
+        val clause = HashSet<Int>()
+        var isAlwaysTrue = false
         for (position in positions) {
-            try {
-                val leader = node.neighbours[position]!!.first() // get any node
-                simplifiedNeighbours[position] = leader
-            } catch (ignored: NoSuchElementException) {
-                // that is okay
+            val id = graph.getId(neighbourhood.neighbours[position]!!)!!
+            var value = id
+            if (reversedRule.isIncluded(position)) {
+                value = -id
             }
-        }
-        simplifiedGraph[node.neighbours[POSITION.X]!!.first()] = simplifiedNeighbours
-    }
-    return simplifiedGraph
-}
-
-/**
- * For each set of neighbours (N, E, S, W) require that they all are equal to
- * leader neighbour in simplifiedNode
- */
-fun requireNeighboursEqual(node: Node, graph: DirectedTileGraph, simplifiedNode: Map<POSITION, Tile>): Set<Set<Int>> {
-    val clausesForEqualNeighbours = HashSet<Set<Int>>()
-    for (position in positions) {
-        val k = node.neighbours[position]!!.size
-        if (k > 1) {
-            val leader = simplifiedNode[position]!!
-            /* for all neighbours except leader: */
-            for (neighbour in node.neighbours[position]!!.filter { it != leader }) {
-                clausesForEqualNeighbours.addAll(twoNotEqual(graph.getId(leader)!!, graph.getId(neighbour)!!))
+            if (clause.contains(-value)) { // if clause is always true
+                isAlwaysTrue = true
+                break
             }
+            clause.add(value)
+        }
+        if (!isAlwaysTrue) {
+            clauses.add(clause)
         }
     }
-    return clausesForEqualNeighbours
-}
-
-fun twoNotEqual(id1: Int, id2: Int): Set<Set<Int>> {
-    val clause1 = hashSetOf(id1, -id2)
-    val clause2 = hashSetOf(-id1, id2)
-    return hashSetOf(clause1, clause2)
-}
-
-/**
- * @return null if reversedRule can never be true for this node
- */
-private fun formClause(node: Map<POSITION, Tile>, reversedRule: VertexRule, graph: DirectedTileGraph): Set<Int>? {
-    val clause = HashSet<Int>()
-    for (position in positions) {
-        var mul = 1
-        if (reversedRule.isIncluded(position)) { // if a position is included by reversed rule then it should be excluded
-            mul = -1
-        }
-        val neighbour = node[position]!!
-        val newConstraint = mul * graph.getId(neighbour)!!
-        if (clause.contains(-newConstraint)) { // if current clause will always be true
-            return null
-        }
-        clause.add(newConstraint)
-    }
-    return clause
+    return clauses
 }
