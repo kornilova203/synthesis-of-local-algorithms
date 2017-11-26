@@ -12,19 +12,24 @@ class DirectedTileGraph(tileSet: TileSet) : TileGraph() {
     override val n: Int = tileSet.n
     override val m: Int = tileSet.m
     override val k: Int = tileSet.k
-    val graph: HashMap<Tile, Neighbourhood> = HashMap()
+    private val graph: HashMap<Tile, HashSet<Neighbourhood>> = HashMap()
     private val ids = DualHashBidiMap<Tile, Int>()
     override val size: Int
         get() = graph.size
 
+    val edgeCount: Int
+        get() = graph.values.sumBy { it.size * 4 }
+
     init {
         for (tile in tileSet.validTiles) {
-            graph[Tile(tile, POSITION.X)] = Neighbourhood(
+            val center = Tile(tile, POSITION.X)
+            val set = graph.computeIfAbsent(center, { HashSet() })
+            set.add(Neighbourhood(
                     Tile(tile, POSITION.N),
                     Tile(tile, POSITION.E),
                     Tile(tile, POSITION.W),
                     Tile(tile, POSITION.S)
-            )
+            ))
         }
         if (graph.size == 0) {
             throw IllegalArgumentException("Cannot construct graph")
@@ -44,7 +49,7 @@ class DirectedTileGraph(tileSet: TileSet) : TileGraph() {
     fun getTile(id: Int): Tile? = ids.getKey(id)
 
     class Neighbourhood(north: Tile, east: Tile, south: Tile, west: Tile) {
-        val neighbours = HashMap<POSITION, Tile>()
+        private val neighbours = HashMap<POSITION, Tile>()
 
         init {
             neighbours[POSITION.N] = north

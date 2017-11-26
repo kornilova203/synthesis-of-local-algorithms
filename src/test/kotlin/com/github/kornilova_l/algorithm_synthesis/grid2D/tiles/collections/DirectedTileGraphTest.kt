@@ -8,10 +8,9 @@ import java.io.File
 class DirectedTileGraphTest {
     @Test
     fun graphSize() {
-        val tileSet1 = TileSet(File("generated_tiles/2-3-1.txt"))
-        val tileSet2 = TileSet(File("generated_tiles/3-2-1.txt"))
-        val graph = DirectedTileGraph(tileSet1, tileSet2)
+        val tileSet = TileSet(File("generated_tiles/4-4-1.txt"))
+        val graph = DirectedTileGraph(tileSet)
         assertEquals(7, graph.size)
-        assertEquals(32, graph.edgeCount)
+        assertEquals(tileSet.validTiles.size * 4, graph.edgeCount)
     }
 }
