@@ -53,9 +53,6 @@ class VertexRule {
         array.indices
                 .filter { array[it] }
                 .forEach { stringBuilder.append(positionLetters[positionIndexes.getKey(it)]) }
-        if (stringBuilder.isEmpty()) {
-            return "-"
-        }
         return stringBuilder.toString()
     }
 

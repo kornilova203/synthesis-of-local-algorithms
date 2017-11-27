@@ -1,17 +1,25 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.LabelingFunction
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.getLabelingFunction
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.visualization.drawLabels
 
 fun main(args: Array<String>) {
-    val labelingFunction = independentSet()
-//    val labelingFunction = test()
-//    val labelingFunction = gameOfLife()
-//    val labelingFunction = invertedIndependentSet()
+//    val rules = independentSet()
+//    val rules = columnIS()
+    val rules = oneZeroAndOneOne()
+//    val rules = test()
+//    val rules = gameOfLife()
+//    val rules = invertedIndependentSet()
+
+    for (rule in rules) {
+        print("$rule ")
+    }
+    println()
+
+    val labelingFunction = getLabelingFunction(rules)
 
     if (labelingFunction == null) {
         println("not found")
@@ -30,8 +38,8 @@ fun main(args: Array<String>) {
     }
 }
 
-fun invertedIndependentSet(): LabelingFunction? {
-    return getLabelingFunction(hashSetOf(
+fun invertedIndependentSet(): HashSet<VertexRule> {
+    return hashSetOf(
             VertexRule("X"),
             VertexRule("XN"),
             VertexRule("XE"),
@@ -48,10 +56,43 @@ fun invertedIndependentSet(): LabelingFunction? {
             VertexRule("XNSW"),
             VertexRule("XESW"),
             VertexRule("NESW")
-    ))
+    )
 }
 
-fun gameOfLife(): LabelingFunction? {
+fun columnIS(): HashSet<VertexRule> {
+    return hashSetOf(
+            VertexRule("X"),
+            VertexRule("XE"),
+            VertexRule("XW"),
+            VertexRule("XEW"),
+            VertexRule("NS"),
+            VertexRule("NSE"),
+            VertexRule("NSW"),
+            VertexRule("NSEW"),
+            VertexRule("XN"),
+            VertexRule("XNE"),
+            VertexRule("XNW"),
+            VertexRule("XNEW"),
+            VertexRule("XS"),
+            VertexRule("XSE"),
+            VertexRule("XSW"),
+            VertexRule("XSEW")
+    )
+}
+
+fun oneZeroAndOneOne(): HashSet<VertexRule> {
+    val rules = HashSet<VertexRule>()
+    rules.addAll(getRulePermutations(1, true))
+    rules.addAll(getRulePermutations(2, true))
+    rules.addAll(getRulePermutations(3, true))
+
+    rules.addAll(getRulePermutations(1, false))
+    rules.addAll(getRulePermutations(2, false))
+    rules.addAll(getRulePermutations(3, false))
+    return rules
+}
+
+fun gameOfLife(): HashSet<VertexRule> {
     val rules = HashSet<VertexRule>()
     /* cell survives if it has 2 or 3 neighbours */
     rules.addAll(getRulePermutations(2, true))
@@ -60,18 +101,18 @@ fun gameOfLife(): LabelingFunction? {
     rules.addAll(getRulePermutations(0, false))
     rules.addAll(getRulePermutations(1, false))
     rules.addAll(getRulePermutations(4, false))
-    return getLabelingFunction(rules)
+    return rules
 }
 
-fun test(): LabelingFunction? {
-    return getLabelingFunction(hashSetOf(
+fun test(): HashSet<VertexRule> {
+    return hashSetOf(
             VertexRule("XNESW")
-    ))
+    )
 }
 
-fun independentSet(): LabelingFunction? {
+fun independentSet(): HashSet<VertexRule> {
     /* independent set */
-    return getLabelingFunction(hashSetOf(
+    return hashSetOf(
             VertexRule("X"),
             VertexRule("N"),
             VertexRule("E"),
@@ -88,6 +129,6 @@ fun independentSet(): LabelingFunction? {
             VertexRule("NSW"),
             VertexRule("ESW"),
             VertexRule("NESW")
-    ))
+    )
 }
 

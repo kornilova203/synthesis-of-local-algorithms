@@ -28,6 +28,7 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
         val n = parameters.n
         val m = parameters.m
         val k = parameters.k
+        println("n $n  m $m  k $k")
         val file = File("generated_tiles/$n-$m-$k.txt")
         val tileSet = TileSet(file)
         val graph = DirectedTileGraph(tileSet)
