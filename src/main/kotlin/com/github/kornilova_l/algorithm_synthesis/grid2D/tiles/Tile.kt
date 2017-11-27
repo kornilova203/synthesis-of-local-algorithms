@@ -2,6 +2,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import java.util.*
+import kotlin.collections.HashSet
 
 class Tile {
     private val grid: Array<BooleanArray>
@@ -134,6 +135,44 @@ class Tile {
         grid = Array(n) { BooleanArray(m) }
         for (i in k until n - k) {
             System.arraycopy(tile.grid[i - k], 0, grid[i], k, tile.getM())
+        }
+    }
+
+    constructor(tile: Tile, newN: Int, newM: Int, solution: Set<Int>) {
+        if ((newN - tile.n) % 2 == 1 ||
+                (newM - tile.m) % 2 == 1) {
+            throw IllegalArgumentException("Tile must be expanded by odd number of cells")
+        }
+        k = tile.k
+        n = newN
+        m = newM
+        grid = Array(n) { BooleanArray(m) }
+        for (i in (newN - tile.n) / 2 until tile.n + (newN - tile.n) / 2) {
+            System.arraycopy(tile.grid[i - (newN - tile.n) / 2], 0, grid[i], (newM - tile.m) / 2, tile.m)
+        }
+        for (num in solution) {
+            if (num > 0) {
+                val x = (num - 1) / m
+                val y = (num - 1) % m
+                grid[x][y] = true
+            }
+        }
+    }
+
+    /**
+     * Clone and expand tile to newN x newM
+     */
+    constructor(newN: Int, newM: Int, tile: Tile) {
+        if ((newN - tile.n) % 2 == 1 ||
+                (newM - tile.m) % 2 == 1) {
+            throw IllegalArgumentException("Tile must be expanded by odd number of cells")
+        }
+        k = tile.k
+        n = newN
+        m = newM
+        grid = Array(n) { BooleanArray(m) }
+        for (i in (newN - tile.n) / 2 until tile.n + (newN - tile.n) / 2) {
+            System.arraycopy(tile.grid[i - (newN - tile.n) / 2], 0, grid[i], (newM - tile.m) / 2, tile.m)
         }
     }
 

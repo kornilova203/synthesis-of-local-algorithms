@@ -1,16 +1,14 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Coordinate
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.generatePossiblyValidTiles
-import com.github.kornilova_l.util.ProgressBar
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.findAllSolutionsWithSatSolver
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.solveWithSatSolver
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.file.Paths
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 
 /**
  * Generates all possible combinations of tileSet n x m in kth power of grid
@@ -19,52 +17,91 @@ class TileGenerator(private val n: Int, private val m: Int, private val k: Int) 
     val tileSet: TileSet
 
     init {
+        var currentN = if (n < k) n else k
+        var currentM = if (m < k) m else k
 
-        val candidateTileIS = ConcurrentLinkedQueue<Tile>() // get concurrently from here
+        var candidateTilesSet = generatePossiblyValidTiles(currentN, currentM, k)
 
-        val candidateTilesSet = generatePossiblyValidTiles(n, m, k)
-        candidateTileIS.addAll(candidateTilesSet)
-
-        printCandidatesFound(candidateTileIS.size)
-        val validTileIS = ConcurrentHashMap.newKeySet<Tile>() // put concurrently here
-        try {
-            removeNotMaximal(candidateTileIS, validTileIS)
-        } catch (e: InterruptedException) {
-            e.printStackTrace()
+        while (currentM < m || currentN < n) {
+            candidateTilesSet = expandTileSet(candidateTilesSet, currentN, currentM)
+            currentN = candidateTilesSet.first().getN()
+            currentM = candidateTilesSet.first().getM()
+            println("Found $currentN x $currentM tiles")
         }
 
-        if (validTileIS.isEmpty()) {
+        val maximalTiles = removeNotMaximal(candidateTilesSet, n, m)
+
+        if (maximalTiles.isEmpty()) {
             throw IllegalArgumentException("Cannot produce valid set of tiles")
         } else {
-            this.tileSet = TileSet(validTileIS)
+            this.tileSet = TileSet(maximalTiles)
         }
     }
 
-    private fun printCandidatesFound(candidatesCount: Int) {
-        println("Found " + candidatesCount + " possible tile" + if (candidatesCount == 1) "" else "s")
-        println("Remove tiles which cannot contain maximal independent set...")
+    private fun expandTileSet(candidateTilesSet: Set<Tile>, currentN: Int, currentM: Int): Set<Tile> {
+        val newN = if (currentN + 2 * k < n) currentN + 2 * k else n
+        val newM = if (currentM + 2 * k < m) currentM + 2 * k else m
+        val expandedTiles = HashSet<Tile>()
+        for (tile in candidateTilesSet) {
+            val clauses = toDimacs(tile, newN, newM)
+            findAllSolutionsWithSatSolver(clauses, newN * newM)
+                    ?.mapTo(expandedTiles) { Tile(tile, newN, newM, it) }
+            println("expanded")
+        }
+        return expandedTiles
+    }
+
+    private fun toDimacs(tile: Tile, newN: Int, newM: Int): Set<Set<Int>> {
+        val biggerTile = Tile(newN, newM, tile)
+        var borderCoordinate: Coordinate? = Coordinate(0, 0)
+
+        val clauses = HashSet<Set<Int>>()
+
+        while (borderCoordinate != null) {
+            val x = borderCoordinate.x
+            val y = borderCoordinate.y
+            if (biggerTile.canBeI(x, y)) {
+                for (i in x - k..x + k) {
+                    (y - k..y + k)
+                            .filter { j ->
+                                i >= 0 && j >= 0 && i < newN && j < newM && !(i == x && j == y) && // not center
+                                        Math.abs(x - i) + Math.abs(y - j) <= k
+                            }
+                            .mapTo(clauses) { j -> hashSetOf(-(x * newM + y + 1), -(i * newM + j + 1)) }
+                }
+            } else {
+                clauses.add(hashSetOf(-(x * newM + y + 1))) // must be zero
+            }
+            /* at least one should be one: */
+            val clause = HashSet<Int>()
+            for (i in x - k..x + k) {
+                (y - k..y + k)
+                        .filter { j ->
+                            i >= 0 && j >= 0 && i < newN && j < newM && !(i == x && j == y) && // not center
+                                    Math.abs(x - i) + Math.abs(y - j) <= k
+                        }
+                        .mapTo(clause) { j -> i * newM + j + 1 }
+            }
+            borderCoordinate = biggerTile.getNextBorderCoordinate(borderCoordinate)
+        }
+        return clauses
     }
 
     /**
      * Remove all tileSet which does not have maximal IS
      */
-    @Throws(InterruptedException::class)
-    private fun removeNotMaximal(candidateTileIS: ConcurrentLinkedQueue<Tile>,
-                                 validTileIS: MutableSet<Tile>) {
-        val progressBar = ProgressBar(candidateTileIS.size)
-        val processorsCount = Runtime.getRuntime().availableProcessors()
-        val executorService = Executors.newFixedThreadPool(processorsCount)
-
-        for (i in 0 until processorsCount) {
-            executorService.submit(TileValidator(candidateTileIS, validTileIS, progressBar))
+    private fun removeNotMaximal(tiles: Set<Tile>, n: Int, m: Int): Set<Tile> {
+        val newN = n + 2 * k
+        val newM = m + 2 * k
+        val maximalTiles = HashSet<Tile>()
+        for (tile in tiles) {
+            val clauses = toDimacs(tile, newN, newM)
+            val solution = solveWithSatSolver(clauses, newN * newM)
+            if (solution != null) {
+                maximalTiles.add(tile)
+            }
         }
-
-        executorService.shutdown()
-        while (!executorService.awaitTermination(24L, TimeUnit.HOURS)) {
-            println("Not yet. Still waiting for termination")
-        }
-        progressBar.finish()
-        println(validTileIS.size.toString() + " valid tiles")
+        return maximalTiles
     }
 
     override fun toString(): String {
@@ -95,20 +132,5 @@ class TileGenerator(private val n: Int, private val m: Int, private val k: Int) 
         return if (addTimestamp!!) {
             String.format("%d-%d-%d-%d.txt", n, m, k, System.currentTimeMillis())
         } else String.format("%d-%d-%d.txt", n, m, k)
-    }
-
-    private inner class TileValidator internal constructor(private val candidateTileIS: ConcurrentLinkedQueue<Tile>, private val validTileIS: MutableSet<Tile>, private val progressBar: ProgressBar) : Runnable {
-
-        override fun run() {
-            while (!candidateTileIS.isEmpty()) {
-                val tile = candidateTileIS.poll()
-                if (tile != null) {
-                    if (tile.isValid) {
-                        validTileIS.add(tile)
-                    }
-                    progressBar.updateProgress(1)
-                }
-            }
-        }
     }
 }

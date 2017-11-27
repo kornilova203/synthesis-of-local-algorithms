@@ -13,6 +13,7 @@ import java.io.IOException
 import java.io.OutputStreamWriter
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 
 
@@ -44,7 +45,7 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
 /**
  * @return null if not satisfiable
  */
-private fun solveWithSatSolver(clauses: Set<Set<Int>>, varCount: Int): List<Int>? {
+fun solveWithSatSolver(clauses: Set<Set<Int>>, varCount: Int): List<Int>? {
     val builder = ProcessBuilder("python", File("python_sat/sat/start_sat.py").toString())
 
     builder.redirectErrorStream(true)
@@ -73,11 +74,62 @@ private fun solveWithSatSolver(clauses: Set<Set<Int>>, varCount: Int): List<Int>
     return null
 }
 
+/**
+ * @return null if not satisfiable
+ */
+fun findAllSolutionsWithSatSolver(clauses: Set<Set<Int>>, varCount: Int): HashSet<Set<Int>>? {
+    val builder = ProcessBuilder("python", File("python_sat/sat/start_sat.py").toString())
+
+    builder.redirectErrorStream(true)
+    try {
+        val process = builder.start()
+        val writer = BufferedWriter(OutputStreamWriter(process.outputStream))
+        writer.write("Find all solutions\n")
+        writer.write("p cnf $varCount ${clauses.size}\n")
+        for (clause in clauses) {
+            for (variable in clause) {
+                writer.write("$variable ")
+            }
+            writer.write("\n")
+        }
+        writer.flush()
+        writer.close()
+        val scanner = Scanner(process.inputStream)
+        process!!.waitFor()
+        val solutions = HashSet<Set<Int>>()
+        var hasSolution = false
+//        while (scanner.hasNextLine()) {
+//            println(scanner.nextLine())
+//        }
+        while (scanner.hasNextLine() && scanner.nextLine() == "OK") {
+            hasSolution = true
+            solutions.add(parseLineResult(scanner))
+        }
+        if (hasSolution) {
+            return solutions
+        }
+        return null
+    } catch (e: IOException) {
+        e.printStackTrace()
+    } catch (e: InterruptedException) {
+        e.printStackTrace()
+    }
+    return null
+}
+
 fun parseResult(scanner: Scanner): List<Int> {
     val res = ArrayList<Int>()
     while (scanner.hasNextInt()) {
         res.add(scanner.nextInt())
     }
+    return res
+}
+
+fun parseLineResult(scanner: Scanner): Set<Int> {
+    val res = HashSet<Int>()
+    val line = scanner.nextLine()
+    val numbers = line.split(" ")
+    numbers.mapTo(res) { Integer.parseInt(it) }
     return res
 }
 

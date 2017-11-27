@@ -79,7 +79,7 @@ class TileSet {
 /**
  * Generates set of possibly-valid validTiles
  */
-fun generatePossiblyValidTiles(n: Int, m: Int, k: Int): HashSet<Tile> {
+fun generatePossiblyValidTiles(n: Int, m: Int, k: Int): Set<Tile> {
 
     /* It is meaningless to make following piece of code recursive
      * because all candidate tiles must be placed in possiblyValidTiles set
