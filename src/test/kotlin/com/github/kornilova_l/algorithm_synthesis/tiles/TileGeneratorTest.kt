@@ -2,6 +2,7 @@ package com.github.kornilova_l.algorithm_synthesis.tiles
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters.getParametersSet
 import org.apache.commons.collections4.CollectionUtils
 import org.junit.Assert.*
 import org.junit.Test
@@ -15,6 +16,20 @@ internal class TileGeneratorTest {
 
         tileGenerator = TileGenerator(5, 7, 3) // set of tiles should not depend on orientation
         assertEquals(2079, tileGenerator.tileSet.size())
+    }
+
+    @Test
+    fun testEasyTiles() {
+        val parametersSet = getParametersSet(1)
+        for (parameters in parametersSet) {
+            val n = parameters.n
+            val m = parameters.m
+            val k = parameters.k
+            val tiles = TileGenerator(n, m, k).tileSet
+            val expectedTiles = TileSet(File("src/test/resources/tiles/$n-$m-$k.txt"))
+
+            assertEquals(expectedTiles, tiles)
+        }
     }
 
     @Test

@@ -74,7 +74,7 @@ internal class TileTest {
         assertEquals(Coordinate(2, 0),
                 tile.getNextBorderCoordinate(Coordinate(1, 0)))
 
-        assertNull(tile.getNextBorderCoordinate(Coordinate(tile.getN() - 1, tile.getM() - 1)))
+        assertNull(tile.getNextBorderCoordinate(Coordinate(tile.n - 1, tile.m - 1)))
     }
 
     @Test

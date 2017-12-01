@@ -49,8 +49,8 @@ class TileSet {
 
     internal constructor(possiblyValidTiles: Collection<Tile>) {
         val someTile = possiblyValidTiles.iterator().next()
-        n = someTile.getN()
-        m = someTile.getM()
+        n = someTile.n
+        m = someTile.m
         k = someTile.k
         for (tile in possiblyValidTiles) {
             addTile(tile) // check that all tile have same size
@@ -60,7 +60,7 @@ class TileSet {
     fun size(): Int = validTiles.size
 
     private fun addTile(tile: Tile) {
-        if (tile.k != k || tile.getM() != m || tile.getN() != n) {
+        if (tile.k != k || tile.m != m || tile.n != n) {
             throw IllegalArgumentException("Tile must have the same parameters as tile set")
         }
 

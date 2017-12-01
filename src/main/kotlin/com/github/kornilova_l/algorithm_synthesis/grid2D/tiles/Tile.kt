@@ -7,8 +7,8 @@ import kotlin.collections.HashSet
 class Tile {
     private val grid: Array<BooleanArray>
     val k: Int
-    private val n: Int
-    private val m: Int
+    val n: Int
+    val m: Int
 
     /**
      * Check if this tile is valid
@@ -21,8 +21,8 @@ class Tile {
     val isValid: Boolean
         get() {
             val canBeAddedToIS = HashSet<Coordinate>()
-            for (i in 0 until getN()) {
-                (0 until getM())
+            for (i in 0 until n) {
+                (0 until m)
                         .filter { !grid[i][it] && canBeI(i, it) }
                         .mapTo(canBeAddedToIS) { Coordinate(i, it) }
             }
@@ -49,12 +49,12 @@ class Tile {
         val m: Int
         when (part) {
             Tile.Part.S, Tile.Part.N -> {
-                n = tile.getN() - 1
-                m = tile.getM()
+                n = tile.n - 1
+                m = tile.m
             }
             Tile.Part.W, Tile.Part.E -> {
-                n = tile.getN()
-                m = tile.getM() - 1
+                n = tile.n
+                m = tile.m - 1
             }
         }
         grid = Array(n) { BooleanArray(m) }
@@ -118,9 +118,9 @@ class Tile {
         k = tile.k
         this.n = tile.n
         this.m = tile.m
-        grid = Array(tile.getN()) { BooleanArray(tile.getM()) }
-        for (i in 0 until tile.getN()) {
-            System.arraycopy(tile.grid[i], 0, grid[i], 0, tile.getM())
+        grid = Array(tile.n) { BooleanArray(tile.m) }
+        for (i in 0 until tile.n) {
+            System.arraycopy(tile.grid[i], 0, grid[i], 0, tile.m)
         }
         grid[x][y] = true
     }
@@ -130,18 +130,17 @@ class Tile {
      */
     constructor(tile: Tile) {
         k = tile.k
-        n = tile.getN() + k * 2
-        m = tile.getM() + k * 2
+        n = tile.n + k * 2
+        m = tile.m + k * 2
         grid = Array(n) { BooleanArray(m) }
         for (i in k until n - k) {
-            System.arraycopy(tile.grid[i - k], 0, grid[i], k, tile.getM())
+            System.arraycopy(tile.grid[i - k], 0, grid[i], k, tile.m)
         }
     }
 
     constructor(tile: Tile, newN: Int, newM: Int, solution: Set<Int>) {
-        if ((newN - tile.n) % 2 == 1 ||
-                (newM - tile.m) % 2 == 1) {
-            throw IllegalArgumentException("Tile must be expanded by odd number of cells")
+        if (solution.containsAll(hashSetOf(-3, -6, -7, -8, -9))) {
+            println()
         }
         k = tile.k
         n = newN
@@ -150,23 +149,16 @@ class Tile {
         for (i in (newN - tile.n) / 2 until tile.n + (newN - tile.n) / 2) {
             System.arraycopy(tile.grid[i - (newN - tile.n) / 2], 0, grid[i], (newM - tile.m) / 2, tile.m)
         }
-        for (num in solution) {
-            if (num > 0) {
-                val x = (num - 1) / m
-                val y = (num - 1) % m
-                grid[x][y] = true
-            }
-        }
+        solution
+                .filter { i -> i > 0 }
+                .map { id -> getCoordinate(id) }
+                .forEach { coordinate -> grid[coordinate.x][coordinate.y] = true }
     }
 
     /**
      * Clone and expand tile to newN x newM
      */
     constructor(newN: Int, newM: Int, tile: Tile) {
-        if ((newN - tile.n) % 2 == 1 ||
-                (newM - tile.m) % 2 == 1) {
-            throw IllegalArgumentException("Tile must be expanded by odd number of cells")
-        }
         k = tile.k
         n = newN
         m = newM
@@ -193,11 +185,6 @@ class Tile {
         }
     }
 
-
-    fun getN(): Int = grid.size
-
-    fun getM(): Int = grid[0].size
-
     /**
      * @return true if grid[x][y] can be an element of an independent set
      */
@@ -205,8 +192,8 @@ class Tile {
         if (grid[x][y]) { // if already I
             return true
         }
-        val endX = Math.min(getN() - 1, x + k)
-        val endY = Math.min(getM() - 1, y + k)
+        val endX = Math.min(n - 1, x + k)
+        val endY = Math.min(m - 1, y + k)
         for (i in Math.max(0, x - k)..endX) {
             (Math.max(0, y - k)..endY)
                     .filter { Math.abs(i - x) + Math.abs(it - y) <= k && grid[i][it] }
@@ -217,9 +204,9 @@ class Tile {
 
     override fun toString(): String {
         val stringBuilder = StringBuilder()
-        for (i in 0 until getN()) {
-            for (j in 0 until getM()) {
-                stringBuilder.append(if (grid[i][j]) 1 else 0).append(if (j == getM() - 1) "" else " ")
+        for (i in 0 until n) {
+            for (j in 0 until m) {
+                stringBuilder.append(if (grid[i][j]) 1 else 0).append(if (j == m - 1) "" else " ")
             }
             stringBuilder.append("\n")
         }
@@ -262,14 +249,14 @@ class Tile {
     fun getNextBorderCoordinate(curCoordinate: Coordinate): Coordinate? {
         var x = curCoordinate.x
         var y = curCoordinate.y
-        if (x == getN() - 1 && y == getM() - 1) { // if last coordinate
+        if (x == n - 1 && y == m - 1) { // if last coordinate
             return null
         }
-        if (x < getN() - 1) { // if not the last in this row
+        if (x < n - 1) { // if not the last in this row
             x++
-            if (y >= k && y < getM() - k) {
-                if (x >= k && x < getN() - k) { // if inside internal tile
-                    x = getN() - k
+            if (y >= k && y < m - k) {
+                if (x >= k && x < n - k) { // if inside internal tile
+                    x = n - k
                 }
             }
         } else {
@@ -306,6 +293,15 @@ class Tile {
                 .toMutableSet()
     }
 
+    fun getId(x: Int, y: Int): Int {
+        return x * m + y + 1
+    }
+
+    fun getCoordinate(id: Int): Coordinate {
+        val num = id - 1
+        return Coordinate(num / m, num % m)
+    }
+
     /**
      * For tests
      */
@@ -316,11 +312,11 @@ class Tile {
         if (other !is Tile) {
             return false
         }
-        if (other.getN() != getN() || other.getM() != getM()) {
+        if (other.n != n || other.m != m) {
             throw IllegalArgumentException("Size of tile is different")
         }
-        for (i in 0 until getN()) {
-            (0 until getM())
+        for (i in 0 until n) {
+            (0 until m)
                     .filter { grid[i][it] != other.grid[i][it] }
                     .forEach { return false }
         }
@@ -351,5 +347,9 @@ class Tile {
             result = 31 * result + y
             return result
         }
+    }
+
+    fun isI(i: Int, j: Int): Boolean {
+        return grid[i][j]
     }
 }

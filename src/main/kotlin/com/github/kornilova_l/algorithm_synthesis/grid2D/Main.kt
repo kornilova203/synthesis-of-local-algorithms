@@ -76,7 +76,15 @@ fun columnIS(): HashSet<VertexRule> {
             VertexRule("XS"),
             VertexRule("XSE"),
             VertexRule("XSW"),
-            VertexRule("XSEW")
+            VertexRule("XSEW"),
+            VertexRule("N"),
+            VertexRule("NE"),
+            VertexRule("NW"),
+            VertexRule("NEW"),
+            VertexRule("S"),
+            VertexRule("SW"),
+            VertexRule("SE"),
+            VertexRule("SWE")
     )
 }
 

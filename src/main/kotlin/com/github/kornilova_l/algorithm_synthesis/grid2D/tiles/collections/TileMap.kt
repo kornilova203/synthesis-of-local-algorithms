@@ -14,7 +14,7 @@ class TileMap<Val>(val n: Int, val m: Int, val k: Int) {
     fun size(): Int = tiles.size
 
     fun put(key: Tile, value: Val) {
-        if (key.k != k || key.getM() != m || key.getN() != n) {
+        if (key.k != k || key.m != m || key.n != n) {
             throw IllegalArgumentException("Tile must have the same parameters as tile set")
         }
 

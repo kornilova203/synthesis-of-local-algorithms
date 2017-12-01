@@ -1,6 +1,5 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Coordinate
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.generatePossiblyValidTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.findAllSolutionsWithSatSolver
@@ -17,15 +16,15 @@ class TileGenerator(private val n: Int, private val m: Int, private val k: Int) 
     val tileSet: TileSet
 
     init {
-        var currentN = if (n < k) n else k
-        var currentM = if (m < k) m else k
+        var currentN = if (n < k * 2) n else k * 2
+        var currentM = if (m < k * 2) m else k * 2
 
         var candidateTilesSet = generatePossiblyValidTiles(currentN, currentM, k)
 
         while (currentM < m || currentN < n) {
             candidateTilesSet = expandTileSet(candidateTilesSet, currentN, currentM)
-            currentN = candidateTilesSet.first().getN()
-            currentM = candidateTilesSet.first().getM()
+            currentN = candidateTilesSet.first().n
+            currentM = candidateTilesSet.first().m
             println("Found $currentN x $currentM tiles")
         }
 
@@ -45,7 +44,7 @@ class TileGenerator(private val n: Int, private val m: Int, private val k: Int) 
         for (tile in candidateTilesSet) {
             val clauses = toDimacs(tile, newN, newM)
             findAllSolutionsWithSatSolver(clauses, newN * newM)
-                    ?.mapTo(expandedTiles) { Tile(tile, newN, newM, it) }
+                    ?.mapTo(expandedTiles) { solution -> Tile(tile, newN, newM, solution) }
             println("expanded")
         }
         return expandedTiles
@@ -53,38 +52,49 @@ class TileGenerator(private val n: Int, private val m: Int, private val k: Int) 
 
     private fun toDimacs(tile: Tile, newN: Int, newM: Int): Set<Set<Int>> {
         val biggerTile = Tile(newN, newM, tile)
-        var borderCoordinate: Coordinate? = Coordinate(0, 0)
+        val intersection = TilesIntersection(biggerTile, tile)
 
         val clauses = HashSet<Set<Int>>()
 
-        while (borderCoordinate != null) {
-            val x = borderCoordinate.x
-            val y = borderCoordinate.y
-            if (biggerTile.canBeI(x, y)) {
-                for (i in x - k..x + k) {
-                    (y - k..y + k)
-                            .filter { j ->
-                                i >= 0 && j >= 0 && i < newN && j < newM && !(i == x && j == y) && // not center
-                                        Math.abs(x - i) + Math.abs(y - j) <= k
-                            }
-                            .mapTo(clauses) { j -> hashSetOf(-(x * newM + y + 1), -(i * newM + j + 1)) }
-                }
-            } else {
-                clauses.add(hashSetOf(-(x * newM + y + 1))) // must be zero
-            }
-            /* at least one should be one: */
-            val clause = HashSet<Int>()
-            for (i in x - k..x + k) {
-                (y - k..y + k)
-                        .filter { j ->
-                            i >= 0 && j >= 0 && i < newN && j < newM && !(i == x && j == y) && // not center
-                                    Math.abs(x - i) + Math.abs(y - j) <= k
+        for (x in 0 until n) {
+            for (y in 0 until m) {
+                if (intersection.isInside(x, y)) {
+                    clauses.add(cellMustNotChange(x, y, biggerTile))
+                } else {
+                    if (biggerTile.canBeI(x, y)) {
+                        for (i in x - k..x + k) {
+                            (y - k..y + k)
+                                    .filter { j ->
+                                        i >= 0 && j >= 0 && i < newN && j < newM && !(i == x && j == y) && // not center
+                                                Math.abs(x - i) + Math.abs(y - j) <= k
+                                    }
+                                    .mapTo(clauses) { j -> hashSetOf(-biggerTile.getId(x, y), -biggerTile.getId(i, j)) }
                         }
-                        .mapTo(clause) { j -> i * newM + j + 1 }
+                    } else {
+                        clauses.add(hashSetOf(-biggerTile.getId(x, y))) // must be zero
+                    }
+                    /* at least one should be one: */
+                    val clause = HashSet<Int>()
+                    for (i in x - k..x + k) {
+                        (y - k..y + k)
+                                .filter { j ->
+                                    i >= 0 && j >= 0 && i < newN && j < newM && !(i == x && j == y) && // not center
+                                            Math.abs(x - i) + Math.abs(y - j) <= k
+                                }
+                                .mapTo(clause) { j -> biggerTile.getId(i, j) }
+                    }
+                }
             }
-            borderCoordinate = biggerTile.getNextBorderCoordinate(borderCoordinate)
         }
         return clauses
+    }
+
+    private fun cellMustNotChange(x: Int, y: Int, biggerTile: Tile): Set<Int> {
+        return if (biggerTile.isI(x, y)) {
+            hashSetOf(biggerTile.getId(x, y))
+        } else {
+            hashSetOf(-biggerTile.getId(x, y))
+        }
     }
 
     /**
