@@ -22,19 +22,8 @@ class VertexSetSolverKtTest {
         graph = DirectedTileGraph(TileSet(file))
         clauses = toDimacs(graph, hashSetOf(VertexRule(1)))
 //        println(clauses.joinToString("", "", transform={ "${it.joinToString(" ", "")}\n" }))
-        expected = parseClauses(File("src/test/resources/vertexSetSolver/to_dimacs_1_2_1.txt").readText())
+        expected = Companion.parseClauses(File("src/test/resources/vertexSetSolver/to_dimacs_1_2_1.txt").readText())
         assertTrue(expected == clauses)
-    }
-
-    private fun parseClauses(text: String): Set<Set<Int>> {
-        val lines = text.split("\n")
-        val clauses = HashSet<Set<Int>>()
-        for (line in lines) {
-            val clause = HashSet<Int>()
-            line.split(" ").filter { it != "" }.mapTo(clause) { Integer.parseInt(it) }
-            clauses.add(clause)
-        }
-        return clauses
     }
 
     @Test
@@ -126,5 +115,18 @@ class VertexSetSolverKtTest {
             }
         }
         return true
+    }
+
+    companion object {
+        fun parseClauses(text: String): Set<Set<Int>> {
+            val lines = text.split("\n")
+            val clauses = HashSet<Set<Int>>()
+            for (line in lines) {
+                val clause = HashSet<Int>()
+                line.split(" ").filter { it != "" }.mapTo(clause) { Integer.parseInt(it) }
+                clauses.add(clause)
+            }
+            return clauses
+        }
     }
 }

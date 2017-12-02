@@ -10,25 +10,25 @@ import java.io.IOException
 import java.nio.file.Paths
 
 /**
- * Generates all possible combinations of tileSet n x m in kth power of grid
+ * Generates all possible combinations of tileSet finalN x finalM in kth power of grid
  */
-class TileGenerator(private val n: Int, private val m: Int, private val k: Int) {
+class TileGenerator(private val finalN: Int, private val finalM: Int, private val k: Int) {
     val tileSet: TileSet
 
     init {
-        var currentN = if (n < k * 2) n else k * 2
-        var currentM = if (m < k * 2) m else k * 2
+        var currentN = if (finalN < k * 2) finalN else k * 2
+        var currentM = if (finalM < k * 2) finalM else k * 2
 
         var candidateTilesSet = generatePossiblyValidTiles(currentN, currentM, k)
 
-        while (currentM < m || currentN < n) {
+        while (currentM < finalM || currentN < finalN) {
             candidateTilesSet = expandTileSet(candidateTilesSet, currentN, currentM)
             currentN = candidateTilesSet.first().n
             currentM = candidateTilesSet.first().m
             println("Found $currentN x $currentM tiles")
         }
 
-        val maximalTiles = removeNotMaximal(candidateTilesSet, n, m)
+        val maximalTiles = removeNotMaximal(candidateTilesSet, finalN, finalM)
 
         if (maximalTiles.isEmpty()) {
             throw IllegalArgumentException("Cannot produce valid set of tiles")
@@ -38,8 +38,8 @@ class TileGenerator(private val n: Int, private val m: Int, private val k: Int) 
     }
 
     private fun expandTileSet(candidateTilesSet: Set<Tile>, currentN: Int, currentM: Int): Set<Tile> {
-        val newN = if (currentN + 2 * k < n) currentN + 2 * k else n
-        val newM = if (currentM + 2 * k < m) currentM + 2 * k else m
+        val newN = if (currentN + 2 * k < finalN) currentN + 2 * k else finalN
+        val newM = if (currentM + 2 * k < finalM) currentM + 2 * k else finalM
         val expandedTiles = HashSet<Tile>()
         for (tile in candidateTilesSet) {
             val clauses = toDimacs(tile, newN, newM)
@@ -48,53 +48,6 @@ class TileGenerator(private val n: Int, private val m: Int, private val k: Int) 
             println("expanded")
         }
         return expandedTiles
-    }
-
-    private fun toDimacs(tile: Tile, newN: Int, newM: Int): Set<Set<Int>> {
-        val biggerTile = Tile(newN, newM, tile)
-        val intersection = TilesIntersection(biggerTile, tile)
-
-        val clauses = HashSet<Set<Int>>()
-
-        for (x in 0 until n) {
-            for (y in 0 until m) {
-                if (intersection.isInside(x, y)) {
-                    clauses.add(cellMustNotChange(x, y, biggerTile))
-                } else {
-                    if (biggerTile.canBeI(x, y)) {
-                        for (i in x - k..x + k) {
-                            (y - k..y + k)
-                                    .filter { j ->
-                                        i >= 0 && j >= 0 && i < newN && j < newM && !(i == x && j == y) && // not center
-                                                Math.abs(x - i) + Math.abs(y - j) <= k
-                                    }
-                                    .mapTo(clauses) { j -> hashSetOf(-biggerTile.getId(x, y), -biggerTile.getId(i, j)) }
-                        }
-                    } else {
-                        clauses.add(hashSetOf(-biggerTile.getId(x, y))) // must be zero
-                    }
-                    /* at least one should be one: */
-                    val clause = HashSet<Int>()
-                    for (i in x - k..x + k) {
-                        (y - k..y + k)
-                                .filter { j ->
-                                    i >= 0 && j >= 0 && i < newN && j < newM && !(i == x && j == y) && // not center
-                                            Math.abs(x - i) + Math.abs(y - j) <= k
-                                }
-                                .mapTo(clause) { j -> biggerTile.getId(i, j) }
-                    }
-                }
-            }
-        }
-        return clauses
-    }
-
-    private fun cellMustNotChange(x: Int, y: Int, biggerTile: Tile): Set<Int> {
-        return if (biggerTile.isI(x, y)) {
-            hashSetOf(biggerTile.getId(x, y))
-        } else {
-            hashSetOf(-biggerTile.getId(x, y))
-        }
     }
 
     /**
@@ -115,7 +68,7 @@ class TileGenerator(private val n: Int, private val m: Int, private val k: Int) 
     }
 
     override fun toString(): String {
-        return n.toString() + " " + m + " " + k + "\n" +
+        return finalN.toString() + " " + finalM + " " + k + "\n" +
                 tileSet.size() + "\n" +
                 tileSet.toString()
     }
@@ -140,7 +93,105 @@ class TileGenerator(private val n: Int, private val m: Int, private val k: Int) 
 
     private fun getFileName(addTimestamp: Boolean?): String {
         return if (addTimestamp!!) {
-            String.format("%d-%d-%d-%d.txt", n, m, k, System.currentTimeMillis())
-        } else String.format("%d-%d-%d.txt", n, m, k)
+            String.format("%d-%d-%d-%d.txt", finalN, finalM, k, System.currentTimeMillis())
+        } else String.format("%d-%d-%d.txt", finalN, finalM, k)
+    }
+
+    companion object {
+
+        internal fun toDimacs(tile: Tile, newN: Int, newM: Int): Set<Set<Int>> {
+            val k = tile.k
+            val biggerTile = Tile(newN, newM, tile)
+            val intersection = TilesIntersection(biggerTile, tile)
+
+            val clauses = HashSet<Set<Int>>()
+
+            for (x in 0 until newN) {
+                for (y in 0 until newM) {
+                    if (intersection.isInside(x, y)) {
+                        clauses.add(cellMustStayTheSame(x, y, biggerTile))
+                        if (biggerTile.isI(x, y)) {
+                            clauses.addAll(allNeighboursMustBeZero(x, y, biggerTile, newN, newM, k))
+                        } else if (biggerTile.canBeI(x, y) && neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
+                            clauses.add(atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k))
+                        }
+
+                    } else {
+                        if (biggerTile.canBeI(x, y)) {
+                            ifCenterIsOneAllOtherAreNot(x, y, biggerTile, clauses, newN, newM, k)
+                            if (neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
+                                val clause = atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k)
+                                clause.add(biggerTile.getId(x, y)) // center may also be in IS
+                                clauses.add(clause)
+                            }
+                        } else {
+                            clauses.add(hashSetOf(-biggerTile.getId(x, y))) // must be zero
+                        }
+                    }
+                }
+            }
+            return clauses
+        }
+
+        private fun neighbourhoodIsInsideTile(x: Int, y: Int, n: Int, m: Int, k: Int): Boolean {
+            if (x - k < 0 || y - k < 0) {
+                return false
+            }
+            if (x + k >= n || y + k >= m) {
+                return false
+            }
+            return true
+        }
+
+        private fun cellMustStayTheSame(x: Int, y: Int, biggerTile: Tile): Set<Int> {
+            return if (biggerTile.isI(x, y)) {
+                hashSetOf(biggerTile.getId(x, y))
+            } else {
+                hashSetOf(-biggerTile.getId(x, y))
+            }
+        }
+
+        private fun allNeighboursMustBeZero(x: Int, y: Int, biggerTile: Tile, newN: Int, newM: Int, k: Int): Set<Set<Int>> {
+            val clauses = HashSet<Set<Int>>()
+            for (i in x - k..x + k) {
+                (y - k..y + k)
+                        .filter { j ->
+                            i >= 0 && j >= 0 && i < newN && j < newM &&
+                                    !(i == x && j == y) && // not center
+                                    Math.abs(x - i) + Math.abs(y - j) <= k
+                        }
+                        .mapTo(clauses) { j -> hashSetOf(-biggerTile.getId(i, j)) } // must be zero
+            }
+            return clauses
+        }
+
+        /**
+         * If (x, y) is 1 then non of it's neighbours is 1
+         */
+        private fun ifCenterIsOneAllOtherAreNot(x: Int, y: Int, biggerTile: Tile,
+                                                clauses: HashSet<Set<Int>>, newN: Int, newM: Int, k: Int) {
+            for (i in x - k..x + k) {
+                (y - k..y + k)
+                        .filter { j ->
+                            i >= 0 && j >= 0 && i < newN && j < newM && !(i == x && j == y) && // not center
+                                    Math.abs(x - i) + Math.abs(y - j) <= k
+                        }
+                        .mapTo(clauses) { j -> hashSetOf(-biggerTile.getId(x, y), -biggerTile.getId(i, j)) }
+            }
+        }
+
+        private fun atLeastOneNeighbourMustBeOne(x: Int, y: Int, biggerTile: Tile, newN: Int, newM: Int, k: Int): HashSet<Int> {
+            val clause = HashSet<Int>()
+            for (i in x - k..x + k) {
+                (y - k..y + k)
+                        .filter { j ->
+                            i >= 0 && j >= 0 && i < newN && j < newM &&
+                                    !(i == x && j == y) && // not center
+                                    Math.abs(x - i) + Math.abs(y - j) <= k
+                        }
+                        .mapTo(clause) { j -> biggerTile.getId(i, j) }
+            }
+            return clause
+        }
     }
 }
