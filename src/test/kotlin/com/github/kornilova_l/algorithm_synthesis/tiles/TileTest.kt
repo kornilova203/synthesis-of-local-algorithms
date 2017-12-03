@@ -119,11 +119,18 @@ internal class TileTest {
 
     @Test
     fun expandTileToDimacsTest() {
-        val tile = Tile(2, 2, 1)
-        val clauses = tile.toDimacsIsTileValid(3, 3)
+        var tile = Tile(2, 2, 1)
+        var clauses = tile.toDimacsIsTileValid(3, 3)
         println(clauses.joinToString("", "", transform = { "${it.joinToString(" ", "")}\n" }))
 
-        val expected = VertexSetSolverKtTest.parseClauses(File("src/test/resources/expand_tile/to_dimacs_3_3.txt").readText())
+        var expected = VertexSetSolverKtTest.parseClauses(File("src/test/resources/expand_tile/to_dimacs_3_3.txt").readText())
+        assertTrue(expected == clauses)
+
+        tile = Tile(tile, 0, 1)
+        clauses = tile.toDimacsIsTileValid(3, 3)
+        println(clauses.joinToString("", "", transform = { "${it.joinToString(" ", "")}\n" }))
+
+        expected = VertexSetSolverKtTest.parseClauses(File("src/test/resources/expand_tile/to_dimacs_3_3_has_one.txt").readText())
         assertTrue(expected == clauses)
     }
 }

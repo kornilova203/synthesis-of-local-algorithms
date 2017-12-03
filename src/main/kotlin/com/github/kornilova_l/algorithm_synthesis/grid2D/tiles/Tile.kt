@@ -236,20 +236,18 @@ class Tile {
                     if (biggerTile.isI(x, y)) {
                         clauses.addAll(allNeighboursMustBeZero(x, y, biggerTile, newN, newM, k, intersection))
                     } else if (biggerTile.canBeI(x, y) && neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
-                        clauses.add(atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k))
+                        clauses.add(atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k, intersection))
                     }
 
                 } else {
                     if (biggerTile.canBeI(x, y)) {
-                        ifCenterIsOneAllOtherAreNot(x, y, biggerTile, clauses, newN, newM, k)
+                        ifCenterIsOneAllOtherAreNot(x, y, biggerTile, clauses, newN, newM, k, intersection)
                         if (neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
-                            val clause = atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k)
+                            val clause = atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k, intersection)
                             clause.add(biggerTile.getId(x, y)) // center may also be in IS
                             clauses.add(clause)
                         }
-                    } else {
-                        clauses.add(hashSetOf(-biggerTile.getId(x, y))) // must be zero
-                    }
+                    } // there is not else branch because if internal cell is in IS then all neighbours are zero
                 }
             }
         }
@@ -328,11 +326,12 @@ class Tile {
         /**
          * If (x, y) is 1 then non of it's neighbours is 1
          */
-        private fun ifCenterIsOneAllOtherAreNot(x: Int, y: Int, biggerTile: Tile,
-                                                clauses: HashSet<Set<Int>>, newN: Int, newM: Int, k: Int) {
+        private fun ifCenterIsOneAllOtherAreNot(x: Int, y: Int, biggerTile: Tile, clauses: HashSet<Set<Int>>,
+                                                newN: Int, newM: Int, k: Int, intersection: TilesIntersection) {
             for (i in x - k..x + k) {
                 (y - k..y + k)
                         .filter { j ->
+                            !intersection.isInside(i, j) && // cells inside cannot be changed
                             i >= 0 && j >= 0 && i < newN && j < newM && !(i == x && j == y) && // not center
                                     Math.abs(x - i) + Math.abs(y - j) <= k
                         }
@@ -340,11 +339,13 @@ class Tile {
             }
         }
 
-        private fun atLeastOneNeighbourMustBeOne(x: Int, y: Int, biggerTile: Tile, newN: Int, newM: Int, k: Int): HashSet<Int> {
+        private fun atLeastOneNeighbourMustBeOne(x: Int, y: Int, biggerTile: Tile, newN: Int,
+                                                 newM: Int, k: Int, intersection: TilesIntersection): HashSet<Int> {
             val clause = HashSet<Int>()
             for (i in x - k..x + k) {
                 (y - k..y + k)
                         .filter { j ->
+                            !intersection.isInside(i, j) && // inside tiles cannot be changed
                             i >= 0 && j >= 0 && i < newN && j < newM &&
                                     !(i == x && j == y) && // not center
                                     Math.abs(x - i) + Math.abs(y - j) <= k
