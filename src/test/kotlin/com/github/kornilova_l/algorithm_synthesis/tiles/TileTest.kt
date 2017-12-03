@@ -48,16 +48,7 @@ internal class TileTest {
         var expected = Tile(9, 10, 3)
 
         expected = Tile(expected, 3, 4)
-        assertEquals(expected, Tile(tile))
-
-
-
-        tile = Tile(3, 4, 3)
-        tile = Tile(tile, 0, 1)
-        expected = Tile(9, 10, 3)
-
-        expected = Tile(expected, 3, 4)
-        assertEquals(expected, Tile(3, 3, tile))
+        assertEquals(expected, Tile(9, 10, tile))
     }
 
     @Test

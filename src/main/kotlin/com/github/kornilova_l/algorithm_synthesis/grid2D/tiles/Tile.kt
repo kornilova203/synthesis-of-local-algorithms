@@ -118,19 +118,6 @@ class Tile {
         grid[x][y] = true
     }
 
-    /**
-     * Clone and expand tile by k
-     */
-    constructor(tile: Tile) {
-        k = tile.k
-        n = tile.n + k * 2
-        m = tile.m + k * 2
-        grid = Array(n) { BooleanArray(m) }
-        for (i in k until n - k) {
-            System.arraycopy(tile.grid[i - k], 0, grid[i], k, tile.m)
-        }
-    }
-
     constructor(tile: Tile, newN: Int, newM: Int, solution: Set<Int>) {
         k = tile.k
         n = newN
@@ -247,7 +234,7 @@ class Tile {
                 if (intersection.isInside(x, y)) {
                     clauses.add(cellMustStayTheSame(x, y, biggerTile))
                     if (biggerTile.isI(x, y)) {
-                        clauses.addAll(allNeighboursMustBeZero(x, y, biggerTile, newN, newM, k))
+                        clauses.addAll(allNeighboursMustBeZero(x, y, biggerTile, newN, newM, k, intersection))
                     } else if (biggerTile.canBeI(x, y) && neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
                         clauses.add(atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k))
                     }
@@ -323,12 +310,13 @@ class Tile {
             }
         }
 
-        private fun allNeighboursMustBeZero(x: Int, y: Int, biggerTile: Tile, newN: Int, newM: Int, k: Int): Set<Set<Int>> {
+        private fun allNeighboursMustBeZero(x: Int, y: Int, biggerTile: Tile, newN: Int, newM: Int, k: Int, intersection: TilesIntersection): Set<Set<Int>> {
             val clauses = HashSet<Set<Int>>()
             for (i in x - k..x + k) {
                 (y - k..y + k)
                         .filter { j ->
-                            i >= 0 && j >= 0 && i < newN && j < newM &&
+                            !intersection.isInside(i, j) && // cells inside are already ok
+                                    i >= 0 && j >= 0 && i < newN && j < newM &&
                                     !(i == x && j == y) && // not center
                                     Math.abs(x - i) + Math.abs(y - j) <= k
                         }
