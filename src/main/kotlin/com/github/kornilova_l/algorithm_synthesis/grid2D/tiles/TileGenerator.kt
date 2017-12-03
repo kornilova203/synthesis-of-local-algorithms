@@ -5,6 +5,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Companion.Ex
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Companion.getAllPossibleExtensions
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.generatePossiblyValidTiles
+import com.github.kornilova_l.util.ProgressBar
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -12,17 +13,15 @@ import java.nio.file.Paths
 
 /**
  * Generates all possible combinations of tileSet finalN x finalM in kth power of grid
+ * @param dir that contains precalculated tiles of smaller size
  */
-class TileGenerator(private val finalN: Int, private val finalM: Int, private val k: Int) {
+class TileGenerator(private val finalN: Int, private val finalM: Int, private val k: Int, dir: File? = null) {
     val tileSet: TileSet
 
     init {
-        var currentN = if (finalN < 3) finalN else 3
-        var currentM = if (finalM < 3) finalM else 3
-
-        var tiles = generatePossiblyValidTiles(currentN, currentM, k)
-
-        tiles = removeNotMaximal(tiles)
+        var tiles = getInitialTiles(dir)
+        var currentN = tiles.first().n
+        var currentM = tiles.first().m
 
         while (currentM < finalM || currentN < finalN) {
             tiles = expandTileSet(tiles)
@@ -38,21 +37,47 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         }
     }
 
+    private fun getInitialTiles(dir: File?): Set<Tile> {
+        var currentN = finalN
+        var currentM = finalM
+        while (currentN >= 3 && currentM >= 3) {
+            val file = Paths.get(dir.toString(), "$currentN-$currentM-$k.txt").toFile()
+            if (file.exists()) {
+                println("Found file: $file")
+                return TileSet(file).validTiles
+            }
+            if (currentM > currentN) {
+                currentM--
+            } else {
+                currentN--
+            }
+        }
+        currentN = if (finalN < 3) finalN else 3
+        currentM = if (finalM < 3) finalM else 3
+        val tiles = generatePossiblyValidTiles(currentN, currentM, k)
+        return removeNotMaximal(tiles)
+    }
+
     /**
      * Expand each tile by 1 row/column
      * Remove not valid tiles
      */
-    private fun expandTileSet(candidateTilesSet: Set<Tile>): Set<Tile> {
-        val currentN = candidateTilesSet.first().n
-        val currentM = candidateTilesSet.first().m
+    private fun expandTileSet(tiles: Set<Tile>): Set<Tile> {
+        val currentN = tiles.first().n
+        val currentM = tiles.first().m
         if (currentN == finalN && currentM == finalM) {
             throw IllegalArgumentException("Tiles have final size")
         }
         val side = if (currentN < currentM && currentN < finalN || currentM == finalM) HEIGHT else WIDTH
+        println("Expand tiles $currentN x $currentM k: $k. Side: $side\nTiles count = ${tiles.size}")
+        val progressBar = ProgressBar(tiles.size)
         val expandedTiles = HashSet<Tile>()
-        candidateTilesSet
-                .map { getAllPossibleExtensions(it, side) }
-                .forEach { extensions -> extensions.filterTo(expandedTiles) { it.isValid } }
+        for (tile in tiles) {
+            val extensions = getAllPossibleExtensions(tile, side)
+            progressBar.updateProgress(1)
+            extensions.filterTo(expandedTiles) { it.isValid }
+        }
+        progressBar.finish()
         return expandedTiles
     }
 

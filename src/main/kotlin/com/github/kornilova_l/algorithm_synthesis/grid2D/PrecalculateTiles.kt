@@ -14,6 +14,6 @@ fun main(args: Array<String>) {
             continue
         }
         println("Calculate $n x $m tile in power $k")
-        TileGenerator(n, m, k).exportToFile(File("generated_tiles"), false)
+        TileGenerator(n, m, k, File("generated_tiles")).exportToFile(File("generated_tiles"), false)
     }
 }
