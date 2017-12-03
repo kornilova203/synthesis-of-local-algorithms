@@ -37,8 +37,8 @@ class ProgressBar(private val total: Int) {
         percent /= 2
         val resizingTotal = 50
         val string = StringBuilder(140)
-        val intPercent = Math.ceil(percent).toInt()
         percent = if (percent == 0.toDouble()) 0.01 else percent
+        val intPercent = Math.ceil(percent).toInt()
         val format = DecimalFormat("####")
         string.append('\r')
                 .append(Collections.nCopies(2 - Math.log10((intPercent * 2).toDouble()).toInt(), " ").joinToString(""))
