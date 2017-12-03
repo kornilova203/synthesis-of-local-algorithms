@@ -1,7 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolverProcessManager
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.solveWithSatSolver
 import java.util.*
 import kotlin.collections.HashSet
 
@@ -14,17 +14,16 @@ class Tile {
     /**
      * Check if this tile is valid
      */
-    val isValid: Boolean
-        get() {
-            val newN = n + k * 2
-            val newM = m + k * 2
-            val clauses = toDimacsIsTileValid(newN, newM)
-            val solution = solveWithSatSolver(clauses, newN * newM)
-            if (solution != null) {
-                return true
-            }
-            return false
+    fun isValid(satManager: SatSolverProcessManager): Boolean {
+        val newN = n + k * 2
+        val newM = m + k * 2
+        val clauses = toDimacsIsTileValid(newN, newM)
+        val solution = satManager.solveWithSatSolver(clauses, newN * newM)
+        if (solution != null) {
+            return true
         }
+        return false
+    }
 
     internal constructor(n: Int, m: Int, k: Int, `is`: Set<Coordinate>) {
         this.n = n
@@ -332,7 +331,7 @@ class Tile {
                 (y - k..y + k)
                         .filter { j ->
                             !intersection.isInside(i, j) && // cells inside cannot be changed
-                            i >= 0 && j >= 0 && i < newN && j < newM && !(i == x && j == y) && // not center
+                                    i >= 0 && j >= 0 && i < newN && j < newM && !(i == x && j == y) && // not center
                                     Math.abs(x - i) + Math.abs(y - j) <= k
                         }
                         .mapTo(clauses) { j -> hashSetOf(-biggerTile.getId(x, y), -biggerTile.getId(i, j)) }
@@ -346,7 +345,7 @@ class Tile {
                 (y - k..y + k)
                         .filter { j ->
                             !intersection.isInside(i, j) && // inside tiles cannot be changed
-                            i >= 0 && j >= 0 && i < newN && j < newM &&
+                                    i >= 0 && j >= 0 && i < newN && j < newM &&
                                     !(i == x && j == y) && // not center
                                     Math.abs(x - i) + Math.abs(y - j) <= k
                         }

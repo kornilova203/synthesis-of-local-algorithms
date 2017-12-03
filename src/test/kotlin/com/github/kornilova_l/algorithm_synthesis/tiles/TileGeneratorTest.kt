@@ -11,8 +11,10 @@ import java.io.File
 internal class TileGeneratorTest {
     @Test
     fun test() {
+        val startTime = System.currentTimeMillis()
         var tileGenerator = TileGenerator(7, 5, 3)
         assertEquals(2079, tileGenerator.tileSet.size())
+        println("Time ${System.currentTimeMillis() - startTime}")
 
         tileGenerator = TileGenerator(5, 7, 3) // set of tiles should not depend on orientation
         assertEquals(2079, tileGenerator.tileSet.size())
@@ -26,8 +28,12 @@ internal class TileGeneratorTest {
             val n = parameters.n
             val m = parameters.m
             val k = parameters.k
+            val file = File("src/test/resources/tiles/$n-$m-$k.txt")
+            if (!file.exists()) {
+                continue
+            }
             val tiles = TileGenerator(n, m, k).tileSet
-            val expectedTiles = TileSet(File("src/test/resources/tiles/$n-$m-$k.txt"))
+            val expectedTiles = TileSet(file)
 
             assertEquals(expectedTiles, tiles)
         }
@@ -36,7 +42,7 @@ internal class TileGeneratorTest {
 
     @Test
     fun exportAndImportTest() {
-        val tileGenerator = TileGenerator(5, 7, 3)
+        val tileGenerator = TileGenerator(3, 5, 3)
         val file = tileGenerator.exportToFile(File("."), true)
         assertNotNull(file)
 

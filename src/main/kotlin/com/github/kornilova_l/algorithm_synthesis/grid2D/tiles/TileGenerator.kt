@@ -5,6 +5,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Companion.Ex
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Companion.getAllPossibleExtensions
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.generatePossiblyValidTiles
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolverProcessManager
 import com.github.kornilova_l.util.ProgressBar
 import java.io.File
 import java.io.FileOutputStream
@@ -19,16 +20,17 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
     val tileSet: TileSet
 
     init {
-        var tiles = getInitialTiles(dir)
+        val satManager = SatSolverProcessManager()
+        var tiles = getInitialTiles(dir, satManager)
         var currentN = tiles.first().n
         var currentM = tiles.first().m
 
         while (currentM < finalM || currentN < finalN) {
-            tiles = expandTileSet(tiles)
+            tiles = expandTileSet(tiles, satManager)
             currentN = tiles.first().n
             currentM = tiles.first().m
-            println("Found $currentN x $currentM tiles")
         }
+        satManager.stop()
 
         if (tiles.isEmpty()) {
             throw IllegalArgumentException("Cannot produce valid set of tiles")
@@ -37,7 +39,7 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         }
     }
 
-    private fun getInitialTiles(dir: File?): Set<Tile> {
+    private fun getInitialTiles(dir: File?, satManager: SatSolverProcessManager): Set<Tile> {
         var currentN = finalN
         var currentM = finalM
         while (currentN >= 3 && currentM >= 3) {
@@ -55,14 +57,14 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         currentN = if (finalN < 3) finalN else 3
         currentM = if (finalM < 3) finalM else 3
         val tiles = generatePossiblyValidTiles(currentN, currentM, k)
-        return removeNotMaximal(tiles)
+        return removeNotMaximal(tiles, satManager)
     }
 
     /**
      * Expand each tile by 1 row/column
      * Remove not valid tiles
      */
-    private fun expandTileSet(tiles: Set<Tile>): Set<Tile> {
+    private fun expandTileSet(tiles: Set<Tile>, satManager: SatSolverProcessManager): Set<Tile> {
         val currentN = tiles.first().n
         val currentM = tiles.first().m
         if (currentN == finalN && currentM == finalM) {
@@ -75,9 +77,10 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         for (tile in tiles) {
             val extensions = getAllPossibleExtensions(tile, side)
             progressBar.updateProgress(1)
-            extensions.filterTo(expandedTiles) { it.isValid }
+            extensions.filterTo(expandedTiles) { it.isValid(satManager) }
         }
         progressBar.finish()
+        println()
         return expandedTiles
     }
 
@@ -116,9 +119,9 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         /**
          * Remove all tileSet which does not have maximal IS
          */
-        private fun removeNotMaximal(tiles: Set<Tile>): Set<Tile> {
+        private fun removeNotMaximal(tiles: Set<Tile>, satManager: SatSolverProcessManager): Set<Tile> {
             val maximalTiles = HashSet<Tile>()
-            tiles.filterTo(maximalTiles) { it.isValid }
+            tiles.filterTo(maximalTiles) { tile -> tile.isValid(satManager) }
             return maximalTiles
         }
     }

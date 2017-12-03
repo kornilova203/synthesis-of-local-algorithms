@@ -4,6 +4,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.Grid2D
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Coordinate
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolverProcessManager
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.VertexSetSolverKtTest
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import org.junit.Assert.*
@@ -34,11 +35,12 @@ internal class TileTest {
 
     @Test
     fun isValidTest() { // may take some time
+        val satManager = SatSolverProcessManager()
         var tile = Tile(5, 6, 2)
-        assertFalse(tile.isValid)
+        assertFalse(tile.isValid(satManager))
 
         tile = Tile(5, 7, 3)
-        assertTrue(tile.isValid)
+        assertTrue(tile.isValid(satManager))
     }
 
     @Test

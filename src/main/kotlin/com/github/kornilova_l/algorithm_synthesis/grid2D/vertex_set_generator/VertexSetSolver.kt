@@ -13,7 +13,6 @@ import java.io.IOException
 import java.io.OutputStreamWriter
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 
 
@@ -24,6 +23,7 @@ import kotlin.collections.HashSet
  * To use this function all tile sets must be precalculated and stored in generated_tiles directory
  */
 fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
+    val satManager = SatSolverProcessManager()
     val parametersSet = getParametersSet(1)
     for (parameters in parametersSet) {
         val n = parameters.n
@@ -34,43 +34,12 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
         val tileSet = TileSet(file)
         val graph = DirectedTileGraph(tileSet)
         val clauses = toDimacs(graph, vertexRules)
-        val solution = solveWithSatSolver(clauses, graph.size)
+        val solution = satManager.solveWithSatSolver(clauses, graph.size)
         if (solution != null) { // solution found
             return LabelingFunction(solution, graph)
         }
     }
-    return null
-}
-
-/**
- * @return null if not satisfiable
- */
-fun solveWithSatSolver(clauses: Set<Set<Int>>, varCount: Int): List<Int>? {
-    val builder = ProcessBuilder("python", File("python_sat/sat/start_sat.py").toString())
-
-    builder.redirectErrorStream(true)
-    try {
-        val process = builder.start()
-        val writer = BufferedWriter(OutputStreamWriter(process.outputStream))
-        writer.write("p cnf $varCount ${clauses.size}\n")
-        for (clause in clauses) {
-            for (variable in clause) {
-                writer.write("$variable ")
-            }
-            writer.write("\n")
-        }
-        writer.flush()
-        writer.close()
-        val scanner = Scanner(process.inputStream)
-        process!!.waitFor()
-        if (scanner.nextLine() == "OK") {
-            return parseResult(scanner)
-        }
-    } catch (e: IOException) {
-        e.printStackTrace()
-    } catch (e: InterruptedException) {
-        e.printStackTrace()
-    }
+    satManager.stop()
     return null
 }
 
@@ -121,6 +90,11 @@ fun parseResult(scanner: Scanner): List<Int> {
     val res = ArrayList<Int>()
     while (scanner.hasNextInt()) {
         res.add(scanner.nextInt())
+    }
+    scanner.nextLine() // end of line
+    val end = scanner.nextLine()
+    if (end != "END") {
+        throw RuntimeException("Cannot find end of result")
     }
     return res
 }
