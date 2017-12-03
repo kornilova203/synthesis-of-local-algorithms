@@ -74,6 +74,17 @@ class TileSet {
         }
         return stringBuilder.toString()
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (other is TileSet) {
+            if (validTiles.size != other.validTiles.size) {
+                return false
+            }
+            val intersect = validTiles.intersect(other.validTiles)
+            return intersect.size == validTiles.size
+        }
+        return false
+    }
 }
 
 /**

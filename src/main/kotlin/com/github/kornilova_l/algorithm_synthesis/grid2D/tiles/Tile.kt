@@ -1,6 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.solveWithSatSolver
 import java.util.*
 import kotlin.collections.HashSet
 
@@ -12,25 +13,17 @@ class Tile {
 
     /**
      * Check if this tile is valid
-     * 1. Expand tile by k cells on each side
-     * 2. Try to generate IS in extended tile
-     * such that it will cover all uncovered cells in original tile.
-     * This proves that internal tile exist but does not tell us that this particular
-     * extended tile also exist.
      */
     val isValid: Boolean
         get() {
-            val canBeAddedToIS = HashSet<Coordinate>()
-            for (i in 0 until n) {
-                (0 until m)
-                        .filter { !grid[i][it] && canBeI(i, it) }
-                        .mapTo(canBeAddedToIS) { Coordinate(i, it) }
+            val newN = n + k * 2
+            val newM = m + k * 2
+            val clauses = toDimacsIsTileValid(newN, newM)
+            val solution = solveWithSatSolver(clauses, newN * newM)
+            if (solution != null) {
+                return true
             }
-            return if (canBeAddedToIS.isEmpty()) {
-                true
-            } else isTileValidRecursive(Tile(this),
-                    changeCoordinatesForExpanded(canBeAddedToIS, k),
-                    Coordinate(0, 0))
+            return false
         }
 
     internal constructor(n: Int, m: Int, k: Int, `is`: Set<Coordinate>) {
@@ -139,9 +132,6 @@ class Tile {
     }
 
     constructor(tile: Tile, newN: Int, newM: Int, solution: Set<Int>) {
-        if (solution.containsAll(hashSetOf(-3, -6, -7, -8, -9))) {
-            println()
-        }
         k = tile.k
         n = newN
         m = newM
@@ -214,35 +204,6 @@ class Tile {
     }
 
     /**
-     * @return true if it is possible to generate expanded tile
-     * which cover all in uncovered cells in internal tile.
-     */
-    private fun isTileValidRecursive(expandedTile: Tile,
-                                     canBeAddedToIS: MutableSet<Coordinate>,
-                                     curCoordinate: Coordinate?): Boolean {
-        if (curCoordinate == null) { // if on previous step there was last coordinate
-            return false
-        }
-        if (isTileValidRecursive(expandedTile, canBeAddedToIS, expandedTile.getNextBorderCoordinate(curCoordinate))) {
-            return true
-        }
-        if (expandedTile.canBeI(curCoordinate.x, curCoordinate.y)) { // it cell can be added to the tile
-            val covered = expandedTile.getCovered(curCoordinate, canBeAddedToIS)
-            if (covered != null) {
-                canBeAddedToIS.removeAll(covered)
-                if (canBeAddedToIS.isEmpty()) { // if covers all
-                    return true
-                }
-                val newTile = Tile(expandedTile, curCoordinate.x, curCoordinate.y)
-                val res = isTileValidRecursive(newTile, canBeAddedToIS, newTile.getNextBorderCoordinate(curCoordinate))
-                canBeAddedToIS.addAll(covered)
-                return res
-            }
-        }
-        return false
-    }
-
-    /**
      * @return next coordinate which does not belong to internal tile
      * or null if it was last tile
      */
@@ -266,40 +227,144 @@ class Tile {
         return Coordinate(x, y)
     }
 
-    /**
-     * Returns true if (x, y) covers at least one point in cells
-     */
-    private fun getCovered(coordinate: Coordinate, cells: Set<Coordinate>): Set<Coordinate>? {
-        val x = coordinate.x
-        val y = coordinate.y
-        var covered: MutableSet<Coordinate>? = null
-        for (cell in cells) {
-            if (Math.abs(x - cell.x) + Math.abs(y - cell.y) <= k) {
-                if (covered == null) {
-                    covered = HashSet()
-                }
-                covered.add(cell)
-            }
-        }
-        return covered
-    }
-
-    /**
-     * Add k to each coordinate
-     */
-    private fun changeCoordinatesForExpanded(canBeAddedToIS: Set<Coordinate>, k: Int): MutableSet<Coordinate> {
-        return canBeAddedToIS
-                .map { Coordinate(it.x + k, it.y + k) }
-                .toMutableSet()
-    }
-
     fun getId(x: Int, y: Int): Int {
         return x * m + y + 1
     }
 
-    fun getCoordinate(id: Int): Coordinate {
+    private fun getCoordinate(id: Int): Coordinate {
         val num = id - 1
         return Coordinate(num / m, num % m)
+    }
+
+    internal fun toDimacsIsTileValid(newN: Int, newM: Int): Set<Set<Int>> {
+        val biggerTile = Tile(newN, newM, this)
+        val intersection = TilesIntersection(biggerTile, this)
+
+        val clauses = HashSet<Set<Int>>()
+
+        for (x in 0 until newN) {
+            for (y in 0 until newM) {
+                if (intersection.isInside(x, y)) {
+                    clauses.add(cellMustStayTheSame(x, y, biggerTile))
+                    if (biggerTile.isI(x, y)) {
+                        clauses.addAll(allNeighboursMustBeZero(x, y, biggerTile, newN, newM, k))
+                    } else if (biggerTile.canBeI(x, y) && neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
+                        clauses.add(atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k))
+                    }
+
+                } else {
+                    if (biggerTile.canBeI(x, y)) {
+                        ifCenterIsOneAllOtherAreNot(x, y, biggerTile, clauses, newN, newM, k)
+                        if (neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
+                            val clause = atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k)
+                            clause.add(biggerTile.getId(x, y)) // center may also be in IS
+                            clauses.add(clause)
+                        }
+                    } else {
+                        clauses.add(hashSetOf(-biggerTile.getId(x, y))) // must be zero
+                    }
+                }
+            }
+        }
+        return clauses
+    }
+
+    companion object {
+        enum class Expand {
+            HEIGHT,
+            WIDTH
+        }
+
+        fun getAllPossibleExtensions(tile: Tile, side: Expand): Set<Tile> {
+            if (side == Expand.WIDTH) {
+                val newN = tile.n
+                val newM = tile.m + 1
+                val extensions = HashSet<Tile>()
+                extensions.add(Tile(newN, newM, tile))
+                for (i in 0 until tile.n) {
+                    val newExtensions = HashSet<Tile>()
+                    extensions
+                            .filter { it.canBeI(i, tile.m) }
+                            .mapTo(newExtensions) { Tile(it, i, tile.m) }
+                    extensions.addAll(newExtensions)
+                }
+                return extensions
+            } else {
+                val newN = tile.n + 1
+                val newM = tile.m
+                val extensions = HashSet<Tile>()
+                extensions.add(Tile(newN, newM, tile))
+                for (j in 0 until tile.m) {
+                    val newExtensions = HashSet<Tile>()
+                    extensions
+                            .filter { it.canBeI(tile.n, j) }
+                            .mapTo(newExtensions) { Tile(it, tile.n, j) }
+                    extensions.addAll(newExtensions)
+                }
+                return extensions
+            }
+        }
+
+        private fun neighbourhoodIsInsideTile(x: Int, y: Int, n: Int, m: Int, k: Int): Boolean {
+            if (x - k < 0 || y - k < 0) {
+                return false
+            }
+            if (x + k >= n || y + k >= m) {
+                return false
+            }
+            return true
+        }
+
+        private fun cellMustStayTheSame(x: Int, y: Int, biggerTile: Tile): Set<Int> {
+            return if (biggerTile.isI(x, y)) {
+                hashSetOf(biggerTile.getId(x, y))
+            } else {
+                hashSetOf(-biggerTile.getId(x, y))
+            }
+        }
+
+        private fun allNeighboursMustBeZero(x: Int, y: Int, biggerTile: Tile, newN: Int, newM: Int, k: Int): Set<Set<Int>> {
+            val clauses = HashSet<Set<Int>>()
+            for (i in x - k..x + k) {
+                (y - k..y + k)
+                        .filter { j ->
+                            i >= 0 && j >= 0 && i < newN && j < newM &&
+                                    !(i == x && j == y) && // not center
+                                    Math.abs(x - i) + Math.abs(y - j) <= k
+                        }
+                        .mapTo(clauses) { j -> hashSetOf(-biggerTile.getId(i, j)) } // must be zero
+            }
+            return clauses
+        }
+
+        /**
+         * If (x, y) is 1 then non of it's neighbours is 1
+         */
+        private fun ifCenterIsOneAllOtherAreNot(x: Int, y: Int, biggerTile: Tile,
+                                                clauses: HashSet<Set<Int>>, newN: Int, newM: Int, k: Int) {
+            for (i in x - k..x + k) {
+                (y - k..y + k)
+                        .filter { j ->
+                            i >= 0 && j >= 0 && i < newN && j < newM && !(i == x && j == y) && // not center
+                                    Math.abs(x - i) + Math.abs(y - j) <= k
+                        }
+                        .mapTo(clauses) { j -> hashSetOf(-biggerTile.getId(x, y), -biggerTile.getId(i, j)) }
+            }
+        }
+
+        private fun atLeastOneNeighbourMustBeOne(x: Int, y: Int, biggerTile: Tile, newN: Int, newM: Int, k: Int): HashSet<Int> {
+            val clause = HashSet<Int>()
+            for (i in x - k..x + k) {
+                (y - k..y + k)
+                        .filter { j ->
+                            i >= 0 && j >= 0 && i < newN && j < newM &&
+                                    !(i == x && j == y) && // not center
+                                    Math.abs(x - i) + Math.abs(y - j) <= k
+                        }
+                        .mapTo(clause) { j -> biggerTile.getId(i, j) }
+            }
+            return clause
+        }
     }
 
     /**

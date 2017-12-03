@@ -4,6 +4,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.Grid2D
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Coordinate
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.VertexSetSolverKtTest
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import org.junit.Assert.*
 import org.junit.Test
@@ -102,26 +103,36 @@ internal class TileTest {
                 Coordinate(3, 3),
                 Coordinate(2, 0)
         )
-        val biggerTile = Tile(5, 4,1, independentSet1)
+        val biggerTile = Tile(5, 4, 1, independentSet1)
 
         val independentSetNorth = hashSetOf(Coordinate(1, 0))
-        val tileNorth = Tile(3, 2,1, independentSetNorth)
+        val tileNorth = Tile(3, 2, 1, independentSetNorth)
         assertEquals(tileNorth, Tile(biggerTile, POSITION.N))
 
         val independentSetEast = hashSetOf(Coordinate(2, 1))
-        val tileEast = Tile(3, 2,1, independentSetEast)
+        val tileEast = Tile(3, 2, 1, independentSetEast)
         assertEquals(tileEast, Tile(biggerTile, POSITION.E))
 
         val independentSetSouth = hashSetOf<Coordinate>()
-        val tileSouth = Tile(3, 2,1, independentSetSouth)
+        val tileSouth = Tile(3, 2, 1, independentSetSouth)
         assertEquals(tileSouth, Tile(biggerTile, POSITION.S))
 
         val independentSetWest = hashSetOf(Coordinate(1, 0), Coordinate(0, 1))
-        val tileWest = Tile(3, 2,1, independentSetWest)
+        val tileWest = Tile(3, 2, 1, independentSetWest)
         assertEquals(tileWest, Tile(biggerTile, POSITION.W))
 
         val independentSetCenter = hashSetOf(Coordinate(0, 0))
-        val tileCenter = Tile(3, 2,1, independentSetCenter)
+        val tileCenter = Tile(3, 2, 1, independentSetCenter)
         assertEquals(tileCenter, Tile(biggerTile, POSITION.X))
+    }
+
+    @Test
+    fun expandTileToDimacsTest() {
+        val tile = Tile(2, 2, 1)
+        val clauses = tile.toDimacsIsTileValid(3, 3)
+        println(clauses.joinToString("", "", transform = { "${it.joinToString(" ", "")}\n" }))
+
+        val expected = VertexSetSolverKtTest.parseClauses(File("src/test/resources/expand_tile/to_dimacs_3_3.txt").readText())
+        assertTrue(expected == clauses)
     }
 }
