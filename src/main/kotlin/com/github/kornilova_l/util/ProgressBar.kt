@@ -33,18 +33,19 @@ class ProgressBar(private val total: Int) {
         }
         current += addToProgress
         lastUpdateTime = System.currentTimeMillis()
-        var percent = current * 100 / total
+        var percent = current * 100 / total.toDouble()
         percent /= 2
         val resizingTotal = 50
         val string = StringBuilder(140)
-        percent = if (percent == 0) 1 else percent
+        val intPercent = Math.ceil(percent).toInt()
+        percent = if (percent == 0.toDouble()) 0.01 else percent
         val format = DecimalFormat("####")
         string.append('\r')
-                .append(Collections.nCopies(2 - Math.log10((percent * 2).toDouble()).toInt(), " ").joinToString(""))
-                .append(String.format(" %d%% [", percent * 2))
-                .append(Collections.nCopies(percent, "=").joinToString(""))
+                .append(Collections.nCopies(2 - Math.log10((intPercent * 2).toDouble()).toInt(), " ").joinToString(""))
+                .append(String.format("%.2f%% [", percent * 2))
+                .append(Collections.nCopies(intPercent, "=").joinToString(""))
                 .append('>')
-                .append(Collections.nCopies(resizingTotal - percent, " ").joinToString(""))
+                .append(Collections.nCopies(resizingTotal - intPercent, " ").joinToString(""))
                 .append(']')
                 .append(String.format("%4s", format.format((lastUpdateTime - startTime).toDouble() / 1000)))
                 .append("s")
