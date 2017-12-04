@@ -15,10 +15,8 @@ class Tile {
      * Check if this tile is valid
      */
     fun isValid(satManager: SatSolverProcessManager): Boolean {
-        val newN = n + k * 2
-        val newM = m + k * 2
-        val clauses = toDimacsIsTileValid(newN, newM)
-        val solution = satManager.solveWithSatSolver(clauses, newN * newM)
+        val clauses = toDimacsIsTileValid()
+        val solution = satManager.solveWithSatSolver(clauses, (n + k * 2) * (m + k * 2))
         if (solution != null) {
             return true
         }
@@ -222,9 +220,11 @@ class Tile {
         return Coordinate(num / m, num % m)
     }
 
-    internal fun toDimacsIsTileValid(newN: Int, newM: Int): Set<Set<Int>> {
+    internal fun toDimacsIsTileValid(): Set<Set<Int>> {
+        val newN = n + k * 2
+        val newM = n + k * 2
         val biggerTile = Tile(newN, newM, this)
-        val intersection = TilesIntersection(biggerTile, this)
+        val intersection = TileIntersection(n, m, newN, newM)
 
         val clauses = HashSet<Set<Int>>()
 
@@ -307,7 +307,7 @@ class Tile {
             }
         }
 
-        private fun allNeighboursMustBeZero(x: Int, y: Int, biggerTile: Tile, newN: Int, newM: Int, k: Int, intersection: TilesIntersection): Set<Set<Int>> {
+        private fun allNeighboursMustBeZero(x: Int, y: Int, biggerTile: Tile, newN: Int, newM: Int, k: Int, intersection: TileIntersection): Set<Set<Int>> {
             val clauses = HashSet<Set<Int>>()
             for (i in x - k..x + k) {
                 (y - k..y + k)
@@ -326,7 +326,7 @@ class Tile {
          * If (x, y) is 1 then non of it's neighbours is 1
          */
         private fun ifCenterIsOneAllOtherAreNot(x: Int, y: Int, biggerTile: Tile, clauses: HashSet<Set<Int>>,
-                                                newN: Int, newM: Int, k: Int, intersection: TilesIntersection) {
+                                                newN: Int, newM: Int, k: Int, intersection: TileIntersection) {
             for (i in x - k..x + k) {
                 (y - k..y + k)
                         .filter { j ->
@@ -339,7 +339,7 @@ class Tile {
         }
 
         private fun atLeastOneNeighbourMustBeOne(x: Int, y: Int, biggerTile: Tile, newN: Int,
-                                                 newM: Int, k: Int, intersection: TilesIntersection): HashSet<Int> {
+                                                 newM: Int, k: Int, intersection: TileIntersection): HashSet<Int> {
             val clause = HashSet<Int>()
             for (i in x - k..x + k) {
                 (y - k..y + k)

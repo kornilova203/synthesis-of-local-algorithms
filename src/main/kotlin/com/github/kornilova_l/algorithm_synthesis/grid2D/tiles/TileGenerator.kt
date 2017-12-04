@@ -75,13 +75,18 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         val progressBar = ProgressBar(tiles.size)
         val expandedTiles = HashSet<Tile>()
         for (tile in tiles) {
-            val extensions = getAllPossibleExtensions(tile, side)
+            addValidExtensionsToSet(tile, expandedTiles, side, satManager)
             progressBar.updateProgress(1)
-            extensions.filterTo(expandedTiles) { it.isValid(satManager) }
         }
         progressBar.finish()
         println()
         return expandedTiles
+    }
+
+    private fun addValidExtensionsToSet(tile: Tile, expandedTiles: HashSet<Tile>, side: Tile.Companion.Expand,
+                                        satManager: SatSolverProcessManager) {
+        val extensions = getAllPossibleExtensions(tile, side)
+        extensions.filterTo(expandedTiles) { it.isValid(satManager) }
     }
 
     override fun toString(): String {
