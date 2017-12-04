@@ -17,8 +17,21 @@ class SatSolverProcessManager private constructor() {
         // it will not be instantiated until it is used
         // because there is no other public static method or public fields
         var satManager = SatSolverProcessManager()
+
         init {
             println("Sat Manager is instantiated")
+        }
+    }
+
+    init {
+        val builder = ProcessBuilder(File("c_sat/sat").toString())
+        builder.redirectErrorStream(true)
+        process = builder.start()
+        writer = BufferedWriter(OutputStreamWriter(process.outputStream))
+        scanner = Scanner(process.inputStream)
+        val line = scanner.nextLine()
+        if (line != "HELLO") {
+            throw RuntimeException("Cannot start python process")
         }
     }
 
@@ -29,12 +42,9 @@ class SatSolverProcessManager private constructor() {
         try {
             writer.write("p cnf $varCount ${clauses.size}\n")
             for (clause in clauses) {
-                for (variable in clause) {
-                    writer.write("$variable ")
-                }
-                writer.write("\n")
+                clause.forEach { variable -> writer.write("$variable") }
+                writer.write("e\n")
             }
-            writer.write("END\n")
             writer.flush()
             val line = scanner.nextLine()
             if (line == "RESULT:") {
@@ -46,17 +56,5 @@ class SatSolverProcessManager private constructor() {
             e.printStackTrace()
         }
         return null
-    }
-
-    init {
-        val builder = ProcessBuilder("python", File("python_sat/sat/start_sat_iterative.py").toString())
-        builder.redirectErrorStream(true)
-        process = builder.start()
-        writer = BufferedWriter(OutputStreamWriter(process.outputStream))
-        scanner = Scanner(process.inputStream)
-        val line = scanner.nextLine()
-        if (line != "HELLO") {
-            throw RuntimeException("Cannot start python process")
-        }
     }
 }

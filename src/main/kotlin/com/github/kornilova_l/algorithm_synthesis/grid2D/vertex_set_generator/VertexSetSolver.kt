@@ -89,9 +89,8 @@ fun parseResult(scanner: Scanner): List<Int> {
     while (scanner.hasNextInt()) {
         res.add(scanner.nextInt())
     }
-    scanner.nextLine() // end of line
     val end = scanner.nextLine()
-    if (end != "END") {
+    if (!end.contains("END")) {
         throw RuntimeException("Cannot find end of result")
     }
     return res
