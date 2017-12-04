@@ -23,7 +23,6 @@ import kotlin.collections.HashSet
  * To use this function all tile sets must be precalculated and stored in generated_tiles directory
  */
 fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
-    val satManager = SatSolverProcessManager()
     val parametersSet = getParametersSet(1)
     for (parameters in parametersSet) {
         val n = parameters.n
@@ -34,12 +33,11 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
         val tileSet = TileSet(file)
         val graph = DirectedTileGraph(tileSet)
         val clauses = toDimacs(graph, vertexRules)
-        val solution = satManager.solveWithSatSolver(clauses, graph.size)
+        val solution = SatSolverProcessManager.satManager.solveWithSatSolver(clauses, graph.size)
         if (solution != null) { // solution found
             return LabelingFunction(solution, graph)
         }
     }
-    satManager.stop()
     return null
 }
 

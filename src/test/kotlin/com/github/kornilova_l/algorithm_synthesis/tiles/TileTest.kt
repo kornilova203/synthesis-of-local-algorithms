@@ -4,7 +4,6 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.Grid2D
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Coordinate
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolverProcessManager
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.VertexSetSolverKtTest
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import org.junit.Assert.*
@@ -35,12 +34,11 @@ internal class TileTest {
 
     @Test
     fun isValidTest() { // may take some time
-        val satManager = SatSolverProcessManager()
         var tile = Tile(5, 6, 2)
-        assertFalse(tile.isValid(satManager))
+        assertFalse(tile.isValid())
 
         tile = Tile(5, 7, 3)
-        assertTrue(tile.isValid(satManager))
+        assertTrue(tile.isValid())
     }
 
     @Test
@@ -121,15 +119,16 @@ internal class TileTest {
 
     @Test
     fun expandTileToDimacsTest() {
+        // todo fix test
         var tile = Tile(2, 2, 1)
-        var clauses = tile.toDimacsIsTileValid(3, 3)
+        var clauses = tile.toDimacsIsTileValid()
         println(clauses.joinToString("", "", transform = { "${it.joinToString(" ", "")}\n" }))
 
         var expected = VertexSetSolverKtTest.parseClauses(File("src/test/resources/expand_tile/to_dimacs_3_3.txt").readText())
         assertTrue(expected == clauses)
 
         tile = Tile(tile, 0, 1)
-        clauses = tile.toDimacsIsTileValid(3, 3)
+        clauses = tile.toDimacsIsTileValid()
         println(clauses.joinToString("", "", transform = { "${it.joinToString(" ", "")}\n" }))
 
         expected = VertexSetSolverKtTest.parseClauses(File("src/test/resources/expand_tile/to_dimacs_3_3_has_one.txt").readText())

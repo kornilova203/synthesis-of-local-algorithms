@@ -14,9 +14,10 @@ class Tile {
     /**
      * Check if this tile is valid
      */
-    fun isValid(satManager: SatSolverProcessManager): Boolean {
+    fun isValid(): Boolean {
         val clauses = toDimacsIsTileValid()
-        val solution = satManager.solveWithSatSolver(clauses, (n + k * 2) * (m + k * 2))
+        val solution = SatSolverProcessManager.satManager
+                .solveWithSatSolver(clauses, (n + k * 2) * (m + k * 2))
         if (solution != null) {
             return true
         }
@@ -224,7 +225,7 @@ class Tile {
         val newN = n + k * 2
         val newM = n + k * 2
         val biggerTile = Tile(newN, newM, this)
-        val intersection = TileIntersection(n, m, newN, newM)
+        val intersection = TileIntersection(newN, newM, n, m)
 
         val clauses = HashSet<Set<Int>>()
 

@@ -11,7 +11,7 @@ fun getParametersSet(difficulty: Int): Set<Parameters> {
         for (n in 3..8) {
             for (m in n..8) {
                 (1..5)
-                        .filter { k -> k >= (m * n) / 5 - 7 } // if not too difficult
+                        .filter { k -> k >= (m * n) / 5 - 9 } // if not too difficult
                         .mapTo(parameters) { Parameters(n, m, it) }
             }
         }

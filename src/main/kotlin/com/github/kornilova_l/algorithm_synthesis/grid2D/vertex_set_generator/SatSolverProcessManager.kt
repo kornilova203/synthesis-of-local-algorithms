@@ -7,25 +7,19 @@ import java.io.OutputStreamWriter
 import java.util.*
 
 
-class SatSolverProcessManager {
+class SatSolverProcessManager private constructor() {
     private val process: Process
     private val writer: BufferedWriter
     private val scanner: Scanner
 
-    init {
-        val builder = ProcessBuilder("python", File("python_sat/sat/start_sat_iterative.py").toString())
-        builder.redirectErrorStream(true)
-        process = builder.start()
-        writer = BufferedWriter(OutputStreamWriter(process.outputStream))
-        scanner = Scanner(process.inputStream)
-        val line = scanner.nextLine()
-        if (line != "HELLO") {
-            throw RuntimeException("Cannot start python process")
-        }
-    }
 
-    fun stop() {
-        writer.write("DONE\n")
+    companion object {
+        // it will not be instantiated until it is used
+        // because there is no other public static method or public fields
+        var satManager = SatSolverProcessManager()
+        init {
+            println("Sat Manager is instantiated")
+        }
     }
 
     /**
@@ -52,5 +46,17 @@ class SatSolverProcessManager {
             e.printStackTrace()
         }
         return null
+    }
+
+    init {
+        val builder = ProcessBuilder("python", File("python_sat/sat/start_sat_iterative.py").toString())
+        builder.redirectErrorStream(true)
+        process = builder.start()
+        writer = BufferedWriter(OutputStreamWriter(process.outputStream))
+        scanner = Scanner(process.inputStream)
+        val line = scanner.nextLine()
+        if (line != "HELLO") {
+            throw RuntimeException("Cannot start python process")
+        }
     }
 }

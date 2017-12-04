@@ -5,7 +5,6 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Companion.Ex
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Companion.getAllPossibleExtensions
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.generatePossiblyValidTiles
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolverProcessManager
 import com.github.kornilova_l.util.ProgressBar
 import java.io.File
 import java.io.FileOutputStream
@@ -20,17 +19,15 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
     val tileSet: TileSet
 
     init {
-        val satManager = SatSolverProcessManager()
-        var tiles = getInitialTiles(dir, satManager)
+        var tiles = getInitialTiles(dir)
         var currentN = tiles.first().n
         var currentM = tiles.first().m
 
         while (currentM < finalM || currentN < finalN) {
-            tiles = expandTileSet(tiles, satManager)
+            tiles = expandTileSet(tiles)
             currentN = tiles.first().n
             currentM = tiles.first().m
         }
-        satManager.stop()
 
         if (tiles.isEmpty()) {
             throw IllegalArgumentException("Cannot produce valid set of tiles")
@@ -39,7 +36,7 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         }
     }
 
-    private fun getInitialTiles(dir: File?, satManager: SatSolverProcessManager): Set<Tile> {
+    private fun getInitialTiles(dir: File?): Set<Tile> {
         var currentN = finalN
         var currentM = finalM
         while (currentN >= 3 && currentM >= 3) {
@@ -57,14 +54,14 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         currentN = if (finalN < 3) finalN else 3
         currentM = if (finalM < 3) finalM else 3
         val tiles = generatePossiblyValidTiles(currentN, currentM, k)
-        return removeNotMaximal(tiles, satManager)
+        return removeNotMaximal(tiles)
     }
 
     /**
      * Expand each tile by 1 row/column
      * Remove not valid tiles
      */
-    private fun expandTileSet(tiles: Set<Tile>, satManager: SatSolverProcessManager): Set<Tile> {
+    private fun expandTileSet(tiles: Set<Tile>): Set<Tile> {
         val currentN = tiles.first().n
         val currentM = tiles.first().m
         if (currentN == finalN && currentM == finalM) {
@@ -75,7 +72,7 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         val progressBar = ProgressBar(tiles.size)
         val expandedTiles = HashSet<Tile>()
         for (tile in tiles) {
-            addValidExtensionsToSet(tile, expandedTiles, side, satManager)
+            addValidExtensionsToSet(tile, expandedTiles, side)
             progressBar.updateProgress(1)
         }
         progressBar.finish()
@@ -83,10 +80,9 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         return expandedTiles
     }
 
-    private fun addValidExtensionsToSet(tile: Tile, expandedTiles: HashSet<Tile>, side: Tile.Companion.Expand,
-                                        satManager: SatSolverProcessManager) {
+    private fun addValidExtensionsToSet(tile: Tile, expandedTiles: HashSet<Tile>, side: Tile.Companion.Expand) {
         val extensions = getAllPossibleExtensions(tile, side)
-        extensions.filterTo(expandedTiles) { it.isValid(satManager) }
+        extensions.filterTo(expandedTiles) { it.isValid() }
     }
 
     override fun toString(): String {
@@ -124,9 +120,9 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         /**
          * Remove all tileSet which does not have maximal IS
          */
-        private fun removeNotMaximal(tiles: Set<Tile>, satManager: SatSolverProcessManager): Set<Tile> {
+        private fun removeNotMaximal(tiles: Set<Tile>): Set<Tile> {
             val maximalTiles = HashSet<Tile>()
-            tiles.filterTo(maximalTiles) { tile -> tile.isValid(satManager) }
+            tiles.filterTo(maximalTiles) { tile -> tile.isValid() }
             return maximalTiles
         }
     }
