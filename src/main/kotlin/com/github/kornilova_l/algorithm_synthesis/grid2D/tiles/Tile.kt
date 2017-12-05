@@ -159,6 +159,49 @@ class Tile {
         }
     }
 
+    constructor(string: String, k: Int) {
+        this.k = k
+        val lines = string.split("\n").filter { it != "" }
+        n = lines.size
+        m = calculateM(lines)
+        grid = Array(n) { BooleanArray(m) }
+        lines.forEachIndexed { i, line ->
+            var j = 0
+            line.forEach { c ->
+                if (c == '1') {
+                    grid[i][j] = true
+                    j++
+                } else if (c == '0') {
+                    grid[i][j] = false
+                    j++
+                }
+            }
+        }
+    }
+
+    private fun calculateM(lines: List<String>): Int {
+        var calcM = 0
+        lines.first().forEach { c ->
+            if (c == '1' || c == '0') {
+                calcM++
+            }
+        }
+        val m = calcM
+        /* check that all lines have the same number of cells */
+        lines.forEach { line ->
+            calcM = 0
+            line.forEach { c ->
+                if (c == '1' || c == '0') {
+                    calcM++
+                }
+            }
+            if (calcM != m) {
+                throw IllegalArgumentException("Rows have different number of cells")
+            }
+        }
+        return m
+    }
+
     /**
      * @return true if grid[x][y] can be an element of an independent set
      */
@@ -222,7 +265,7 @@ class Tile {
 
     internal fun toDimacsIsTileValid(): Set<Set<Int>>? {
         val newN = n + k * 2
-        val newM = n + k * 2
+        val newM = m + k * 2
         val biggerTile = Tile(newN, newM, this)
         val intersection = TileIntersection(newN, newM, n, m)
 
@@ -370,7 +413,7 @@ class Tile {
             return false
         }
         if (other.n != n || other.m != m) {
-            throw IllegalArgumentException("Size of tile is different")
+            return false
         }
         for (i in 0 until n) {
             (0 until m)
