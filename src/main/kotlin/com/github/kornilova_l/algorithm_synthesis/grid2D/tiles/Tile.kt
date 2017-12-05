@@ -1,6 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolverProcessManager
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.isSolvable
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import java.util.*
 import kotlin.collections.HashSet
@@ -16,11 +16,7 @@ class Tile {
      */
     fun isValid(): Boolean {
         val clauses = toDimacsIsTileValid() ?: return false
-        val solution = SatSolverProcessManager.solve(clauses, (n + k * 2) * (m + k * 2))
-        if (solution != null) {
-            return true
-        }
-        return false
+        return isSolvable(clauses)
     }
 
     internal constructor(n: Int, m: Int, k: Int, `is`: Set<Coordinate>) {
