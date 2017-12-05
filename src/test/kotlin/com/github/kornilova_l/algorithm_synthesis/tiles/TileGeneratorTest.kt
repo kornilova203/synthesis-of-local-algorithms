@@ -24,18 +24,18 @@ internal class TileGeneratorTest {
     fun testEasyTiles() {
         val startTime = System.currentTimeMillis()
         val parametersSet = getParametersSet(1)
-        for (parameters in parametersSet) {
+        parametersSet.forEachIndexed { i, parameters ->
             val n = parameters.n
             val m = parameters.m
             val k = parameters.k
             val file = File("src/test/resources/tiles/$n-$m-$k.txt")
-            if (!file.exists()) {
-                continue
-            }
-            val tiles = TileGenerator(n, m, k).tileSet
-            val expectedTiles = TileSet(file)
+            if (file.exists()) {
+                val tiles = TileGenerator(n, m, k).tileSet
+                val expectedTiles = TileSet(file)
 
-            assertEquals(expectedTiles, tiles)
+                assertEquals(expectedTiles, tiles)
+            }
+            println("$i / ${parametersSet.size}")
         }
         println("Time: ${System.currentTimeMillis() - startTime}")
     }

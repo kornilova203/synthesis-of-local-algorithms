@@ -115,22 +115,68 @@ internal class TileTest {
         val independentSetCenter = hashSetOf(Coordinate(0, 0))
         val tileCenter = Tile(3, 2, 1, independentSetCenter)
         assertEquals(tileCenter, Tile(biggerTile, POSITION.X))
+
+        val actual = Tile("1 0 0 0\n0 1 0 1\n0 0 1 0\n", 1)
+        val expected = Tile(3, 4, 1, hashSetOf(Coordinate(0, 0), Coordinate(1, 1), Coordinate(1, 3), Coordinate(2, 2)))
+        assertEquals(expected, actual)
     }
 
     @Test
     fun expandTileToDimacsTest() {
         var tile = Tile(2, 2, 1)
-        var clauses = tile.toDimacsIsTileValid()
-        println(clauses.joinToString("", "", transform = { "${it.joinToString(" ", "")}\n" }))
+        var clauses = tile.toDimacsIsTileValid()!!
 
         var expected = VertexSetSolverKtTest.parseClauses(File("src/test/resources/expand_tile/to_dimacs_3_3.txt").readText())
-        assertEquals(expected, clauses)
+        assertEquals(Clauses(expected), Clauses(clauses))
+
 
         tile = Tile(tile, 0, 1)
-        clauses = tile.toDimacsIsTileValid()
-        println(clauses.joinToString("", "", transform = { "${it.joinToString(" ", "")}\n" }))
+        clauses = tile.toDimacsIsTileValid()!!
 
         expected = VertexSetSolverKtTest.parseClauses(File("src/test/resources/expand_tile/to_dimacs_3_3_has_one.txt").readText())
-        assertEquals(expected, clauses)
+        assertEquals(Clauses(expected), Clauses(clauses))
+
+
+        tile = Tile("1 0 0 0\n0 1 0 1\n0 0 1 0\n", 1)
+        clauses = tile.toDimacsIsTileValid()!!
+
+        expected = VertexSetSolverKtTest.parseClauses(File("src/test/resources/expand_tile/to_dimacs_3_4.txt").readText())
+        assertEquals(Clauses(expected), Clauses(clauses))
+    }
+
+    /**
+     * This class is used for tests
+     * it allows to see difference between clauses conveniently
+     */
+    @Suppress("EqualsOrHashCode")
+    private class Clauses(private val clauses: Set<Set<Int>>) {
+        override fun equals(other: Any?): Boolean {
+            if (other !is Clauses) {
+                return false
+            }
+            return clauses == other.clauses
+        }
+
+        override fun toString(): String {
+            val sorted = ArrayList<List<Int>>()
+            for (clause in clauses) {
+                val sortedClause = ArrayList<Int>(clause)
+                sortedClause.sort()
+                sorted.add(sortedClause)
+            }
+            val res = sorted.sortedWith(Comparator { o1, o2 ->
+                when {
+                    o1.size < o2.size -> -1
+                    o1.size > o2.size -> 1
+                    else -> when {
+                        Math.abs(o1[0]) < Math.abs(o2[0]) -> -1
+                        Math.abs(o1[0]) > Math.abs(o2[0]) -> 1
+                        else -> 0
+                    }
+                }
+
+            })
+            return res.joinToString("", "", transform = { "${it.joinToString(" ", "")}\n" })
+        }
     }
 }

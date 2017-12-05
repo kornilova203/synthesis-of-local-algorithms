@@ -1,6 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolverProcessManager
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.isSolvable
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import java.util.*
 import kotlin.collections.HashSet
@@ -15,13 +15,8 @@ class Tile {
      * Check if this tile is valid
      */
     fun isValid(): Boolean {
-        val clauses = toDimacsIsTileValid()
-        val solution = SatSolverProcessManager.satManager
-                .solveWithSatSolver(clauses, (n + k * 2) * (m + k * 2))
-        if (solution != null) {
-            return true
-        }
-        return false
+        val clauses = toDimacsIsTileValid() ?: return false
+        return isSolvable(clauses)
     }
 
     internal constructor(n: Int, m: Int, k: Int, `is`: Set<Coordinate>) {
@@ -160,6 +155,49 @@ class Tile {
         }
     }
 
+    constructor(string: String, k: Int) {
+        this.k = k
+        val lines = string.split("\n").filter { it != "" }
+        n = lines.size
+        m = calculateM(lines)
+        grid = Array(n) { BooleanArray(m) }
+        lines.forEachIndexed { i, line ->
+            var j = 0
+            line.forEach { c ->
+                if (c == '1') {
+                    grid[i][j] = true
+                    j++
+                } else if (c == '0') {
+                    grid[i][j] = false
+                    j++
+                }
+            }
+        }
+    }
+
+    private fun calculateM(lines: List<String>): Int {
+        var calcM = 0
+        lines.first().forEach { c ->
+            if (c == '1' || c == '0') {
+                calcM++
+            }
+        }
+        val m = calcM
+        /* check that all lines have the same number of cells */
+        lines.forEach { line ->
+            calcM = 0
+            line.forEach { c ->
+                if (c == '1' || c == '0') {
+                    calcM++
+                }
+            }
+            if (calcM != m) {
+                throw IllegalArgumentException("Rows have different number of cells")
+            }
+        }
+        return m
+    }
+
     /**
      * @return true if grid[x][y] can be an element of an independent set
      */
@@ -221,9 +259,9 @@ class Tile {
         return Coordinate(num / m, num % m)
     }
 
-    internal fun toDimacsIsTileValid(): Set<Set<Int>> {
+    internal fun toDimacsIsTileValid(): Set<Set<Int>>? {
         val newN = n + k * 2
-        val newM = n + k * 2
+        val newM = m + k * 2
         val biggerTile = Tile(newN, newM, this)
         val intersection = TileIntersection(newN, newM, n, m)
 
@@ -236,7 +274,11 @@ class Tile {
                     if (biggerTile.isI(x, y)) {
                         clauses.addAll(allNeighboursMustBeZero(x, y, biggerTile, newN, newM, k, intersection))
                     } else if (biggerTile.canBeI(x, y) && neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
-                        clauses.add(atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k, intersection))
+                        val clause = atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k, intersection)
+                        if (clause.size == 0) { // this cannot be satisfied
+                            return null
+                        }
+                        clauses.add(clause)
                     }
 
                 } else {
@@ -367,7 +409,7 @@ class Tile {
             return false
         }
         if (other.n != n || other.m != m) {
-            throw IllegalArgumentException("Size of tile is different")
+            return false
         }
         for (i in 0 until n) {
             (0 until m)

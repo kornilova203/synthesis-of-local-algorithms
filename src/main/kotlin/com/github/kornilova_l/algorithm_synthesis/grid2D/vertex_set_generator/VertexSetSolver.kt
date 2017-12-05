@@ -33,7 +33,7 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
         val tileSet = TileSet(file)
         val graph = DirectedTileGraph(tileSet)
         val clauses = toDimacs(graph, vertexRules)
-        val solution = SatSolverProcessManager.satManager.solveWithSatSolver(clauses, graph.size)
+        val solution = solve(clauses, graph.size)
         if (solution != null) { // solution found
             return LabelingFunction(solution, graph)
         }
@@ -89,8 +89,9 @@ fun parseResult(scanner: Scanner): List<Int> {
     while (scanner.hasNextInt()) {
         res.add(scanner.nextInt())
     }
+    scanner.nextLine() // end of line
     val end = scanner.nextLine()
-    if (!end.contains("END")) {
+    if (end != "END") {
         throw RuntimeException("Cannot find end of result")
     }
     return res
