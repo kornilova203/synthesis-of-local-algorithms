@@ -121,14 +121,14 @@ internal class TileTest {
     fun expandTileToDimacsTest() {
         var tile = Tile(2, 2, 1)
         var clauses = tile.toDimacsIsTileValid()
-        println(clauses.joinToString("", "", transform = { "${it.joinToString(" ", "")}\n" }))
+        println(clauses!!.joinToString("", "", transform = { "${it.joinToString(" ", "")}\n" }))
 
         var expected = VertexSetSolverKtTest.parseClauses(File("src/test/resources/expand_tile/to_dimacs_3_3.txt").readText())
         assertEquals(expected, clauses)
 
         tile = Tile(tile, 0, 1)
         clauses = tile.toDimacsIsTileValid()
-        println(clauses.joinToString("", "", transform = { "${it.joinToString(" ", "")}\n" }))
+        println(clauses!!.joinToString("", "", transform = { "${it.joinToString(" ", "")}\n" }))
 
         expected = VertexSetSolverKtTest.parseClauses(File("src/test/resources/expand_tile/to_dimacs_3_3_has_one.txt").readText())
         assertEquals(expected, clauses)

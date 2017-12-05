@@ -15,9 +15,8 @@ class Tile {
      * Check if this tile is valid
      */
     fun isValid(): Boolean {
-        val clauses = toDimacsIsTileValid()
-        val solution = SatSolverProcessManager.satManager
-                .solveWithSatSolver(clauses, (n + k * 2) * (m + k * 2))
+        val clauses = toDimacsIsTileValid() ?: return false
+        val solution = SatSolverProcessManager.solve(clauses, (n + k * 2) * (m + k * 2))
         if (solution != null) {
             return true
         }
@@ -221,7 +220,7 @@ class Tile {
         return Coordinate(num / m, num % m)
     }
 
-    internal fun toDimacsIsTileValid(): Set<Set<Int>> {
+    internal fun toDimacsIsTileValid(): Set<Set<Int>>? {
         val newN = n + k * 2
         val newM = n + k * 2
         val biggerTile = Tile(newN, newM, this)
@@ -236,7 +235,11 @@ class Tile {
                     if (biggerTile.isI(x, y)) {
                         clauses.addAll(allNeighboursMustBeZero(x, y, biggerTile, newN, newM, k, intersection))
                     } else if (biggerTile.canBeI(x, y) && neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
-                        clauses.add(atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k, intersection))
+                        val clause = atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k, intersection)
+                        if (clause.size == 0) { // this cannot be satisfied
+                            return null
+                        }
+                        clauses.add(clause)
                     }
 
                 } else {
