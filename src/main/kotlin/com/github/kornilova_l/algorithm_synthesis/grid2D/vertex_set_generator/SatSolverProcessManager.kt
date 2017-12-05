@@ -2,12 +2,13 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
 import jnisat.JPicoSat
 
+private val sat = JPicoSat()
 
 /**
  * @return null if not satisfiable
  */
 fun isSolvable(clauses: Set<Set<Int>>): Boolean {
-    val sat = initSat(clauses)
+    initSat(clauses)
     return sat.solve()
 }
 
@@ -33,7 +34,7 @@ fun solve(clauses: Set<Set<Int>>, varCount: Int): List<Int>? {
 }
 
 private fun initSat(clauses: Set<Set<Int>>): JPicoSat {
-    val sat = JPicoSat()
+    sat.reset()
     for (clause in clauses) {
         sat.addClause(*clause.toIntArray())
     }
