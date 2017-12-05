@@ -4,12 +4,14 @@ import java.text.DecimalFormat
 import java.util.Collections
 import java.util.Timer
 import java.util.TimerTask
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 
 class ProgressBar(private val total: Int) {
-    private val startTime = System.currentTimeMillis()
+    private val startTime = AtomicLong(System.currentTimeMillis())
     private val timer: Timer = Timer()
-    private var lastUpdateTime: Long = 0
-    private var current = 0
+    private var lastUpdateTime = AtomicLong()
+    private var current = AtomicInteger()
 
     init {
         timer.schedule(object : TimerTask() {
@@ -23,20 +25,20 @@ class ProgressBar(private val total: Int) {
     @Synchronized
     fun finish() {
         timer.cancel()
-        updateProgress(total - current)
+        updateProgress(total - current.get())
         redraw()
         println()
     }
 
     fun redraw() {
-        var percent = current * 100 / total.toDouble()
+        var percent = current.get() * 100 / total.toDouble()
         percent /= 2
         val resizingTotal = 50
         val string = StringBuilder(140)
         percent = if (percent == 0.toDouble()) 0.01 else percent
         val intPercent = Math.ceil(percent).toInt()
         val format = DecimalFormat("####")
-        val timePassed = lastUpdateTime - startTime
+        val timePassed = lastUpdateTime.get() - startTime.get()
         string.append('\r')
                 .append(Collections.nCopies(2 - Math.log10((intPercent * 2).toDouble()).toInt(), " ").joinToString(""))
                 .append(String.format("%.2f%% [", percent * 2))
@@ -47,8 +49,8 @@ class ProgressBar(private val total: Int) {
                 .append(String.format("%4s", format.format(timePassed / 1000)))
                 .append("s")
 
-        if (timePassed / 1000 > 0 && current > 0) { // predict time
-            val timePerElement = timePassed.toDouble() / 1000 / current
+        if (timePassed / 1000 > 0 && current.get() > 0) { // predict time
+            val timePerElement = timePassed.toDouble() / 1000 / current.get()
             val totalTime = timePerElement * total
             string
                     .append(" / ")
@@ -63,10 +65,10 @@ class ProgressBar(private val total: Int) {
 
     @Synchronized
     fun updateProgress(addToProgress: Int) {
-        if (addToProgress == 0 && (System.currentTimeMillis() - lastUpdateTime) / 1000 == 0L) {
+        if (addToProgress == 0 && (System.currentTimeMillis() - lastUpdateTime.get()) / 1000 == 0L) {
             return
         }
-        current += addToProgress
-        lastUpdateTime = System.currentTimeMillis()
+        current.addAndGet(addToProgress)
+        lastUpdateTime.set(System.currentTimeMillis())
     }
 }

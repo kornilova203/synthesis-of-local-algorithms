@@ -10,6 +10,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.file.Paths
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Generates all possible combinations of tileSet finalN x finalM in kth power of grid
@@ -70,8 +71,8 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         val side = if (currentN < currentM && currentN < finalN || currentM == finalM) HEIGHT else WIDTH
         println("Expand tiles $currentN x $currentM k: $k. Side: $side\nTiles count = ${tiles.size}")
         val progressBar = ProgressBar(tiles.size)
-        val expandedTiles = HashSet<Tile>()
-        for (tile in tiles) {
+        val expandedTiles: MutableSet<Tile> = ConcurrentHashMap.newKeySet()
+        tiles.parallelStream().forEach { tile ->
             addValidExtensionsToSet(tile, expandedTiles, side)
             progressBar.updateProgress(1)
         }
@@ -80,7 +81,7 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         return expandedTiles
     }
 
-    private fun addValidExtensionsToSet(tile: Tile, expandedTiles: HashSet<Tile>, side: Tile.Companion.Expand) {
+    private fun addValidExtensionsToSet(tile: Tile, expandedTiles: MutableSet<Tile>, side: Tile.Companion.Expand) {
         val extensions = getAllPossibleExtensions(tile, side)
         extensions.filterTo(expandedTiles) { it.isValid() }
     }
