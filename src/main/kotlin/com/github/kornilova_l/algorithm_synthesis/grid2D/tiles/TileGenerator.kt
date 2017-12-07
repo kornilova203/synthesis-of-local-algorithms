@@ -86,9 +86,12 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         extensions.filterTo(expandedTiles) { it.isValid() }
     }
 
+    /**
+     * Do not use this method if set of tiles is big ( > 1 million)
+     */
     override fun toString(): String {
         return finalN.toString() + " " + finalM + " " + k + "\n" +
-                tileSet.size() + "\n" +
+                tileSet.size + "\n" +
                 tileSet.toString()
     }
 
@@ -100,7 +103,10 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         val file = filePath.toFile()
         try {
             FileOutputStream(file).use { outputStream ->
-                outputStream.write(toString().toByteArray())
+                outputStream.write("$finalN $finalM $k\n${tileSet.size}\n".toByteArray())
+                tileSet.validTiles.forEach { tile ->
+                    outputStream.write("$tile\n".toByteArray())
+                }
                 return file
             }
         } catch (e: IOException) {

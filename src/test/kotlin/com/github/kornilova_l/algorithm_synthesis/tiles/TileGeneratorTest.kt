@@ -13,11 +13,11 @@ internal class TileGeneratorTest {
     fun test() {
         val startTime = System.currentTimeMillis()
         var tileGenerator = TileGenerator(7, 5, 3)
-        assertEquals(2079, tileGenerator.tileSet.size())
+        assertEquals(2079, tileGenerator.tileSet.size)
         println("Time ${System.currentTimeMillis() - startTime}")
 
         tileGenerator = TileGenerator(5, 7, 3) // set of tiles should not depend on orientation
-        assertEquals(2079, tileGenerator.tileSet.size())
+        assertEquals(2079, tileGenerator.tileSet.size)
     }
 
     @Test

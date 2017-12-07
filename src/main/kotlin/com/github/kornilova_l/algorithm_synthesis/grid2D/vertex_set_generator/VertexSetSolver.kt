@@ -30,7 +30,7 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
         val k = parameters.k
         println("n $n  m $m  k $k")
         val file = File("generated_tiles/$n-$m-$k.txt")
-        if (!file.exists()) {
+        if (!file.exists()) { // if was not precalculated
             continue
         }
         val tileSet = TileSet(file)

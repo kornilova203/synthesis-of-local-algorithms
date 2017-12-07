@@ -57,7 +57,8 @@ class TileSet {
         }
     }
 
-    fun size(): Int = validTiles.size
+    val size: Int
+        get() = validTiles.size
 
     private fun addTile(tile: Tile) {
         if (tile.k != k || tile.m != m || tile.n != n) {

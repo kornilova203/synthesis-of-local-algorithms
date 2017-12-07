@@ -32,8 +32,8 @@ class DirectedTileGraph(tileSet: TileSet) : TileGraph() {
             set.add(Neighbourhood(
                     Tile(tile, POSITION.N),
                     Tile(tile, POSITION.E),
-                    Tile(tile, POSITION.W),
                     Tile(tile, POSITION.S),
+                    Tile(tile, POSITION.W),
                     center
             ))
         }
