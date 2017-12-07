@@ -3,8 +3,45 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.r
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Positions.Companion.positionIndexes
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Positions.Companion.positionLetters
 
+/**
+ * @param pattern that describes set of rules
+ * Each character tells if this position XNESW is included (1), not included (0) or may be any (?)
+ * For example this pattern 11?0? will generate set of 4 rules
+ */
+fun getVertexRules(pattern: String): Set<VertexRule> {
+    validatePattern(pattern)
+    val arrays = hashSetOf(BooleanArray(5))
+    pattern.forEachIndexed { i, c ->
+        if (c == '0' || c == '1') {
+            val value = c == '1'
+            arrays.addAll(arrays.map { array -> array[i] = value; array })
+        } else { // c == '?'
+            arrays.addAll(arrays.flatMap { array ->
+                val array2 = array.copyOf()
+                array2[i] = true
+                hashSetOf(array, array2)
+            })
+        }
+    }
+    return arrays.map { array -> VertexRule(array) }.toSet()
+}
+
+private fun validatePattern(pattern: String) {
+    if (pattern.length != 5) {
+        throw IllegalArgumentException("Length of pattern must be 5")
+    }
+    pattern.forEach {
+        if (it != '0' && it != '1' && it != '?') {
+            throw IllegalArgumentException("Pattern may contain only '0', '1' and '?'")
+        }
+    }
+}
+
 class VertexRule {
-    val array = Array(32, { false })
+    /**
+     * XNESW
+     */
+    private val array = BooleanArray(5)
     val id: Int
 
     constructor(id: Int) {

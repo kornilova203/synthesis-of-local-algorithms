@@ -2,6 +2,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getVertexRules
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.reverseRules
 import org.junit.Assert.*
 import org.junit.Test
@@ -32,4 +33,29 @@ class VertexRuleKtTest {
         assertEquals(30, reverseRules(hashSetOf(VertexRule(1), VertexRule(2), VertexRule(1))).size)
     }
 
+    @Test
+    fun setFromPatternTest() {
+        var rules = getVertexRules("00000")
+        assertEquals(1, rules.size)
+        assertEquals(VertexRule(""), rules.first())
+
+
+        rules = getVertexRules("01001")
+        assertEquals(1, rules.size)
+        assertEquals(VertexRule("NW"), rules.first())
+
+        rules = getVertexRules("?1001")
+        assertEquals(hashSetOf(VertexRule("NW"), VertexRule("XNW")), rules)
+
+        rules = getVertexRules("??001")
+        assertEquals(hashSetOf(
+                VertexRule("NW"),
+                VertexRule("XNW"),
+                VertexRule("XW"),
+                VertexRule("W")
+        ), rules)
+
+        rules = getVertexRules("?????")
+        assertEquals(32, rules.size)
+    }
 }
