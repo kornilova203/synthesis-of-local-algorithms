@@ -4,12 +4,14 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.getLabelingFunction
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getVertexRules
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.visualization.drawLabels
 
 fun main(args: Array<String>) {
 //    val rules = independentSet()
 //    val rules = columnIS()
-    val rules = oneZeroAndOneOne()
+    val rules = columnMinimalDominatingSet()
+//    val rules = oneZeroAndOneOne()
 //    val rules = test()
 //    val rules = gameOfLife()
 //    val rules = invertedIndependentSet()
@@ -59,33 +61,27 @@ fun invertedIndependentSet(): HashSet<VertexRule> {
     )
 }
 
+/**
+ * X N XE NE S NS ES NES XW NW XEW NEW SW NSW ESW NESW
+ */
 fun columnIS(): HashSet<VertexRule> {
-    return hashSetOf(
-            VertexRule("X"),
-            VertexRule("XE"),
-            VertexRule("XW"),
-            VertexRule("XEW"),
-            VertexRule("NS"),
-            VertexRule("NSE"),
-            VertexRule("NSW"),
-            VertexRule("NSEW"),
-            VertexRule("XN"),
-            VertexRule("XNE"),
-            VertexRule("XNW"),
-            VertexRule("XNEW"),
-            VertexRule("XS"),
-            VertexRule("XSE"),
-            VertexRule("XSW"),
-            VertexRule("XSEW"),
-            VertexRule("N"),
-            VertexRule("NE"),
-            VertexRule("NW"),
-            VertexRule("NEW"),
-            VertexRule("S"),
-            VertexRule("SW"),
-            VertexRule("SE"),
-            VertexRule("SWE")
-    )
+    val rules = HashSet<VertexRule>()
+    rules.addAll(getVertexRules("10?0?"))
+    rules.addAll(getVertexRules("01?0?"))
+    rules.addAll(getVertexRules("00?1?"))
+    rules.addAll(getVertexRules("01?1?"))
+    return rules
+}
+
+fun columnMinimalDominatingSet(): HashSet<VertexRule> {
+    val rules = HashSet<VertexRule>()
+    rules.addAll(getVertexRules("10?0?"))
+    rules.addAll(getVertexRules("01?0?"))
+    rules.addAll(getVertexRules("00?1?"))
+    rules.addAll(getVertexRules("01?1?"))
+    rules.addAll(getVertexRules("11?0?"))
+    rules.addAll(getVertexRules("10?1?"))
+    return rules
 }
 
 fun oneZeroAndOneOne(): HashSet<VertexRule> {

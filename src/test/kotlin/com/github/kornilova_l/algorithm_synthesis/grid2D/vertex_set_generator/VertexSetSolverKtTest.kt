@@ -4,6 +4,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedTileGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getVertexRules
 import org.junit.Assert.*
 import org.junit.Test
 import java.io.File
@@ -26,9 +27,20 @@ class VertexSetSolverKtTest {
         assertTrue(expected == clauses)
     }
 
+    private fun testLabelingFunction(rules: HashSet<VertexRule>) {
+        val iterations = 10000
+        val labelingFunction = getLabelingFunction(rules)
+        assertNotNull(labelingFunction)
+        for (i in 0 until iterations) {
+            val grid = generateGrid(10, 10)
+            val labeledGrid = labelingFunction!!.getLabels(grid)
+            assertNotNull(labeledGrid)
+            assertTrue(isRight(labeledGrid!!, rules))
+        }
+    }
+
     @Test
     fun labelingFunctionForIS() {
-        val iterations = 1000
         val independentSetRules = hashSetOf(
                 VertexRule("X"),
                 VertexRule("N"),
@@ -47,19 +59,11 @@ class VertexSetSolverKtTest {
                 VertexRule("ESW"),
                 VertexRule("NESW")
         )
-        val labelingFunction = getLabelingFunction(independentSetRules)
-        assertNotNull(labelingFunction)
-        for (i in 0 until iterations) {
-            val grid = generateGrid(10, 10)
-            val labeledGrid = labelingFunction!!.getLabels(grid)
-            assertNotNull(labeledGrid)
-            assertTrue(isRight(labeledGrid!!, independentSetRules))
-        }
+        testLabelingFunction(independentSetRules)
     }
 
     @Test
     fun labelingFunctionForInvertedIS() {
-        val iterations = 1000
         val invertedISRules = hashSetOf(
                 VertexRule("X"),
                 VertexRule("XN"),
@@ -78,14 +82,19 @@ class VertexSetSolverKtTest {
                 VertexRule("XESW"),
                 VertexRule("NESW")
         )
-        val labelingFunction = getLabelingFunction(invertedISRules)
-        assertNotNull(labelingFunction)
-        for (i in 0 until iterations) {
-            val grid = generateGrid(10, 10)
-            val labeledGrid = labelingFunction!!.getLabels(grid)
-            assertNotNull(labeledGrid)
-            assertTrue(isRight(labeledGrid!!, invertedISRules))
-        }
+        testLabelingFunction(invertedISRules)
+    }
+
+    @Test
+    fun columnMinimalDominatingSet() {
+        val rules = HashSet<VertexRule>()
+        rules.addAll(getVertexRules("10?0?"))
+        rules.addAll(getVertexRules("01?0?"))
+        rules.addAll(getVertexRules("00?1?"))
+        rules.addAll(getVertexRules("01?1?"))
+        rules.addAll(getVertexRules("11?0?"))
+        rules.addAll(getVertexRules("10?1?"))
+        testLabelingFunction(rules)
     }
 
     private fun isRight(labeledGrid: Array<BooleanArray>, rules: HashSet<VertexRule>): Boolean {
