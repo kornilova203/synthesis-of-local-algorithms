@@ -4,6 +4,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
 import java.util.*
+import kotlin.collections.HashSet
 
 /**
  * Constructs graph of tiles.
@@ -13,6 +14,7 @@ class DirectedTileGraph(tileSet: TileSet) : TileGraph() {
     override val n: Int = tileSet.n - 2
     override val m: Int = tileSet.m - 2
     override val k: Int = tileSet.k
+    private var nextTileId = 1
 
     val graph: HashMap<Tile, HashSet<Neighbourhood>> = HashMap()
     private val ids = DualHashBidiMap<Tile, Int>()
@@ -26,31 +28,40 @@ class DirectedTileGraph(tileSet: TileSet) : TileGraph() {
         if (n <= 0 || m <= 0) {
             throw IllegalArgumentException("Each dimension of tiles in set must be at least 3")
         }
+        /* There must exist at most one instance of each tile */
         for (tile in tileSet.validTiles) {
-            val center = Tile(tile, POSITION.X)
+            val center = getIfAlreadyCreated(Tile(tile, POSITION.X))
             val set = graph.computeIfAbsent(center, { HashSet() })
             set.add(Neighbourhood(
-                    Tile(tile, POSITION.N),
-                    Tile(tile, POSITION.E),
-                    Tile(tile, POSITION.S),
-                    Tile(tile, POSITION.W),
+                    getIfAlreadyCreated(Tile(tile, POSITION.N)),
+                    getIfAlreadyCreated(Tile(tile, POSITION.E)),
+                    getIfAlreadyCreated(Tile(tile, POSITION.S)),
+                    getIfAlreadyCreated(Tile(tile, POSITION.W)),
                     center
             ))
         }
         if (graph.size == 0) {
             throw IllegalArgumentException("Cannot construct graph")
         }
-
-        assignIds()
     }
 
-    private fun assignIds() {
-        for ((i, tile) in graph.keys.withIndex()) {
-            ids.put(tile, i + 1) // ids must be positive
+    /**
+     * This method also assigns ids
+     * so it is not needed to traverse graph one more time
+     * which might be time-expensive
+     */
+    private fun getIfAlreadyCreated(tile: Tile): Tile {
+        val maybeId = ids[tile]
+        return if (maybeId != null) {
+            assert(maybeId > 0)
+            ids.getKey(maybeId)
+        } else {
+            tile.id = nextTileId
+            ids[tile] = nextTileId
+            nextTileId++
+            tile
         }
     }
-
-    fun getId(tile: Tile): Int? = ids[tile]
 
     fun getTile(id: Int): Tile? = ids.getKey(id)
 

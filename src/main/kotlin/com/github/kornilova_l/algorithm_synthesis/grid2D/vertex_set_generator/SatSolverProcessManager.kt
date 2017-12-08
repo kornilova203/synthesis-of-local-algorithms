@@ -13,7 +13,7 @@ fun isSolvable(clauses: Set<Set<Int>>): Boolean {
 /**
  * @return null if not satisfiable
  */
-fun solve(clauses: Set<Set<Int>>, varCount: Int): List<Int>? {
+fun solve(clauses: Collection<Set<Int>>, varCount: Int): List<Int>? {
     val sat = initSat(clauses)
     val res = sat.solve()
     if (!res) {
@@ -31,7 +31,7 @@ fun solve(clauses: Set<Set<Int>>, varCount: Int): List<Int>? {
     return solution
 }
 
-private fun initSat(clauses: Set<Set<Int>>): JPicoSat {
+private fun initSat(clauses: Collection<Set<Int>>): JPicoSat {
     val sat = JPicoSat()
     for (clause in clauses) {
         sat.addClause(*clause.toIntArray())

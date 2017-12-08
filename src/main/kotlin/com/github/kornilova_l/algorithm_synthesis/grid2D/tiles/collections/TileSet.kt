@@ -1,12 +1,17 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
+import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileReader
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Contains set of validTiles of one size
+ * For performance this class does not make sure that
+ * all tiles are unique
  */
 class TileSet {
     internal var n: Int = 0
@@ -15,7 +20,7 @@ class TileSet {
     /**
      * Do not modify this set externally
      */
-    val validTiles = HashSet<Tile>()
+    val validTiles: ArrayList<Tile>
 
     internal val isEmpty: Boolean
         get() = validTiles.isEmpty()
@@ -24,49 +29,73 @@ class TileSet {
         if (!file.exists() || !file.isFile) {
             throw IllegalArgumentException("File does not exist or it is not a file")
         }
+        var size = 0
         Scanner(FileInputStream(file)).use { scanner ->
             n = scanner.nextInt()
             m = scanner.nextInt()
             k = scanner.nextInt()
-            val size = scanner.nextInt()
-            for (i in 0 until size) {
-                val `is` = HashSet<Tile.Coordinate>()
-                for (row in 0 until n) {
-                    for (column in 0 until m) {
-                        if (scanner.nextInt() == 1) {
-                            `is`.add(Tile.Coordinate(row, column))
-                        }
-                    }
-                }
-                validTiles.add(Tile(n, m, k, `is`))
-            }
+            size = scanner.nextInt()
         }
-        /* Still cannot understand why try-catch gives not-initialized error */
         if (n == 0) {
             throw IllegalArgumentException("Could not open file")
         }
+        validTiles = ArrayList(size)
+        BufferedReader(FileReader(file)).use { reader ->
+            var i = 0
+            var j = 0
+            var grid = Array(n) { BooleanArray(m) }
+            skipTwoLines(reader)
+            var r = reader.read()
+            while (r != -1) {
+                val c = r.toChar()
+                if (c == '0') {
+                    grid[i][j++] = false
+                } else if (c == '1') {
+                    grid[i][j++] = true
+                }
+                if (j == m) {
+                    j = 0
+                    i++
+                }
+                if (i == n) {
+                    validTiles.add(Tile(grid, k))
+                    i = 0
+                    grid = Array(n) { BooleanArray(m) }
+                }
+                r = reader.read()
+            }
+            if (size != validTiles.size) {
+                throw IllegalArgumentException("File contains less tiles that it states in the beginning of the file")
+            }
+        }
     }
 
-    internal constructor(possiblyValidTiles: Collection<Tile>) {
-        val someTile = possiblyValidTiles.iterator().next()
+    private fun skipTwoLines(reader: BufferedReader) {
+        var r = reader.read()
+        var linesCount = 0
+        while (r != -1) {
+            val c = r.toChar()
+            if (c == '\n') {
+                linesCount++
+                if (linesCount == 2) {
+                    return
+                }
+            }
+            r = reader.read()
+        }
+    }
+
+    internal constructor(validTiles: Collection<Tile>) {
+        val someTile = validTiles.iterator().next()
         n = someTile.n
         m = someTile.m
         k = someTile.k
-        for (tile in possiblyValidTiles) {
-            addTile(tile) // check that all tile have same size
-        }
+        this.validTiles = ArrayList()
+        this.validTiles.addAll(validTiles)
     }
 
     val size: Int
         get() = validTiles.size
-
-    private fun addTile(tile: Tile) {
-        if (tile.k != k || tile.m != m || tile.n != n) {
-            throw IllegalArgumentException("Tile must have the same parameters as tile set")
-        }
-
-        this.validTiles.add(tile)
-    }
 
     override fun toString(): String {
         val stringBuilder = StringBuilder()

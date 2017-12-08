@@ -10,6 +10,12 @@ class Tile {
     val k: Int
     val n: Int
     val m: Int
+    /**
+     * Optional field. It is used for building clauses
+     * So it is not needed to search id in map
+     * 0 means that id was not set
+     */
+    var id = 0
 
     /**
      * Check if this tile is valid
@@ -173,6 +179,13 @@ class Tile {
                 }
             }
         }
+    }
+
+    constructor(grid: Array<BooleanArray>, k: Int) {
+        this.grid = grid
+        this.n = grid.size
+        this.m = grid[0].size
+        this.k = k
     }
 
     private fun calculateM(lines: List<String>): Int {

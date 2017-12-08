@@ -44,7 +44,7 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
             val file = Paths.get(dir.toString(), "$currentN-$currentM-$k.txt").toFile()
             if (file.exists()) {
                 println("Found file: $file")
-                return TileSet(file).validTiles
+                return TileSet(file).validTiles.toSet()
             }
             if (currentM > currentN) {
                 currentM--

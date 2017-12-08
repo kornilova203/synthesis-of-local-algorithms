@@ -28,18 +28,26 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
         val n = parameters.n
         val m = parameters.m
         val k = parameters.k
-        println("n $n  m $m  k $k")
-        val file = File("generated_tiles/$n-$m-$k.txt")
-        if (!file.exists()) { // if was not precalculated
-            continue
+        val function = tryToFindSolution(vertexRules, n, m, k)
+        if (function != null) {
+            return function
         }
-        val tileSet = TileSet(file)
-        val graph = DirectedTileGraph(tileSet)
-        val clauses = toDimacs(graph, vertexRules)
-        val solution = solve(clauses, graph.size)
-        if (solution != null) { // solution found
-            return LabelingFunction(solution, graph)
-        }
+    }
+    return null
+}
+
+private fun tryToFindSolution(vertexRules: Set<VertexRule>, n: Int, m: Int, k: Int): LabelingFunction? {
+    println("n $n  m $m  k $k")
+    val file = File("generated_tiles/$n-$m-$k.txt")
+    if (!file.exists()) { // if was not precalculated
+        return null
+    }
+    val tileSet = TileSet(file)
+    val graph = DirectedTileGraph(tileSet)
+    val clauses = toDimacs(graph, vertexRules)
+    val solution = solve(clauses, graph.size)
+    if (solution != null) { // solution found
+        return LabelingFunction(solution, graph)
     }
     return null
 }
@@ -108,21 +116,24 @@ fun parseLineResult(scanner: Scanner): Set<Int> {
     return res
 }
 
-fun toDimacs(graph: DirectedTileGraph, rules: Set<VertexRule>): Set<Set<Int>> {
+fun toDimacs(graph: DirectedTileGraph, rules: Set<VertexRule>): Collection<Set<Int>> {
     val reversedRules = reverseRules(rules)
-    val clauses = HashSet<Set<Int>>()
+    val clauses = ArrayList<Set<Int>>()
     graph.graph.values
-            .forEach { it.forEach { clauses.addAll(formClause(it, reversedRules, graph)) } }
+            .forEach { it.forEach { formClause(it, reversedRules, graph, clauses) } }
     return clauses
 }
 
-private fun formClause(neighbourhood: Neighbourhood, reversedRules: Set<VertexRule>, graph: DirectedTileGraph): Set<Set<Int>> {
-    val clauses = HashSet<Set<Int>>()
+private fun formClause(neighbourhood: Neighbourhood, reversedRules: Set<VertexRule>,
+                       graph: DirectedTileGraph, clauses: ArrayList<Set<Int>>) {
     for (reversedRule in reversedRules) {
         val clause = HashSet<Int>()
         var isAlwaysTrue = false
         for (position in positions) {
-            val id = graph.getId(neighbourhood.neighbours[position]!!)!!
+            val id = neighbourhood.neighbours[position]!!.id
+            if (id == 0) {
+                throw AssertionError("id must be bigger than 0")
+            }
             var value = id
             if (reversedRule.isIncluded(position)) {
                 value = -id
@@ -137,5 +148,4 @@ private fun formClause(neighbourhood: Neighbourhood, reversedRules: Set<VertexRu
             clauses.add(clause)
         }
     }
-    return clauses
 }
