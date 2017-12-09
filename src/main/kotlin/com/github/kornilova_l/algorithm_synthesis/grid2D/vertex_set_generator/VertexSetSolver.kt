@@ -1,7 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedTileGraph
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedTileGraph.Neighbourhood
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Neighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters.getParametersSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
@@ -43,7 +43,7 @@ private fun tryToFindSolution(vertexRules: Set<VertexRule>, n: Int, m: Int, k: I
         return null
     }
     val tileSet = TileSet(file)
-    val graph = DirectedTileGraph(tileSet)
+    val graph = DirectedGraph(tileSet)
     val clauses = toDimacs(graph, vertexRules)
     val solution = solve(clauses, graph.size)
     if (solution != null) { // solution found
@@ -116,7 +116,7 @@ fun parseLineResult(scanner: Scanner): Set<Int> {
     return res
 }
 
-fun toDimacs(graph: DirectedTileGraph, rules: Set<VertexRule>): Collection<Set<Int>> {
+fun toDimacs(graph: DirectedGraph, rules: Set<VertexRule>): Collection<Set<Int>> {
     val reversedRules = reverseRules(rules)
     val clauses = ArrayList<Set<Int>>()
     graph.graph.values
@@ -125,7 +125,7 @@ fun toDimacs(graph: DirectedTileGraph, rules: Set<VertexRule>): Collection<Set<I
 }
 
 private fun formClause(neighbourhood: Neighbourhood, reversedRules: Set<VertexRule>,
-                       graph: DirectedTileGraph, clauses: ArrayList<Set<Int>>) {
+                       graph: DirectedGraph, clauses: ArrayList<Set<Int>>) {
     for (reversedRule in reversedRules) {
         val clause = HashSet<Int>()
         var isAlwaysTrue = false

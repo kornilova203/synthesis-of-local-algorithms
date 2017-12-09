@@ -5,7 +5,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.ru
 import org.apache.lucene.util.OpenBitSet
 import java.util.*
 
-class Tile {
+open class Tile {
     private val grid: OpenBitSet
     val k: Int
     val n: Int

@@ -1,22 +1,22 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedTileGraph.Neighbourhood
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Neighbourhood
 import org.junit.Test
 
 import org.junit.Assert.*
 import java.io.File
 
-class DirectedTileGraphTest {
+class DirectedGraphTest {
     @Test
     fun graphSize() {
         var tileSet = TileSet(File("generated_tiles/4-4-1.txt"))
-        var graph = DirectedTileGraph(tileSet)
+        var graph = DirectedGraph(tileSet)
         assertEquals(7, graph.size)
         assertEquals(392, graph.edgeCount)
 
         tileSet = TileSet(File("generated_tiles/3-3-1.txt"))
-        graph = DirectedTileGraph(tileSet)
+        graph = DirectedGraph(tileSet)
         assertEquals(2, graph.size)
         assertEquals((15 + 1) * 4, graph.edgeCount)
     }
@@ -33,7 +33,7 @@ class DirectedTileGraphTest {
 
         val tileSet = TileSet(File("generated_tiles/4-5-4.txt"))
 
-        val graph = DirectedTileGraph(tileSet).graph
+        val graph = DirectedGraph(tileSet).graph
 
         val neighbourhoods5 = graph[tile5]
         assertEquals(hashSetOf(Neighbourhood(tile1, tile1, tile2, tile6, tile5)), neighbourhoods5)

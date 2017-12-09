@@ -1,7 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedTileGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getVertexRules
@@ -13,14 +13,14 @@ class VertexSetSolverKtTest {
     @Test
     fun toDimacsTest() {
         var file = File("generated_tiles/3-3-1.txt")
-        var graph = DirectedTileGraph(TileSet(file))
+        var graph = DirectedGraph(TileSet(file))
         var clauses = toDimacs(graph, hashSetOf(VertexRule(1)))
 //        println(clauses.joinToString("", "", transform={ "${it.joinToString(" ", "")}\n" }))
         var expected = parseClauses(File("src/test/resources/vertexSetSolver/to_dimacs_1_1_1.txt").readText())
         assertTrue(expected == clauses)
 
         file = File("generated_tiles/3-4-1.txt")
-        graph = DirectedTileGraph(TileSet(file))
+        graph = DirectedGraph(TileSet(file))
         clauses = toDimacs(graph, hashSetOf(VertexRule(1)))
 //        println(clauses.joinToString("", "", transform={ "${it.joinToString(" ", "")}\n" }))
         expected = Companion.parseClauses(File("src/test/resources/vertexSetSolver/to_dimacs_1_2_1.txt").readText())

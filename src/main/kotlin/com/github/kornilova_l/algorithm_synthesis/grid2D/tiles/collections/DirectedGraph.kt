@@ -10,7 +10,7 @@ import kotlin.collections.HashSet
  * Constructs graph of tiles.
  * This implementation saves orientation of edges
  */
-class DirectedTileGraph(tileSet: TileSet) : TileGraph() {
+class DirectedGraph(tileSet: TileSet) : TileGraph() {
     override val n: Int = tileSet.n - 2
     override val m: Int = tileSet.m - 2
     override val k: Int = tileSet.k
