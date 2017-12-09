@@ -2,6 +2,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Neighbourhood
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -33,12 +34,11 @@ class DirectedGraphTest {
 
         val tileSet = TileSet(File("generated_tiles/4-5-4.txt"))
 
-        val graph = DirectedGraph(tileSet).graph
+        val graph = DirectedGraph(tileSet).neighbourhoods
 
-        val neighbourhoods5 = graph[tile5]
-        assertEquals(hashSetOf(Neighbourhood(tile1, tile1, tile2, tile6, tile5)), neighbourhoods5)
+        val neighbourhood = Neighbourhood(tile1, tile1, tile2, tile6, tile5)
+        assertTrue(graph.contains(neighbourhood))
 
-        val neighbourhoods1 = graph[tile1]
         val expected = hashSetOf(
                 Neighbourhood(tile1, tile1, tile6, tile1, tile1),
                 Neighbourhood(tile1, tile4, tile5, tile1, tile1),
@@ -60,6 +60,10 @@ class DirectedGraphTest {
                 Neighbourhood(tile2, tile1, tile1, tile1, tile1),
                 Neighbourhood(tile4, tile1, tile5, tile1, tile1)
         )
-        assertEquals(expected, neighbourhoods1)
+        for (n in expected) {
+            assertTrue(graph.contains(n))
+        }
+        val count = graph.count { it.neighbours[POSITION.X] == tile1 }
+        assertEquals(expected.size, count)
     }
 }

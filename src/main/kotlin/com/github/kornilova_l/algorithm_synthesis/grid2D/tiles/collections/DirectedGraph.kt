@@ -16,13 +16,13 @@ class DirectedGraph(tileSet: TileSet) : TileGraph() {
     override val k: Int = tileSet.k
     private var nextTileId = 1
 
-    val graph: HashMap<Tile, HashSet<Neighbourhood>> = HashMap()
+    val neighbourhoods: HashSet<Neighbourhood> = HashSet()
     private val ids = DualHashBidiMap<Tile, Int>()
     override val size: Int
-        get() = graph.size
+        get() = ids.size
 
     val edgeCount: Int
-        get() = graph.values.sumBy { it.size * 4 }
+        get() = neighbourhoods.size * 4
 
     init {
         if (n <= 0 || m <= 0) {
@@ -31,16 +31,16 @@ class DirectedGraph(tileSet: TileSet) : TileGraph() {
         /* There must exist at most one instance of each tile */
         for (tile in tileSet.validTiles) {
             val center = getIfAlreadyCreated(Tile(tile, POSITION.X))
-            val set = graph.computeIfAbsent(center, { HashSet() })
-            set.add(Neighbourhood(
-                    getIfAlreadyCreated(Tile(tile, POSITION.N)),
-                    getIfAlreadyCreated(Tile(tile, POSITION.E)),
-                    getIfAlreadyCreated(Tile(tile, POSITION.S)),
-                    getIfAlreadyCreated(Tile(tile, POSITION.W)),
-                    center
-            ))
+            neighbourhoods.add(
+                    Neighbourhood(
+                            getIfAlreadyCreated(Tile(tile, POSITION.N)),
+                            getIfAlreadyCreated(Tile(tile, POSITION.E)),
+                            getIfAlreadyCreated(Tile(tile, POSITION.S)),
+                            getIfAlreadyCreated(Tile(tile, POSITION.W)),
+                            center
+                    ))
         }
-        if (graph.size == 0) {
+        if (neighbourhoods.size == 0) {
             throw IllegalArgumentException("Cannot construct graph")
         }
     }

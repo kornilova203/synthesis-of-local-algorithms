@@ -119,13 +119,14 @@ fun parseLineResult(scanner: Scanner): Set<Int> {
 fun toDimacs(graph: DirectedGraph, rules: Set<VertexRule>): Collection<Set<Int>> {
     val reversedRules = reverseRules(rules)
     val clauses = ArrayList<Set<Int>>()
-    graph.graph.values
-            .forEach { it.forEach { formClause(it, reversedRules, graph, clauses) } }
+    graph.neighbourhoods.forEach { neighbourhood ->
+        formClause(neighbourhood, reversedRules, clauses)
+    }
     return clauses
 }
 
 private fun formClause(neighbourhood: Neighbourhood, reversedRules: Set<VertexRule>,
-                       graph: DirectedGraph, clauses: ArrayList<Set<Int>>) {
+                       clauses: ArrayList<Set<Int>>) {
     for (reversedRule in reversedRules) {
         val clause = HashSet<Int>()
         var isAlwaysTrue = false
