@@ -3,8 +3,8 @@ package com.github.kornilova_l.algorithm_synthesis.tiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters.getParametersSet
-import org.apache.commons.collections4.CollectionUtils
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Test
 import java.io.File
 
@@ -49,8 +49,7 @@ internal class TileGeneratorTest {
         val tileIS = TileSet(file!!).validTiles
         assertNotNull(tileIS)
 
-        assertTrue(CollectionUtils.isEqualCollection(tileGenerator.tileSet.validTiles, tileIS))
-
+        assertEquals(tileGenerator.tileSet.validTiles, tileIS)
 
         file.delete()
     }

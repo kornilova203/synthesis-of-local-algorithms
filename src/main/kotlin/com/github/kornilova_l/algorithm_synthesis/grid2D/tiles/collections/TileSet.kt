@@ -1,6 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
+import org.apache.lucene.util.OpenBitSet
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
@@ -41,26 +42,24 @@ class TileSet {
         }
         validTiles = ArrayList(size)
         BufferedReader(FileReader(file)).use { reader ->
-            var i = 0
-            var j = 0
-            var grid = Array(n) { BooleanArray(m) }
+            var i = 0L
+            val n = n.toLong()
+            val m = m.toLong()
+            var grid = OpenBitSet(n * m)
             skipTwoLines(reader)
             var r = reader.read()
             while (r != -1) {
                 val c = r.toChar()
-                if (c == '0') {
-                    grid[i][j++] = false
-                } else if (c == '1') {
-                    grid[i][j++] = true
-                }
-                if (j == m) {
-                    j = 0
+                if (c == '1' || c == '0') {
+                    if (c == '1') {
+                        grid.set(i)
+                    }
                     i++
-                }
-                if (i == n) {
-                    validTiles.add(Tile(grid, k))
-                    i = 0
-                    grid = Array(n) { BooleanArray(m) }
+                    if (i == m * n) {
+                        validTiles.add(Tile(grid, this.n, this.m, k))
+                        i = 0
+                        grid = OpenBitSet(n * m)
+                    }
                 }
                 r = reader.read()
             }
@@ -110,10 +109,14 @@ class TileSet {
             if (validTiles.size != other.validTiles.size) {
                 return false
             }
-            val intersect = validTiles.intersect(other.validTiles)
-            return intersect.size == validTiles.size
+            val count = validTiles.count { tile -> other.validTiles.contains(tile) }
+            return validTiles.size == count
         }
         return false
+    }
+
+    override fun hashCode(): Int {
+        return validTiles.hashCode()
     }
 }
 

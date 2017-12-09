@@ -2,11 +2,11 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.isSolvable
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
+import org.apache.lucene.util.OpenBitSet
 import java.util.*
-import kotlin.collections.HashSet
 
 class Tile {
-    private val grid: Array<BooleanArray>
+    private val grid: OpenBitSet
     val k: Int
     val n: Int
     val m: Int
@@ -25,16 +25,20 @@ class Tile {
         return isSolvable(clauses)
     }
 
-    internal constructor(n: Int, m: Int, k: Int, `is`: Set<Coordinate>) {
-        this.n = n
-        this.m = m
-        this.k = k
-        grid = Array(n) { BooleanArray(m) }
-        for (coordinate in `is`) {
-            grid[coordinate.x][coordinate.y] = true
-        }
+    private fun getIndex(x: Int, y: Int): Long {
+        return (x * m + y).toLong()
     }
 
+    private fun getIndex(x: Long, y: Long): Long {
+        return x * m + y
+    }
+
+    /**
+     * Creates a subtile of size
+     * tile.n - 1 x tile.m
+     * or
+     * tile.n x tile.m - 1
+     */
     constructor(tile: Tile, part: Part) {
         k = tile.k
         val n: Int
@@ -49,43 +53,49 @@ class Tile {
                 m = tile.m - 1
             }
         }
-        grid = Array(n) { BooleanArray(m) }
+        grid = OpenBitSet((n * m).toLong())
         when (part) {
-            Tile.Part.N, Tile.Part.W -> for (i in 0 until n) {
-                System.arraycopy(tile.grid[i], 0, grid[i], 0, m)
-            }
-            Tile.Part.S -> for (i in 0 until n) {
-                System.arraycopy(tile.grid[i + 1], 0, grid[i], 0, m)
-            }
-            Tile.Part.E -> for (i in 0 until n) {
-                System.arraycopy(tile.grid[i], 1, grid[i], 0, m)
-            }
+            Tile.Part.N -> // copy first tile.n - 1 rows
+                (0L until n * m).filter { i -> tile.grid.get(i) }
+                        .forEach { i -> this.grid.set(i) }
+            Tile.Part.S -> // copy last tile.n - 1 rows
+                (0L until n * m).filter { i -> tile.grid.get(i + m) }
+                        .forEach { i -> this.grid.set(i) }
+            Tile.Part.W ->
+                (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m, i % m)) }
+                        .forEach { i -> this.grid.set(i) }
+            Tile.Part.E ->
+                (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m, i % m) + 1) }
+                        .forEach { i -> this.grid.set(i) }
         }
         this.n = n
         this.m = m
     }
 
+    /**
+     * Created a subtile of size tile.n - 2 x tile.m - 2
+     */
     constructor(tile: Tile, position: POSITION) {
         k = tile.k
         n = tile.n - 2
         m = tile.m - 2
-        grid = Array(n) { BooleanArray(m) }
+        grid = OpenBitSet((n * m).toLong())
         when (position) {
-            POSITION.N -> for (i in 0 until n) {
-                System.arraycopy(tile.grid[i], 1, grid[i], 0, m)
-            }
-            POSITION.E -> for (i in 0 until n) {
-                System.arraycopy(tile.grid[i + 1], 2, grid[i], 0, m)
-            }
-            POSITION.S -> for (i in 0 until n) {
-                System.arraycopy(tile.grid[i + 2], 1, grid[i], 0, m)
-            }
-            POSITION.W -> for (i in 0 until n) {
-                System.arraycopy(tile.grid[i + 1], 0, grid[i], 0, m)
-            }
-            POSITION.X -> for (i in 0 until n) {
-                System.arraycopy(tile.grid[i + 1], 1, grid[i], 0, m)
-            }
+            POSITION.N ->
+                (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m, i % m + 1)) }
+                        .forEach { i -> grid.set(i) }
+            POSITION.E ->
+                (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m + 1, i % m + 2)) }
+                        .forEach { i -> grid.set(i) }
+            POSITION.S ->
+                (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m + 2, i % m + 1)) }
+                        .forEach { i -> grid.set(i) }
+            POSITION.W ->
+                (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m + 1, i % m)) }
+                        .forEach { i -> grid.set(i) }
+            POSITION.X ->
+                (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m + 1, i % m + 1)) }
+                        .forEach { i -> grid.set(i) }
         }
     }
 
@@ -99,36 +109,19 @@ class Tile {
     constructor(n: Int, m: Int, k: Int) {
         this.n = n
         this.m = m
-        grid = Array(n) { BooleanArray(m) }
+        grid = OpenBitSet((n * m).toLong())
         this.k = k
     }
 
     /**
-     * Clone tile and change grid[x][y]
+     * Clone tile and set `grid[x][y]` to true
      */
     constructor(tile: Tile, x: Int, y: Int) {
         k = tile.k
-        this.n = tile.n
-        this.m = tile.m
-        grid = Array(tile.n) { BooleanArray(tile.m) }
-        for (i in 0 until tile.n) {
-            System.arraycopy(tile.grid[i], 0, grid[i], 0, tile.m)
-        }
-        grid[x][y] = true
-    }
-
-    constructor(tile: Tile, newN: Int, newM: Int, solution: Set<Int>) {
-        k = tile.k
-        n = newN
-        m = newM
-        grid = Array(n) { BooleanArray(m) }
-        for (i in (newN - tile.n) / 2 until tile.n + (newN - tile.n) / 2) {
-            System.arraycopy(tile.grid[i - (newN - tile.n) / 2], 0, grid[i], (newM - tile.m) / 2, tile.m)
-        }
-        solution
-                .filter { i -> i > 0 }
-                .map { id -> getCoordinate(id) }
-                .forEach { coordinate -> grid[coordinate.x][coordinate.y] = true }
+        n = tile.n
+        m = tile.m
+        grid = tile.grid.clone() as OpenBitSet
+        grid.set(getIndex(x, y))
     }
 
     /**
@@ -138,10 +131,9 @@ class Tile {
         k = tile.k
         n = newN
         m = newM
-        grid = Array(n) { BooleanArray(m) }
-        for (i in (newN - tile.n) / 2 until tile.n + (newN - tile.n) / 2) {
-            System.arraycopy(tile.grid[i - (newN - tile.n) / 2], 0, grid[i], (newM - tile.m) / 2, tile.m)
-        }
+        grid = OpenBitSet((newN * newM).toLong())
+        (0L until tile.n * tile.m).filter { i -> tile.grid.get(i) }
+                .forEach { i -> grid.set(getIndex(i / tile.m + (newN - tile.n) / 2, i % tile.m + (newM - tile.m) / 2)) }
     }
 
     constructor(independentSet: Array<BooleanArray>, x: Int, y: Int, n: Int, m: Int, k: Int) {
@@ -153,11 +145,11 @@ class Tile {
         this.k = k
         val sizeN = independentSet.size
         val sizeM = independentSet[0].size
-        grid = Array(n) { BooleanArray(m) }
+        grid = OpenBitSet((n * m).toLong())
         for (i in 0 until n) {
-            for (j in 0 until m) {
-                grid[i][j] = independentSet[(x - n / 2 + i + sizeN) % sizeN][(y - m / 2 + j + sizeM) % sizeM]
-            }
+            (0 until m)
+                    .filter { j -> independentSet[(x - n / 2 + i + sizeN) % sizeN][(y - m / 2 + j + sizeM) % sizeM] }
+                    .forEach { j -> grid.set(getIndex(i, j)) }
         }
     }
 
@@ -166,25 +158,24 @@ class Tile {
         val lines = string.split("\n").filter { it != "" }
         n = lines.size
         m = calculateM(lines)
-        grid = Array(n) { BooleanArray(m) }
+        grid = OpenBitSet((n * m).toLong())
         lines.forEachIndexed { i, line ->
             var j = 0
             line.forEach { c ->
                 if (c == '1') {
-                    grid[i][j] = true
+                    grid.set(getIndex(i, j))
                     j++
                 } else if (c == '0') {
-                    grid[i][j] = false
                     j++
                 }
             }
         }
     }
 
-    constructor(grid: Array<BooleanArray>, k: Int) {
+    constructor(grid: OpenBitSet, n: Int, m: Int, k: Int) {
         this.grid = grid
-        this.n = grid.size
-        this.m = grid[0].size
+        this.n = n
+        this.m = m
         this.k = k
     }
 
@@ -215,14 +206,14 @@ class Tile {
      * @return true if grid[x][y] can be an element of an independent set
      */
     fun canBeI(x: Int, y: Int): Boolean {
-        if (grid[x][y]) { // if already I
+        if (grid.get(getIndex(x, y))) { // if already I
             return true
         }
         val endX = Math.min(n - 1, x + k)
         val endY = Math.min(m - 1, y + k)
         for (i in Math.max(0, x - k)..endX) {
             (Math.max(0, y - k)..endY)
-                    .filter { Math.abs(i - x) + Math.abs(it - y) <= k && grid[i][it] }
+                    .filter { j -> Math.abs(i - x) + Math.abs(j - y) <= k && grid.get(getIndex(i, j)) }
                     .forEach { return false }
         }
         return true
@@ -232,44 +223,15 @@ class Tile {
         val stringBuilder = StringBuilder()
         for (i in 0 until n) {
             for (j in 0 until m) {
-                stringBuilder.append(if (grid[i][j]) 1 else 0).append(if (j == m - 1) "" else " ")
+                stringBuilder.append(if (grid.get(getIndex(i, j))) 1 else 0).append(if (j == m - 1) "" else " ")
             }
             stringBuilder.append("\n")
         }
         return stringBuilder.toString()
     }
 
-    /**
-     * @return next coordinate which does not belong to internal tile
-     * or null if it was last tile
-     */
-    fun getNextBorderCoordinate(curCoordinate: Coordinate): Coordinate? {
-        var x = curCoordinate.x
-        var y = curCoordinate.y
-        if (x == n - 1 && y == m - 1) { // if last coordinate
-            return null
-        }
-        if (x < n - 1) { // if not the last in this row
-            x++
-            if (y >= k && y < m - k) {
-                if (x >= k && x < n - k) { // if inside internal tile
-                    x = n - k
-                }
-            }
-        } else {
-            y++
-            x = 0
-        }
-        return Coordinate(x, y)
-    }
-
     fun getId(x: Int, y: Int): Int {
         return x * m + y + 1
-    }
-
-    private fun getCoordinate(id: Int): Coordinate {
-        val num = id - 1
-        return Coordinate(num / m, num % m)
     }
 
     internal fun toDimacsIsTileValid(): Set<Set<Int>>? {
@@ -426,13 +388,13 @@ class Tile {
         }
         for (i in 0 until n) {
             (0 until m)
-                    .filter { grid[i][it] != other.grid[i][it] }
+                    .filter { j -> grid.get(getIndex(i, j)) != other.grid.get(getIndex(i, j)) }
                     .forEach { return false }
         }
         return true
     }
 
-    override fun hashCode(): Int = Arrays.deepHashCode(grid)
+    override fun hashCode(): Int = grid.hashCode()
 
     enum class Part {
         N,
@@ -441,24 +403,7 @@ class Tile {
         E
     }
 
-    class Coordinate(internal val x: Int, internal val y: Int) {
-
-        override fun toString(): String = "($x, $y)"
-
-        override fun equals(other: Any?): Boolean {
-            return if (other !is Coordinate) {
-                false
-            } else x == other.x && y == other.y
-        }
-
-        override fun hashCode(): Int {
-            var result = x
-            result = 31 * result + y
-            return result
-        }
-    }
-
     fun isI(i: Int, j: Int): Boolean {
-        return grid[i][j]
+        return grid.get(getIndex(i, j))
     }
 }

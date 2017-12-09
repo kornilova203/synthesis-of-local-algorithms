@@ -3,7 +3,6 @@ package com.github.kornilova_l.algorithm_synthesis.tiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.Grid2D
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Coordinate
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.VertexSetSolverKtTest
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import org.junit.Assert.*
@@ -52,73 +51,54 @@ internal class TileTest {
     }
 
     @Test
-    fun getNextBorderCoordinateTest() {
-        val tile = Tile(6, 8, 2)
-        assertEquals(Coordinate(1, 0),
-                tile.getNextBorderCoordinate(Coordinate(0, 0)))
-
-        assertEquals(Coordinate(0, 1),
-                tile.getNextBorderCoordinate(Coordinate(5, 0)))
-
-        assertEquals(Coordinate(4, 2),
-                tile.getNextBorderCoordinate(Coordinate(1, 2)))
-
-        assertEquals(Coordinate(2, 0),
-                tile.getNextBorderCoordinate(Coordinate(1, 0)))
-
-        assertNull(tile.getNextBorderCoordinate(Coordinate(tile.n - 1, tile.m - 1)))
-    }
-
-    @Test
     fun tileFromArrayTest() {
         val grid2D = Grid2D(File("src/test/resources/grids/01_grid_5-6.txt"))
         val independentSet = IndependentSetAlgorithm(grid2D, 2).independentSet
 
         var tile = Tile(independentSet, 1, 3, 3, 5, 2)
 
-        assertEquals("0 0 0 0 0\n" +
-                "0 0 0 1 0\n" +
-                "0 1 0 0 0\n", tile.toString())
+        assertEquals(Tile("0 0 0 0 0\n0 0 0 1 0\n0 1 0 0 0\n", 2), tile)
 
         tile = Tile(independentSet, 0, 0, 3, 5, 2)
 
-        assertEquals("0 0 0 0 0\n" +
-                "0 0 1 0 0\n" +
-                "1 0 0 0 0\n", tile.toString())
+        assertEquals(Tile("0 0 0 0 0\n0 0 1 0 0\n1 0 0 0 0\n", 2), tile)
     }
 
     @Test
-    fun tileConstructorTest() {
-        val independentSet1 = hashSetOf(
-                Coordinate(1, 1),
-                Coordinate(3, 3),
-                Coordinate(2, 0)
-        )
-        val biggerTile = Tile(5, 4, 1, independentSet1)
+    fun tileConstructorWithPosition() {
+        val biggerTile = Tile("0 0 0 0\n0 1 0 0\n1 0 0 0\n0 0 0 1", 1)
 
-        val independentSetNorth = hashSetOf(Coordinate(1, 0))
-        val tileNorth = Tile(3, 2, 1, independentSetNorth)
+        val tileNorth = Tile("0 0\n1 0", 1)
         assertEquals(tileNorth, Tile(biggerTile, POSITION.N))
 
-        val independentSetEast = hashSetOf(Coordinate(2, 1))
-        val tileEast = Tile(3, 2, 1, independentSetEast)
+        val tileEast = Tile("0 0\n0 0", 1)
         assertEquals(tileEast, Tile(biggerTile, POSITION.E))
 
-        val independentSetSouth = hashSetOf<Coordinate>()
-        val tileSouth = Tile(3, 2, 1, independentSetSouth)
+        val tileSouth = Tile("0 0\n0 0", 1)
         assertEquals(tileSouth, Tile(biggerTile, POSITION.S))
 
-        val independentSetWest = hashSetOf(Coordinate(1, 0), Coordinate(0, 1))
-        val tileWest = Tile(3, 2, 1, independentSetWest)
+        val tileWest = Tile("0 1\n1 0", 1)
         assertEquals(tileWest, Tile(biggerTile, POSITION.W))
 
-        val independentSetCenter = hashSetOf(Coordinate(0, 0))
-        val tileCenter = Tile(3, 2, 1, independentSetCenter)
+        val tileCenter = Tile("1 0\n0 0", 1)
         assertEquals(tileCenter, Tile(biggerTile, POSITION.X))
+    }
 
-        val actual = Tile("1 0 0 0\n0 1 0 1\n0 0 1 0\n", 1)
-        val expected = Tile(3, 4, 1, hashSetOf(Coordinate(0, 0), Coordinate(1, 1), Coordinate(1, 3), Coordinate(2, 2)))
-        assertEquals(expected, actual)
+    @Test
+    fun tileConstructorWithPart() {
+        val biggerTile = Tile("0 0 0 0\n0 1 0 0\n1 0 0 0\n0 0 0 1", 1)
+
+        val tileNorth = Tile("0 0 0 0\n0 1 0 0\n1 0 0 0", 1)
+        assertEquals(tileNorth, Tile(biggerTile, Tile.Part.N))
+
+        val tileEast = Tile("0 0 0\n0 1 0\n1 0 0\n0 0 0", 1)
+        assertEquals(tileEast, Tile(biggerTile, Tile.Part.W))
+
+        val tileSouth = Tile("0 1 0 0\n1 0 0 0\n0 0 0 1", 1)
+        assertEquals(tileSouth, Tile(biggerTile, Tile.Part.S))
+
+        val tileWest = Tile("0 0 0\n1 0 0\n0 0 0\n0 0 1", 1)
+        assertEquals(tileWest, Tile(biggerTile, Tile.Part.E))
     }
 
     @Test
