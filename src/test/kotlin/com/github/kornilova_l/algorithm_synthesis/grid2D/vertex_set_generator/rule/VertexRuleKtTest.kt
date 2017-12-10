@@ -1,9 +1,5 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
+package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getVertexRules
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.reverseRules
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -57,5 +53,20 @@ class VertexRuleKtTest {
 
         rules = getVertexRules("?????")
         assertEquals(32, rules.size)
+    }
+
+    @Test
+    fun rotateRuleTest() {
+        var rule = VertexRule("XN")
+        assertEquals(VertexRule("XE"), rotateRule(rule))
+
+        rule = VertexRule("NESW")
+        assertEquals(VertexRule("ENWS"), rotateRule(rule))
+
+        rule = VertexRule("XN")
+        assertEquals(VertexRule("XS"), rotateRule(rule, 2))
+
+        rule = VertexRule("XN")
+        assertEquals(VertexRule("XW"), rotateRule(rule, -1))
     }
 }

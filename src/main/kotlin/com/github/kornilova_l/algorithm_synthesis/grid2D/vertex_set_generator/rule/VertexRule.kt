@@ -37,11 +37,19 @@ private fun validatePattern(pattern: String) {
     }
 }
 
+fun rotateRule(rule: VertexRule, rotationsCount: Int = 1): VertexRule {
+    val array = rule.array.copyOf()
+    for (i in 0 until 4) {
+        array[i % 4 + 1] = rule.array[(i - rotationsCount + 4) % 4 + 1]
+    }
+    return VertexRule(array)
+}
+
 class VertexRule {
     /**
      * XNESW
      */
-    private val array = BooleanArray(5)
+    internal val array = BooleanArray(5)
     val id: Int
 
     constructor(id: Int) {
