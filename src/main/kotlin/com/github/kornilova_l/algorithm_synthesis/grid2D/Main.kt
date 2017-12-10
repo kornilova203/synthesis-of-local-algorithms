@@ -1,5 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.getLabelingFunction
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
@@ -28,7 +29,8 @@ fun main(args: Array<String>) {
     } else {
         println("found")
         val grid = generateGrid(10, 10)
-        val labeledGrid = labelingFunction.getLabels(grid)
+        val independentSet = IndependentSetAlgorithm(grid, labelingFunction.k).independentSet
+        val labeledGrid = labelingFunction.getLabels(independentSet)
         println(grid)
         for (i in 0 until labeledGrid!!.size) {
             (0 until labeledGrid[0].size)
@@ -36,7 +38,7 @@ fun main(args: Array<String>) {
                     .forEach { print("$it ") }
             println()
         }
-        drawLabels(labeledGrid)
+        drawLabels(labeledGrid, independentSet)
     }
 }
 

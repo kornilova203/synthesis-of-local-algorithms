@@ -1,7 +1,5 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.Grid2D
-import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileMap
@@ -9,9 +7,11 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileM
 
 class LabelingFunction {
     private val tileLabels: TileMap<Boolean>
+    val k: Int
 
     constructor(tileLabels: TileMap<Boolean>) {
         this.tileLabels = tileLabels
+        k = tileLabels.k
     }
 
     constructor(solution: List<Int>, graph: DirectedGraph) {
@@ -20,12 +20,11 @@ class LabelingFunction {
             val id = Math.abs(index)
             tileLabels.put(graph.getTile(id)!!, index > 0)
         }
+        k = tileLabels.k
     }
 
-    fun getLabels(grid2d: Grid2D): Array<BooleanArray>? {
-        val colouredGraph = Array(grid2d.n) { BooleanArray(grid2d.m) }
-
-        val independentSet = IndependentSetAlgorithm(grid2d, tileLabels.k).independentSet
+    fun getLabels(independentSet: Array<BooleanArray>): Array<BooleanArray>? {
+        val colouredGraph = Array(independentSet.size) { BooleanArray(independentSet[0].size) }
         for (i in independentSet.indices) {
             for (j in independentSet[i].indices) {
                 val tile = Tile(independentSet, i, j, tileLabels.n, tileLabels.m, tileLabels.k)

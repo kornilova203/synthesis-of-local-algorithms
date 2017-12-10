@@ -1,5 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
@@ -33,7 +34,8 @@ class VertexSetSolverKtTest {
         assertNotNull(labelingFunction)
         for (i in 0 until iterations) {
             val grid = generateGrid(10, 10)
-            val labeledGrid = labelingFunction!!.getLabels(grid)
+            val independentSet = IndependentSetAlgorithm(grid, labelingFunction!!.k).independentSet
+            val labeledGrid = labelingFunction.getLabels(independentSet)
             assertNotNull(labeledGrid)
             assertTrue(isRight(labeledGrid!!, rules))
         }
