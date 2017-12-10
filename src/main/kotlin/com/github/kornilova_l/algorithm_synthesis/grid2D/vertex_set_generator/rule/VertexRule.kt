@@ -45,6 +45,10 @@ fun rotateRule(rule: VertexRule, rotationsCount: Int = 1): VertexRule {
     return VertexRule(array)
 }
 
+fun rotateRuleSet(rules: Set<VertexRule>, rotationsCount: Int = 1): Set<VertexRule> {
+    return rules.map { rule -> rotateRule(rule, rotationsCount) }.toSet()
+}
+
 class VertexRule {
     /**
      * XNESW
