@@ -35,4 +35,8 @@ class LabelingFunction {
         }
         return colouredGraph
     }
+
+    fun rotate(): LabelingFunction {
+        return LabelingFunction(tileLabels.rotate())
+    }
 }

@@ -1,6 +1,5 @@
-package com.github.kornilova_l.algorithm_synthesis.tiles
+package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters.getParametersSet
 import org.junit.Assert.assertEquals

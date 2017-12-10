@@ -1,8 +1,7 @@
-package com.github.kornilova_l.algorithm_synthesis.tiles
+package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.Grid2D
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.VertexSetSolverKtTest
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import org.junit.Assert.*
@@ -66,7 +65,7 @@ internal class TileTest {
 
     @Test
     fun tileConstructorWithPosition() {
-        val biggerTile = Tile("0 0 0 0\n0 1 0 0\n1 0 0 0\n0 0 0 1", 1)
+        val biggerTile = Tile("0000\n0 1 0 0\n1 0 0 0\n0 0 0 1", 1)
 
         val tileNorth = Tile("0 0\n1 0", 1)
         assertEquals(tileNorth, Tile(biggerTile, POSITION.N))
@@ -82,6 +81,12 @@ internal class TileTest {
 
         val tileCenter = Tile("1 0\n0 0", 1)
         assertEquals(tileCenter, Tile(biggerTile, POSITION.X))
+    }
+
+    @Test
+    fun rotateTest() {
+        val tile = Tile("010\n000\n000\n100", 1)
+        assertEquals(Tile("1000\n0001\n0000", 1), tile.rotate())
     }
 
     @Test

@@ -22,4 +22,12 @@ class TileMap<Val>(val n: Int, val m: Int, val k: Int) {
     }
 
     operator fun get(tile: Tile): Val = tiles[tile]!!
+
+    fun rotate(): TileMap<Val> {
+        val rotatedTileMap = TileMap<Val>(m, n, k)
+        for (entry in tiles.entries) {
+            rotatedTileMap.put(entry.key.rotate(), entry.value)
+        }
+        return rotatedTileMap
+    }
 }

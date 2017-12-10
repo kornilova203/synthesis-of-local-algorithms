@@ -9,8 +9,8 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.vi
 
 fun main(args: Array<String>) {
 //    val rules = independentSet()
-//    val rules = columnIS()
-    val rules = columnMinimalDominatingSet()
+    val rules = columnIS()
+//    val rules = columnMinimalDominatingSet()
 //    val rules = oneZeroAndOneOne()
 //    val rules = test()
 //    val rules = gameOfLife()

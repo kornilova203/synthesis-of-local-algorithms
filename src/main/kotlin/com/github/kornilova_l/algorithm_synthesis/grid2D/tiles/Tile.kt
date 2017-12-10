@@ -5,6 +5,10 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.ru
 import org.apache.lucene.util.OpenBitSet
 import java.util.*
 
+private fun getIndex(x: Long, y: Long, m: Int): Long {
+    return x * m + y
+}
+
 open class Tile {
     private val grid: OpenBitSet
     val k: Int
@@ -405,5 +409,20 @@ open class Tile {
 
     fun isI(i: Int, j: Int): Boolean {
         return grid.get(getIndex(i, j))
+    }
+
+    /**
+     * Creates a new tile that equals to the original tile rotated clockwise
+     */
+    fun rotate(): Tile {
+        val rotatedGrid = OpenBitSet(n * m.toLong())
+        (0L until n).forEach { i ->
+            (0L until m).filter { j ->
+                grid.get(getIndex(i, j))
+            }.forEach { j ->
+                rotatedGrid.set(getIndex(j, n - i - 1, n))
+            }
+        }
+        return Tile(rotatedGrid, m, n, k)
     }
 }

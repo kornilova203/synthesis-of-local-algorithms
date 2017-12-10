@@ -11,7 +11,7 @@ fun getParametersSet(difficulty: Int): Set<Parameters> {
         for (n in 3..8) {
             for (m in n..8) {
                 (1..5)
-                        .filter { k -> k >= (m * n) / 5 - 9 } // if not too difficult
+                        .filter { k -> k >= (m * n) / 5 - 10 } // if not too difficult
                         .mapTo(parameters) { Parameters(n, m, it) }
             }
         }
@@ -41,7 +41,7 @@ class Parameters(val n: Int, val m: Int, val k: Int) : Comparable<Parameters> {
                 if (k == other.k) {
                     return 0
                 }
-                return if (k < other.k) -1 else 1
+                return if (k > other.k) -1 else 1
             }
             return if (smaller < oSmaller) -1 else 1
         }

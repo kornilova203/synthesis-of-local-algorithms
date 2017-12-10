@@ -58,15 +58,15 @@ class VertexRuleKtTest {
     @Test
     fun rotateRuleTest() {
         var rule = VertexRule("XN")
-        assertEquals(VertexRule("XE"), rotateRule(rule))
+        assertEquals(VertexRule("XE"), rule.rotate())
 
         rule = VertexRule("NESW")
-        assertEquals(VertexRule("ENWS"), rotateRule(rule))
+        assertEquals(VertexRule("ENWS"), rule.rotate())
 
         rule = VertexRule("XN")
-        assertEquals(VertexRule("XS"), rotateRule(rule, 2))
+        assertEquals(VertexRule("XS"), rule.rotate(2))
 
         rule = VertexRule("XN")
-        assertEquals(VertexRule("XW"), rotateRule(rule, -1))
+        assertEquals(VertexRule("XW"), rule.rotate(-1))
     }
 }

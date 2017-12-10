@@ -4,9 +4,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.Direc
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Neighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters.getParametersSet
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.positions
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.reverseRules
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.*
 import java.io.BufferedWriter
 import java.io.File
 import java.io.IOException
@@ -28,9 +26,18 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
         val n = parameters.n
         val m = parameters.m
         val k = parameters.k
-        val function = tryToFindSolution(vertexRules, n, m, k)
+        if (n == 7 && m == 7 && k == 1) {
+            continue
+        }
+        var function = tryToFindSolution(vertexRules, n, m, k)
         if (function != null) {
             return function
+        }
+
+        function = tryToFindSolution(rotateRuleSet(vertexRules), n, m, k)
+        if (function != null) {
+            println("Found rotated")
+            return function.rotate()
         }
     }
     return null
