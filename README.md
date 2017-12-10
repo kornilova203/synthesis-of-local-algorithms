@@ -37,7 +37,14 @@ The goal of computer search is to find such normal form and radius of a neighbou
  
 Using normal form of grid and a SAT solver we can find a mapping from local neighbourhood to vertex label, so each vertex will belong to one of the rules described above:  
 ![independent set](images/is.png)  
+Green stroke indicated original independent set.  
 This is not surprising because normal form for this problem is a maximal independent set of a grid.
 
-Dominating set:  
+Dominating set (1 x 1 tiles, 1 power)   
 ![dominating set](images/dominating_set.png)
+
+Column maximal independent set (4 x 7 tiles, 1 power)  
+![](images/column_maximal_is.png)
+
+Column minimal dominating set (4 x 5 tiles, 1 power)  
+![](images/column_minimal_ds.png)
