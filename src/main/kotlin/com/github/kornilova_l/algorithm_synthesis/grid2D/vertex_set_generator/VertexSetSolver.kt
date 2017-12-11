@@ -31,7 +31,12 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
         val n = parameters.n
         val m = parameters.m
         val k = parameters.k
-        if (n == 7 && m == 7 && k == 1) {
+        if (n == 7 && m == 7 && k == 1 ||
+                n == 6 && m == 8 && k == 1 ||
+                n == 7 && m == 8 && k == 2 ||
+                n == 8 && m == 8 && k == 3 ||
+                n == 8 && m == 8 && k == 2 ||
+                n == 6 && m == 7 && k == 1) {
             continue
         }
         val file = File("generated_tiles/$n-$m-$k.txt")
