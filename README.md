@@ -43,8 +43,8 @@ This is not surprising because normal form for this problem is a maximal indepen
 Dominating set (1 x 1 tiles, 1 power)   
 ![dominating set](images/dominating_set.png)
 
-Column maximal independent set (4 x 7 tiles, 1 power)  
+Column maximal independent set (5 x 2 tiles, 1 power)  
 ![](images/column_maximal_is.png)
 
-Column minimal dominating set (4 x 5 tiles, 1 power)  
+Column minimal dominating set (3 x 2 tiles, 1 power)  
 ![](images/column_minimal_ds.png)
