@@ -41,6 +41,25 @@ fun rotateRuleSet(rules: Set<VertexRule>, rotationsCount: Int = 1): Set<VertexRu
     return rules.map { rule -> rule.rotate(rotationsCount) }.toSet()
 }
 
+fun parseRules(line: String): Set<VertexRule> {
+    /* remove '[' and ']' or any other trailing symbols */
+    var startIndex = 0
+    while (!isRuleChar(line[startIndex])) {
+        startIndex++
+    }
+    var endIndex = line.length
+    while (!isRuleChar(line[endIndex - 1])) {
+        endIndex--
+    }
+    val cutLine = line.substring(startIndex, endIndex)
+    val parts = if (cutLine.contains(", ")) cutLine.split(", ") else cutLine.split(" ")
+    return parts.map { part -> VertexRule(part) }.toSet()
+}
+
+fun isRuleChar(c: Char): Boolean {
+    return c == 'X' || c == 'N' || c == 'E' || c == 'W' || c == 'S' || c == '-'
+}
+
 class VertexRule {
     /**
      * XNESW

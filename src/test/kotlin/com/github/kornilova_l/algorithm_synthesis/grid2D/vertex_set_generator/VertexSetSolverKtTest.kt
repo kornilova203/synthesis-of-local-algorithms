@@ -2,12 +2,12 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileTest
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileTest.Clauses
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileTest.Companion.flatSetToSetOfSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getVertexRules
 import org.junit.Assert.*
 import org.junit.Test
@@ -88,6 +88,18 @@ class VertexSetSolverKtTest {
                 VertexRule("NESW")
         )
         testLabelingFunction(invertedISRules)
+    }
+
+    @Test
+    fun someRulesTest() {
+        val rules = HashSet<VertexRule>()
+        rules.addAll(getRulePermutations(2, true))
+        rules.addAll(getRulePermutations(3, true))
+        rules.addAll(getRulePermutations(2, false))
+        rules.addAll(getRulePermutations(3, false))
+        rules.addAll(getRulePermutations(1, false))
+
+        testLabelingFunction(rules)
     }
 
     @Test

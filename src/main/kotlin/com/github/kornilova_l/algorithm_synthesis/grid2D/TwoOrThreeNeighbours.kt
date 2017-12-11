@@ -6,10 +6,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.ru
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.rotateRuleSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tryToFindSolution
-import java.io.BufferedWriter
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileWriter
+import java.io.*
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.collections.ArrayList
@@ -30,7 +27,12 @@ fun main(args: Array<String>) {
             continue
         }
         val startTime = System.currentTimeMillis()
-        tryToFindSolutionForWindowOfRules(from, to)
+        val logFile = File("log/$from-$to-${System.currentTimeMillis()}.txt")
+
+        val rulesCombinations = scanFromFile(from, to)
+        FileWriter(logFile).use { writer ->
+            tryToFindSolutionForEachRulesSet(rulesCombinations, writer)
+        }
         System.err.println("Time: ${(System.currentTimeMillis() - startTime) / 1000}s")
         from += step
         to += step
@@ -56,40 +58,35 @@ fun wasChecked(from: Int, to: Int): Boolean {
     return false
 }
 
-fun tryToFindSolutionForWindowOfRules(from: Int, to: Int) {
-    val logFile = File("log/$from-$to-${System.currentTimeMillis()}.txt")
-    FileWriter(logFile).use { writer ->
-        writer.write("Check tiles No: $from-$to\n")
-        println("Check tiles No: $from-$to")
-        val rulesCombinations = scanFromFile(from, to)
-        val solutions = HashSet<Set<VertexRule>>()
-        val files = File("generated_tiles").listFiles()
-        for (i in 0 until files.size) {
-            val file = files[i]
-            if (tilesFilePattern.matcher(file.name).matches()) {
-                val parts = file.name.split("-")
-                val n = Integer.parseInt(parts[0])
-                val m = Integer.parseInt(parts[1])
-                val k = Integer.parseInt(parts[2].split(".")[0])
-                if (n < 3 || m < 3 ||
-                        n > m) {
-                    continue
-                }
-                if (tooBig(n, m, k)) {
-                    continue
-                }
-                println("Try n=$n m=$m k=$k")
-                useFileToFindSolutions(rulesCombinations, file, writer, solutions, n, m, k)
+fun tryToFindSolutionForEachRulesSet(rulesCombinations: List<Set<VertexRule>>, writer: Writer? = null) {
+    val solutions = HashSet<Set<VertexRule>>()
+    val files = File("generated_tiles").listFiles()
+    for (i in 0 until files.size) {
+        val file = files[i]
+        if (tilesFilePattern.matcher(file.name).matches()) {
+            val parts = file.name.split("-")
+            val n = Integer.parseInt(parts[0])
+            val m = Integer.parseInt(parts[1])
+            val k = Integer.parseInt(parts[2].split(".")[0])
+            if (n < 3 || m < 3 ||
+                    n > m) {
+                continue
             }
+            if (tooBig(n, m, k)) {
+                continue
+            }
+            println("Try n=$n m=$m k=$k")
+            useFileToFindSolutions(rulesCombinations, file, writer, solutions, n, m, k)
         }
-        if (!solutions.isEmpty()) {
-            writer.write("SOLUTION FOUND")
-        }
-        writer.write("COMPLETE\n")
     }
+    if (!solutions.isEmpty()) {
+        writer?.write("SOLUTION FOUND")
+    }
+    writer?.write("COMPLETE\n")
+    println("COMPLETE")
 }
 
-fun useFileToFindSolutions(rulesCombinations: List<Set<VertexRule>>, file: File, writer: FileWriter,
+fun useFileToFindSolutions(rulesCombinations: List<Set<VertexRule>>, file: File, writer: Writer?,
                            solutions: HashSet<Set<VertexRule>>, n: Int, m: Int, k: Int) {
     try {
         val tileSet = TileSet(file)
@@ -100,23 +97,19 @@ fun useFileToFindSolutions(rulesCombinations: List<Set<VertexRule>>, file: File,
                 continue
             }
             var function = tryToFindSolution(rulesCombination, graph)
+            if (function == null && n != m) {
+                function = tryToFindSolution(rotateRuleSet(rulesCombination), graph)
+            }
             if (function != null) {
-                writer.write("Found solution for $rulesCombination\n")
+                writer?.write("Found solution for $rulesCombination\n")
                 println("Found solution for $rulesCombination")
                 solutions.add(rulesCombination)
-            } else if (n != m) {
-                function = tryToFindSolution(rotateRuleSet(rulesCombination), graph)
-                if (function != null) {
-                    writer.write("Found solution for $rulesCombination\n")
-                    println("Found solution for $rulesCombination")
-                    solutions.add(rulesCombination)
-                }
             }
         }
-        writer.write("Checked parameters n=$n m=$m k=$k\n")
+        writer?.write("Checked parameters n=$n m=$m k=$k\n")
         println("Checked parameters n=$n m=$m k=$k")
     } catch (e: OutOfMemoryError) {
-        writer.write("OutOfMemoryError n=$n m=$m k=$k\n")
+        writer?.write("OutOfMemoryError n=$n m=$m k=$k\n")
         System.err.println("OutOfMemoryError n=$n m=$m k=$k")
     }
 }

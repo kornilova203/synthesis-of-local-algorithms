@@ -7,8 +7,8 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.ru
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.positions
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.reverseRules
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.rotateRuleSet
-import com.github.kornilova_l.tilesFilePattern
-import com.github.kornilova_l.tooBig
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tilesFilePattern
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tooBig
 import gnu.trove.list.array.TIntArrayList
 import gnu.trove.set.hash.TIntHashSet
 import java.io.BufferedWriter
@@ -35,7 +35,8 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
             val n = Integer.parseInt(parts[0])
             val m = Integer.parseInt(parts[1])
             val k = Integer.parseInt(parts[2].split(".")[0])
-            if (n < 3 || m < 3) {
+            if (n < 3 || m < 3 ||
+                    n > m) {
                 continue
             }
             if (tooBig(n, m, k)) {

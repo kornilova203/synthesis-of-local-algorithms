@@ -48,3 +48,7 @@ Column maximal independent set (5 x 2 tiles, 1 power)
 
 Column minimal dominating set (3 x 2 tiles, 1 power)  
 ![](images/column_minimal_ds.png)
+
+XN XE NE XNE XS NS XNS ES XES NES XNES XW NW XNW EW XEW NEW XNEW SW XSW NSW XNSW ESW XESW  
+(5 x 7 tiles, 3 power)  
+![](images/01_grid.png)

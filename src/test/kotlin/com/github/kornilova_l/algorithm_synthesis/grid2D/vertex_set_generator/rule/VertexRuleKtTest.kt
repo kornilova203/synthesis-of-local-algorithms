@@ -69,4 +69,13 @@ class VertexRuleKtTest {
         rule = VertexRule("XN")
         assertEquals(VertexRule("XW"), rule.rotate(-1))
     }
+
+    @Test
+    fun parseRulesTest() {
+        var actual = parseRules("[X, NWE]")
+        assertEquals(hashSetOf(VertexRule("X"), VertexRule("NWE")), actual)
+
+        actual = parseRules("- E]")
+        assertEquals(hashSetOf(VertexRule("-"), VertexRule("E")), actual)
+    }
 }
