@@ -62,10 +62,9 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
     return null
 }
 
-private fun tryToFindSolution(vertexRules: Set<VertexRule>, graph: DirectedGraph): LabelingFunction? {
+fun tryToFindSolution(vertexRules: Set<VertexRule>, graph: DirectedGraph): LabelingFunction? {
 
     val clauses = toDimacs(graph, vertexRules)
-    println(clauses.size)
     val solution = solve(clauses, graph.size)
     if (solution != null) { // solution found
         return LabelingFunction(solution, graph)

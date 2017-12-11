@@ -5,7 +5,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters
  * All of them are proportional to computational difficulty
  * This class generated disjoint sets of parameters based of given difficulty
  */
-fun getParametersSet(difficulty: Int): Set<Parameters> {
+fun getParametersSet(difficulty: Int = 1): Set<Parameters> {
     if (difficulty == 1) {
         val parameters = java.util.TreeSet<Parameters>()
         for (n in 3..8) {

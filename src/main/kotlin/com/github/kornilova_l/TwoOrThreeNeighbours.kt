@@ -1,49 +1,145 @@
 package com.github.kornilova_l
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.getLabelingFunction
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters.getParametersSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.rotateRuleSet
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tryToFindSolution
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileWriter
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
 
 var count = 0
 
 fun main(args: Array<String>) {
-    val rules = ArrayList<VertexRule>()
-    rules.addAll(getRulePermutations(2, true))
-    rules.addAll(getRulePermutations(3, true))
-    rules.addAll(getRulePermutations(2, false))
-    rules.addAll(getRulePermutations(3, false))
-    println(rules.size)
-
-    val res = HashSet<Set<VertexRule>>()
-    getAllRuleCombination(rules, ArrayList(rules.size), res)
-    println(res)
+    val rulesCount = Math.pow(2.toDouble(), 20.toDouble())
+    val step = 100
+    var from = 0
+    var to = step
+    while (to < rulesCount) {
+        if (wasChecked(from, to)) {
+            from += step
+            to += step
+            continue
+        }
+        tryToFindSolutionForWindowOfRules(from, to)
+        from += step
+        to += step
+    }
 }
 
-fun scanFromFile() {
-    Scanner(FileInputStream(File("lists_of_rules/two_or_three_neighbours.txt"))).use { scanner ->
-        while (scanner.hasNextLine()) {
-            val line = scanner.nextLine()
-            if (line == "" || line.contains("FOUND")) {
-                continue
-            }
-            val startTime = System.currentTimeMillis()
-            val rules = line.split(" ").filter { ruleString -> ruleString != "" }
-                    .map { ruleString -> VertexRule(ruleString) }.toSet()
-            println(rules)
-            val labelingFunction = getLabelingFunction(rules)
-            if (labelingFunction == null) {
-                println("NOT FOUND ${System.currentTimeMillis() - startTime}")
-            } else {
-                println("FOUND ${System.currentTimeMillis() - startTime}")
+fun wasChecked(from: Int, to: Int): Boolean {
+    val logDir = File("log")
+    logDir.listFiles()!!.forEach { file ->
+        val parts = file.name.split("-")
+        val fileFrom = Integer.parseInt(parts[0])
+        val fileTo = Integer.parseInt(parts[1])
+        if (from >= fileFrom && to <= fileTo) {
+            Scanner(FileInputStream(file)).use { scanner ->
+                while (scanner.hasNextLine()) {
+                    if (scanner.nextLine() == "COMPLETE") {
+                        return true
+                    }
+                }
             }
         }
     }
+    return false
+}
+
+fun tryToFindSolutionForWindowOfRules(from: Int, to: Int) {
+    val logFile = File("log/$from-$to-${System.currentTimeMillis()}.txt")
+    FileWriter(logFile).use { writer ->
+        writer.write("Check tiles No: $from-$to\n")
+        println("Check tiles No: $from-$to")
+        val rulesCombinations = scanFromFile(from, to)
+        val solutions = HashSet<Set<VertexRule>>()
+        for (parameters in getParametersSet()) {
+            val n = parameters.n
+            val m = parameters.m
+            val k = parameters.k
+            if (tooBig(n, m, k)) {
+                continue
+            }
+            val file = File("generated_tiles/$n-$m-$k.txt")
+            if (!file.exists()) { // if was not precalculated
+                continue
+            }
+            println("Try n=$n m=$m k=$k")
+            useFileToFindSolutions(rulesCombinations, file, writer, solutions, n, m, k)
+        }
+        if (!solutions.isEmpty()) {
+            writer.write("SOLUTION FOUND")
+        }
+        writer.write("COMPLETE\n")
+    }
+}
+
+fun useFileToFindSolutions(rulesCombinations: List<Set<VertexRule>>, file: File, writer: FileWriter,
+                           solutions: HashSet<Set<VertexRule>>, n: Int, m: Int, k: Int) {
+    try {
+        val tileSet = TileSet(file)
+        val graph = DirectedGraph(tileSet)
+
+        for (rulesCombination in rulesCombinations) {
+            if (solutions.contains(rulesCombination)) { // if solution was found
+                continue
+            }
+            var function = tryToFindSolution(rulesCombination, graph)
+            if (function != null) {
+                writer.write("Found solution for $rulesCombination\n")
+                println("Found solution for $rulesCombination")
+                solutions.add(rulesCombination)
+            } else if (n != m) {
+                function = tryToFindSolution(rotateRuleSet(rulesCombination), graph)
+                if (function != null) {
+                    writer.write("Found solution for $rulesCombination\n")
+                    println("Found solution for $rulesCombination")
+                    solutions.add(rulesCombination)
+                }
+            }
+        }
+        writer.write("Checked parameters n=$n m=$m k=$k\n")
+        println("Checked parameters n=$n m=$m k=$k")
+    } catch (e: OutOfMemoryError) {
+        writer.write("OutOfMemoryError n=$n m=$m k=$k\n")
+        System.err.println("OutOfMemoryError n=$n m=$m k=$k")
+    }
+}
+
+fun tooBig(n: Int, m: Int, k: Int): Boolean {
+    return n == 7 && m == 7 && k == 1 ||
+            n == 6 && m == 7 && k == 1 ||
+            n == 7 && m == 7 && k == 2 ||
+            n == 5 && m == 8 && k == 1 ||
+            n == 6 && m == 8 && k == 2 ||
+            n == 6 && m == 8 && k == 1 ||
+            n == 7 && m == 8 && k == 2 ||
+            n == 8 && m == 8 && k == 3
+}
+
+fun scanFromFile(from: Int, to: Int): List<Set<VertexRule>> {
+    val rulesCombinations = ArrayList<Set<VertexRule>>()
+    Scanner(FileInputStream(File("lists_of_rules/two_or_three_neighbours.txt"))).use { scanner ->
+        (0 until from).forEach { scanner.nextLine() } // skip first `from` rules
+        (0 until to - from).forEach {
+            if (scanner.hasNextLine()) {
+                val line = scanner.nextLine()
+                if (line != "") {
+                    val rules = line.split(" ").filter { ruleString -> ruleString != "" }
+                            .map { ruleString -> VertexRule(ruleString) }.toSet()
+                    rulesCombinations.add(rules)
+                }
+            }
+        }
+    }
+    return rulesCombinations
 }
 
 /**
