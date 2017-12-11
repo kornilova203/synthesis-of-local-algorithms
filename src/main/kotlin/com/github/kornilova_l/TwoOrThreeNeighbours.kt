@@ -2,7 +2,6 @@ package com.github.kornilova_l
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters.getParametersSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.rotateRuleSet
@@ -12,10 +11,12 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileWriter
 import java.util.*
+import java.util.regex.Pattern
 import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
 
 var count = 0
+val tilesFilePattern = Pattern.compile("\\d+-\\d+-\\d+\\.txt")!!
 
 fun main(args: Array<String>) {
     val rulesCount = Math.pow(2.toDouble(), 20.toDouble())
@@ -28,7 +29,9 @@ fun main(args: Array<String>) {
             to += step
             continue
         }
+        val startTime = System.currentTimeMillis()
         tryToFindSolutionForWindowOfRules(from, to)
+        System.err.println("Time: ${(System.currentTimeMillis() - startTime) / 1000}s")
         from += step
         to += step
     }
@@ -60,19 +63,23 @@ fun tryToFindSolutionForWindowOfRules(from: Int, to: Int) {
         println("Check tiles No: $from-$to")
         val rulesCombinations = scanFromFile(from, to)
         val solutions = HashSet<Set<VertexRule>>()
-        for (parameters in getParametersSet()) {
-            val n = parameters.n
-            val m = parameters.m
-            val k = parameters.k
-            if (tooBig(n, m, k)) {
-                continue
+        val files = File("generated_tiles").listFiles()
+        for (i in 0 until files.size) {
+            val file = files[i]
+            if (tilesFilePattern.matcher(file.name).matches()) {
+                val parts = file.name.split("-")
+                val n = Integer.parseInt(parts[0])
+                val m = Integer.parseInt(parts[1])
+                val k = Integer.parseInt(parts[2].split(".")[0])
+                if (n < 3 || m < 3) {
+                    continue
+                }
+                if (tooBig(n, m, k)) {
+                    continue
+                }
+                println("Try n=$n m=$m k=$k")
+                useFileToFindSolutions(rulesCombinations, file, writer, solutions, n, m, k)
             }
-            val file = File("generated_tiles/$n-$m-$k.txt")
-            if (!file.exists()) { // if was not precalculated
-                continue
-            }
-            println("Try n=$n m=$m k=$k")
-            useFileToFindSolutions(rulesCombinations, file, writer, solutions, n, m, k)
         }
         if (!solutions.isEmpty()) {
             writer.write("SOLUTION FOUND")
@@ -114,14 +121,19 @@ fun useFileToFindSolutions(rulesCombinations: List<Set<VertexRule>>, file: File,
 }
 
 fun tooBig(n: Int, m: Int, k: Int): Boolean {
-    return n == 7 && m == 7 && k == 1 ||
-            n == 6 && m == 7 && k == 1 ||
+    return n == 6 && m == 7 && k == 1 ||
+            n == 7 && m == 7 && k == 1 ||
             n == 7 && m == 7 && k == 2 ||
             n == 5 && m == 8 && k == 1 ||
             n == 6 && m == 8 && k == 2 ||
             n == 6 && m == 8 && k == 1 ||
             n == 7 && m == 8 && k == 2 ||
-            n == 8 && m == 8 && k == 3
+            n == 8 && m == 8 && k == 3 ||
+
+            n == 5 && m == 8 && k == 2 ||
+            n == 6 && m == 8 && k == 3 ||
+            n == 8 && m == 8 && k == 4 ||
+            n == 7 && m == 8 && k == 3
 }
 
 fun scanFromFile(from: Int, to: Int): List<Set<VertexRule>> {

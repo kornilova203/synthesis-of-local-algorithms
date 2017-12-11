@@ -3,11 +3,12 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Neighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters.getParametersSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.positions
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.reverseRules
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.rotateRuleSet
+import com.github.kornilova_l.tilesFilePattern
+import com.github.kornilova_l.tooBig
 import gnu.trove.list.array.TIntArrayList
 import gnu.trove.set.hash.TIntHashSet
 import java.io.BufferedWriter
@@ -26,37 +27,35 @@ import kotlin.collections.HashSet
  * To use this function all tile sets must be precalculated and stored in generated_tiles directory
  */
 fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
-    val parametersSet = getParametersSet(1)
-    for (parameters in parametersSet) {
-        val n = parameters.n
-        val m = parameters.m
-        val k = parameters.k
-        if (n == 7 && m == 7 && k == 1 ||
-                n == 6 && m == 8 && k == 1 ||
-                n == 7 && m == 8 && k == 2 ||
-                n == 8 && m == 8 && k == 3 ||
-                n == 8 && m == 8 && k == 2 ||
-                n == 6 && m == 7 && k == 1) {
-            continue
-        }
-        val file = File("generated_tiles/$n-$m-$k.txt")
-        if (!file.exists()) { // if was not precalculated
-            continue
-        }
-        print("n $n  m $m  k $k ")
-        val tileSet = TileSet(file)
-        val graph = DirectedGraph(tileSet)
-        println("graph constructed")
+    val files = File("generated_tiles").listFiles()
+    for (i in 0 until files.size) {
+        val file = files[i]
+        if (tilesFilePattern.matcher(file.name).matches()) {
+            val parts = file.name.split("-")
+            val n = Integer.parseInt(parts[0])
+            val m = Integer.parseInt(parts[1])
+            val k = Integer.parseInt(parts[2].split(".")[0])
+            if (n < 3 || m < 3) {
+                continue
+            }
+            if (tooBig(n, m, k)) {
+                continue
+            }
+            print("n $n  m $m  k $k ")
+            val tileSet = TileSet(file)
+            val graph = DirectedGraph(tileSet)
+            println("graph constructed")
 
-        var function = tryToFindSolution(vertexRules, graph)
-        if (function != null) {
-            return function
-        }
+            var function = tryToFindSolution(vertexRules, graph)
+            if (function != null) {
+                return function
+            }
 
-        function = tryToFindSolution(rotateRuleSet(vertexRules), graph)
-        if (function != null) {
-            println("Found rotated")
-            return function.rotate()
+            function = tryToFindSolution(rotateRuleSet(vertexRules), graph)
+            if (function != null) {
+                println("Found rotated")
+                return function.rotate()
+            }
         }
     }
     return null
