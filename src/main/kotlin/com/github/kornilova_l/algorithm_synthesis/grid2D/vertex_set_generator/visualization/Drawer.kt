@@ -7,11 +7,11 @@ import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 
-val blue = Color(51, 99, 255)
-val gray = Color(230, 230, 230)
-val white = Color(255, 255, 255)
-val lightGreen = Color(0, 255, 136)
-val cellWidth = 15
+val blue = Color(110, 145, 255)
+val gray = Color(224, 224, 224)
+val darkBlue = Color(2, 15, 56)
+val cellWidth = 19
+val independentSetWidth = 7
 val gap = 7
 
 fun drawLabels(labels: Array<BooleanArray>, independentSet: Array<BooleanArray>) {
@@ -30,13 +30,16 @@ private fun drawSquares(graphics: Graphics, labels: Array<BooleanArray>, indepen
         for (j in 0 until labels[0].size) {
             if (labels[i][j]) {
                 graphics.color = blue
+                graphics.fillRect(gap + j * (cellWidth + gap), gap + i * (cellWidth + gap), cellWidth, cellWidth)
             } else {
                 graphics.color = gray
-            }
-            graphics.fillRect(gap + j * (cellWidth + gap), gap + i * (cellWidth + gap), cellWidth, cellWidth)
-            if (independentSet[i][j]) {
-                graphics.color = lightGreen
                 graphics.drawRect(gap + j * (cellWidth + gap), gap + i * (cellWidth + gap), cellWidth, cellWidth)
+            }
+            if (independentSet[i][j]) {
+                graphics.color = darkBlue
+                graphics.fillRect(gap + j * (cellWidth + gap) + (cellWidth - independentSetWidth) / 2,
+                        gap + i * (cellWidth + gap) + (cellWidth - independentSetWidth) / 2,
+                        independentSetWidth, independentSetWidth)
             }
         }
     }
@@ -44,7 +47,7 @@ private fun drawSquares(graphics: Graphics, labels: Array<BooleanArray>, indepen
 
 private fun createGraphics(bufferedImage: BufferedImage, imageWidth: Int, imageHeight: Int): Graphics {
     val graphics = bufferedImage.createGraphics()
-    graphics.color = white
+    graphics.color = Color.WHITE
     graphics.fillRect(0, 0, imageWidth, imageHeight)
     graphics.stroke = BasicStroke(2f)
     return graphics
