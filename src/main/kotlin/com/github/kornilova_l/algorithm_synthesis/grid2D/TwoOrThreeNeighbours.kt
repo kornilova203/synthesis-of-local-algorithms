@@ -58,10 +58,14 @@ fun wasChecked(from: Int, to: Int): Boolean {
     return false
 }
 
-fun tryToFindSolutionForEachRulesSet(rulesCombinations: List<Set<VertexRule>>, writer: Writer? = null) {
-    val solutions = HashSet<Set<VertexRule>>()
+fun tryToFindSolutionForEachRulesSet(rulesCombinations: List<Set<VertexRule>>,
+                                     writer: Writer? = null): Set<Set<VertexRule>> {
+    val solvable = HashSet<Set<VertexRule>>()
     val files = File("generated_tiles").listFiles()
     for (i in 0 until files.size) {
+        if (solvable.size == rulesCombinations.size) { // if everything is solved
+            return solvable
+        }
         val file = files[i]
         if (tilesFilePattern.matcher(file.name).matches()) {
             val parts = file.name.split("-")
@@ -75,19 +79,20 @@ fun tryToFindSolutionForEachRulesSet(rulesCombinations: List<Set<VertexRule>>, w
             if (tooBig(n, m, k)) {
                 continue
             }
-            println("Try n=$n m=$m k=$k")
-            useFileToFindSolutions(rulesCombinations, file, writer, solutions, n, m, k)
+            useFileToFindSolutions(rulesCombinations, file, writer, solvable, n, m, k)
         }
     }
-    if (!solutions.isEmpty()) {
+    if (!solvable.isEmpty()) {
         writer?.write("SOLUTION FOUND")
     }
     writer?.write("COMPLETE\n")
     println("COMPLETE")
+    return solvable
 }
 
 fun useFileToFindSolutions(rulesCombinations: List<Set<VertexRule>>, file: File, writer: Writer?,
-                           solutions: HashSet<Set<VertexRule>>, n: Int, m: Int, k: Int) {
+                           solutions: MutableSet<Set<VertexRule>>, n: Int, m: Int, k: Int) {
+//    println("Try n=$n m=$m k=$k")
     try {
         val tileSet = TileSet(file)
         val graph = DirectedGraph(tileSet)
@@ -102,12 +107,12 @@ fun useFileToFindSolutions(rulesCombinations: List<Set<VertexRule>>, file: File,
             }
             if (function != null) {
                 writer?.write("Found solution for $rulesCombination\n")
-                println("Found solution for $rulesCombination")
+//                println("Found solution for $rulesCombination")
                 solutions.add(rulesCombination)
             }
         }
         writer?.write("Checked parameters n=$n m=$m k=$k\n")
-        println("Checked parameters n=$n m=$m k=$k")
+//        println("Checked parameters n=$n m=$m k=$k")
     } catch (e: OutOfMemoryError) {
         writer?.write("OutOfMemoryError n=$n m=$m k=$k\n")
         System.err.println("OutOfMemoryError n=$n m=$m k=$k")

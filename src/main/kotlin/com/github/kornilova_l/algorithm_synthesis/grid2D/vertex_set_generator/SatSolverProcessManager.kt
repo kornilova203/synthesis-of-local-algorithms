@@ -27,7 +27,7 @@ fun solve(clauses: List<TIntArrayList>, varCount: Int): List<Int>? {
         when {
             value < 0 -> solution.add(-variable)
             value > 0 -> solution.add(variable)
-            else -> throw RuntimeException("Variable cannot be found in sat")
+            else -> solution.add(-variable) // variable may be any
         }
     }
     return solution

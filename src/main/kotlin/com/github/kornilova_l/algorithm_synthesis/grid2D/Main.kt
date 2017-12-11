@@ -6,13 +6,13 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.ge
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getVertexRules
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.parseRules
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.visualization.drawLabels
 
 fun main(args: Array<String>) {
 //    val rules = independentSet()
 //    val rules = columnIS()
-    val rules = parseRules("XN, XE, NE, XNE, XS, NS, XNS, ES, XES, NES, XNES, XW, NW, XNW, EW, XEW, NEW, XNEW, SW, XSW, NSW, XNSW, ESW, XESW")
+    val rules = toSetOfVertexRules(1073732864)
+//    val rules = parseRules("XN, XE, NE, XNE, XS, NS, XNS, ES, XES, NES, XNES, XW, NW, XNW, EW, XEW, NEW, XNEW, SW, XSW, NSW, XNSW, ESW, XESW")
 //    val rules = columnMinimalDominatingSet()
 //    val rules = oneZeroAndOneOne()
 //    val rules = test()

@@ -60,6 +60,39 @@ fun isRuleChar(c: Char): Boolean {
     return c == 'X' || c == 'N' || c == 'E' || c == 'W' || c == 'S' || c == '-'
 }
 
+val allRulesExceptTrivial = arrayOf(
+        VertexRule("N"),
+        VertexRule("E"),
+        VertexRule("S"),
+        VertexRule("W"),
+        VertexRule("NE"),
+        VertexRule("NS"),
+        VertexRule("NW"),
+        VertexRule("ES"),
+        VertexRule("EW"),
+        VertexRule("SW"),
+        VertexRule("NES"),
+        VertexRule("ESW"),
+        VertexRule("SWN"),
+        VertexRule("WNE"),
+        VertexRule("NESW"),
+        VertexRule("X"),
+        VertexRule("XN"),
+        VertexRule("XE"),
+        VertexRule("XS"),
+        VertexRule("XW"),
+        VertexRule("XNE"),
+        VertexRule("XNS"),
+        VertexRule("XNW"),
+        VertexRule("XES"),
+        VertexRule("XEW"),
+        VertexRule("XSW"),
+        VertexRule("XNES"),
+        VertexRule("XESW"),
+        VertexRule("XSWN"),
+        VertexRule("XWNE")
+)
+
 class VertexRule {
     /**
      * XNESW
