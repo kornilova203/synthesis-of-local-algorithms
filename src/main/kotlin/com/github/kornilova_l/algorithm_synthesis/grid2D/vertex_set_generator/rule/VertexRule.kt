@@ -58,6 +58,13 @@ class VertexRule {
     }
 
     constructor(rule: String) {
+        if (rule == "") {
+            throw IllegalArgumentException("To construct an empty rule use \"-\" string")
+        }
+        if (rule == "-") {
+            this.id = 0
+            return
+        }
         var id = 0
         for (i in 0 until rule.length) {
             val c = rule[i]

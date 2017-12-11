@@ -4,6 +4,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.Grid2D
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.VertexSetSolverKtTest
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
+import gnu.trove.list.array.TIntArrayList
 import org.junit.Assert.*
 import org.junit.Test
 import java.io.File
@@ -112,21 +113,21 @@ internal class TileTest {
         var clauses = tile.toDimacsIsTileValid()!!
 
         var expected = VertexSetSolverKtTest.parseClauses(File("src/test/resources/expand_tile/to_dimacs_3_3.txt").readText())
-        assertEquals(Clauses(expected), Clauses(clauses))
+        assertEquals(Clauses(expected), Clauses(Companion.flatSetToSetOfSet(clauses)))
 
 
         tile = Tile(tile, 0, 1)
         clauses = tile.toDimacsIsTileValid()!!
 
         expected = VertexSetSolverKtTest.parseClauses(File("src/test/resources/expand_tile/to_dimacs_3_3_has_one.txt").readText())
-        assertEquals(Clauses(expected), Clauses(clauses))
+        assertEquals(Clauses(expected), Clauses(Companion.flatSetToSetOfSet(clauses)))
 
 
         tile = Tile("1 0 0 0\n0 1 0 1\n0 0 1 0\n", 1)
         clauses = tile.toDimacsIsTileValid()!!
 
         expected = VertexSetSolverKtTest.parseClauses(File("src/test/resources/expand_tile/to_dimacs_3_4.txt").readText())
-        assertEquals(Clauses(expected), Clauses(clauses))
+        assertEquals(Clauses(expected), Clauses(Companion.flatSetToSetOfSet(clauses)))
     }
 
     /**
@@ -134,7 +135,7 @@ internal class TileTest {
      * it allows to see difference between clauses conveniently
      */
     @Suppress("EqualsOrHashCode")
-    private class Clauses(private val clauses: Set<Set<Int>>) {
+    class Clauses(private val clauses: Set<Set<Int>>) {
         override fun equals(other: Any?): Boolean {
             if (other !is Clauses) {
                 return false
@@ -162,6 +163,23 @@ internal class TileTest {
 
             })
             return res.joinToString("", "", transform = { "${it.joinToString(" ", "")}\n" })
+        }
+    }
+
+    companion object {
+        fun flatSetToSetOfSet(clauses: TIntArrayList): Set<Set<Int>> {
+            val newClauses = HashSet<Set<Int>>()
+            var currentClause = HashSet<Int>()
+            for (i in 0 until clauses.size()) {
+                val value = clauses[i]
+                if (value != 0) {
+                    currentClause.add(value)
+                } else {
+                    newClauses.add(currentClause)
+                    currentClause = HashSet<Int>()
+                }
+            }
+            return newClauses
         }
     }
 }

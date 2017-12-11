@@ -2,6 +2,9 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileTest
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileTest.Clauses
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileTest.Companion.flatSetToSetOfSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
@@ -18,14 +21,14 @@ class VertexSetSolverKtTest {
         var clauses = toDimacs(graph, hashSetOf(VertexRule(1)))
 //        println(clauses.joinToString("", "", transform={ "${it.joinToString(" ", "")}\n" }))
         var expected = parseClauses(File("src/test/resources/vertexSetSolver/to_dimacs_1_1_1.txt").readText())
-        assertTrue(expected == clauses)
+        assertEquals(Clauses(expected), Clauses(flatSetToSetOfSet(clauses)))
 
         file = File("generated_tiles/3-4-1.txt")
         graph = DirectedGraph(TileSet(file))
         clauses = toDimacs(graph, hashSetOf(VertexRule(1)))
 //        println(clauses.joinToString("", "", transform={ "${it.joinToString(" ", "")}\n" }))
         expected = Companion.parseClauses(File("src/test/resources/vertexSetSolver/to_dimacs_1_2_1.txt").readText())
-        assertTrue(expected == clauses)
+        assertEquals(Clauses(expected), Clauses(flatSetToSetOfSet(clauses)))
     }
 
     private fun testLabelingFunction(rules: HashSet<VertexRule>) {

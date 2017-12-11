@@ -2,6 +2,8 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.isSolvable
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
+import gnu.trove.list.array.TIntArrayList
+import gnu.trove.set.hash.TIntHashSet
 import org.apache.lucene.util.OpenBitSet
 import java.util.*
 
@@ -238,26 +240,27 @@ open class Tile {
         return x * m + y + 1
     }
 
-    internal fun toDimacsIsTileValid(): Set<Set<Int>>? {
+    internal fun toDimacsIsTileValid(): TIntArrayList? {
         val newN = n + k * 2
         val newM = m + k * 2
         val biggerTile = Tile(newN, newM, this)
         val intersection = TileIntersection(newN, newM, n, m)
 
-        val clauses = HashSet<Set<Int>>()
+        val clauses = TIntArrayList()
 
         for (x in 0 until newN) {
             for (y in 0 until newM) {
                 if (intersection.isInside(x, y)) {
-                    clauses.add(cellMustStayTheSame(x, y, biggerTile))
+                    appendNewOneValueClause(clauses, cellMustStayTheSame(x, y, biggerTile))
                     if (biggerTile.isI(x, y)) {
-                        clauses.addAll(allNeighboursMustBeZero(x, y, biggerTile, newN, newM, k, intersection))
+                        allNeighboursMustBeZero(x, y, biggerTile, newN, newM, k, intersection, clauses)
                     } else if (biggerTile.canBeI(x, y) && neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
                         val clause = atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k, intersection)
-                        if (clause.size == 0) { // this cannot be satisfied
+                        if (clause.size() == 0) { // this cannot be satisfied
                             return null
                         }
-                        clauses.add(clause)
+                        clauses.addAll(clause)
+                        clauses.add(0)
                     }
 
                 } else {
@@ -266,7 +269,8 @@ open class Tile {
                         if (neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
                             val clause = atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k, intersection)
                             clause.add(biggerTile.getId(x, y)) // center may also be in IS
-                            clauses.add(clause)
+                            clauses.addAll(clause)
+                            clause.add(0)
                         }
                     } // there is not else branch because if internal cell is in IS then all neighbours are zero
                 }
@@ -279,6 +283,11 @@ open class Tile {
         enum class Expand {
             HEIGHT,
             WIDTH
+        }
+
+        private fun appendNewOneValueClause(clauses: TIntArrayList, value: Int) {
+            clauses.add(value)
+            clauses.add(0)
         }
 
         fun getAllPossibleExtensions(tile: Tile, side: Expand): Set<Tile> {
@@ -321,16 +330,16 @@ open class Tile {
             return true
         }
 
-        private fun cellMustStayTheSame(x: Int, y: Int, biggerTile: Tile): Set<Int> {
+        private fun cellMustStayTheSame(x: Int, y: Int, biggerTile: Tile): Int {
             return if (biggerTile.isI(x, y)) {
-                hashSetOf(biggerTile.getId(x, y))
+                biggerTile.getId(x, y)
             } else {
-                hashSetOf(-biggerTile.getId(x, y))
+                -biggerTile.getId(x, y)
             }
         }
 
-        private fun allNeighboursMustBeZero(x: Int, y: Int, biggerTile: Tile, newN: Int, newM: Int, k: Int, intersection: TileIntersection): Set<Set<Int>> {
-            val clauses = HashSet<Set<Int>>()
+        private fun allNeighboursMustBeZero(x: Int, y: Int, biggerTile: Tile, newN: Int, newM: Int, k: Int,
+                                            intersection: TileIntersection, clauses: TIntArrayList) {
             for (i in x - k..x + k) {
                 (y - k..y + k)
                         .filter { j ->
@@ -339,15 +348,16 @@ open class Tile {
                                     !(i == x && j == y) && // not center
                                     Math.abs(x - i) + Math.abs(y - j) <= k
                         }
-                        .mapTo(clauses) { j -> hashSetOf(-biggerTile.getId(i, j)) } // must be zero
+                        .forEach { j ->
+                            appendNewOneValueClause(clauses, -biggerTile.getId(i, j))
+                        } // must be zero
             }
-            return clauses
         }
 
         /**
          * If (x, y) is 1 then non of it's neighbours is 1
          */
-        private fun ifCenterIsOneAllOtherAreNot(x: Int, y: Int, biggerTile: Tile, clauses: HashSet<Set<Int>>,
+        private fun ifCenterIsOneAllOtherAreNot(x: Int, y: Int, biggerTile: Tile, clauses: TIntArrayList,
                                                 newN: Int, newM: Int, k: Int, intersection: TileIntersection) {
             for (i in x - k..x + k) {
                 (y - k..y + k)
@@ -356,13 +366,17 @@ open class Tile {
                                     i >= 0 && j >= 0 && i < newN && j < newM && !(i == x && j == y) && // not center
                                     Math.abs(x - i) + Math.abs(y - j) <= k
                         }
-                        .mapTo(clauses) { j -> hashSetOf(-biggerTile.getId(x, y), -biggerTile.getId(i, j)) }
+                        .forEach { j ->
+                            clauses.add(-biggerTile.getId(x, y))
+                            clauses.add(-biggerTile.getId(i, j))
+                            clauses.add(0)
+                        }
             }
         }
 
         private fun atLeastOneNeighbourMustBeOne(x: Int, y: Int, biggerTile: Tile, newN: Int,
-                                                 newM: Int, k: Int, intersection: TileIntersection): HashSet<Int> {
-            val clause = HashSet<Int>()
+                                                 newM: Int, k: Int, intersection: TileIntersection): TIntHashSet {
+            val clause = TIntHashSet()
             for (i in x - k..x + k) {
                 (y - k..y + k)
                         .filter { j ->
@@ -371,7 +385,7 @@ open class Tile {
                                     !(i == x && j == y) && // not center
                                     Math.abs(x - i) + Math.abs(y - j) <= k
                         }
-                        .mapTo(clause) { j -> biggerTile.getId(i, j) }
+                        .forEach { j -> clause.add(biggerTile.getId(i, j)) }
             }
             return clause
         }

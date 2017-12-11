@@ -7,7 +7,7 @@ import org.junit.Test
 class TileIntersectionTest {
     @Test
     fun biggerByOne() {
-        val intersection = TileIntersection(2, 2, 3, 3)
+        val intersection = TileIntersection(3, 3, 2, 2)
 
         assertTrue(intersection.isInside(0, 0))
         assertTrue(intersection.isInside(1, 0))
@@ -23,7 +23,7 @@ class TileIntersectionTest {
 
     @Test
     fun biggerByTwo() {
-        val intersection = TileIntersection(1, 1, 3, 3)
+        val intersection = TileIntersection(3, 3, 1, 1)
 
         assertTrue(intersection.isInside(1, 1))
 
@@ -39,7 +39,7 @@ class TileIntersectionTest {
 
     @Test
     fun biggerByThree() {
-        val intersection = TileIntersection(1, 1, 4, 3)
+        val intersection = TileIntersection(4, 3, 1, 1)
 
         assertTrue(intersection.isInside(1, 1))
 

@@ -33,7 +33,7 @@ class VertexRuleKtTest {
     fun setFromPatternTest() {
         var rules = getVertexRules("00000")
         assertEquals(1, rules.size)
-        assertEquals(VertexRule(""), rules.first())
+        assertEquals(VertexRule("-"), rules.first())
 
 
         rules = getVertexRules("01001")

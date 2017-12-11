@@ -1,12 +1,36 @@
 package com.github.kornilova_l
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.getLabelingFunction
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
 import java.io.BufferedWriter
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileWriter
+import java.util.*
 
 var count = 0
+
+fun main(args: Array<String>) {
+    Scanner(FileInputStream(File("lists_of_rules/two_or_three_neighbours.txt"))).use { scanner ->
+        while (scanner.hasNextLine()) {
+            val line = scanner.nextLine()
+            if (line == "" || line.contains("FOUND")) {
+                continue
+            }
+            val startTime = System.currentTimeMillis()
+            val rules = line.split(" ").filter{ ruleString -> ruleString != "" }
+                    .map { ruleString -> VertexRule(ruleString) }.toSet()
+            println(rules)
+            val labelingFunction = getLabelingFunction(rules)
+            if (labelingFunction == null) {
+                println("NOT FOUND ${System.currentTimeMillis() - startTime}")
+            } else {
+                println("FOUND ${System.currentTimeMillis() - startTime}")
+            }
+        }
+    }
+}
 
 /**
  * Outputs all possible combinations of rules

@@ -4,7 +4,12 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.Direc
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Neighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters.getParametersSet
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.*
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.positions
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.reverseRules
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.rotateRuleSet
+import gnu.trove.list.array.TIntArrayList
+import gnu.trove.set.hash.TIntHashSet
 import java.io.BufferedWriter
 import java.io.File
 import java.io.IOException
@@ -29,12 +34,21 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
         if (n == 7 && m == 7 && k == 1) {
             continue
         }
-        var function = tryToFindSolution(vertexRules, n, m, k)
+        val file = File("generated_tiles/$n-$m-$k.txt")
+        if (!file.exists()) { // if was not precalculated
+            continue
+        }
+        print("n $n  m $m  k $k ")
+        val tileSet = TileSet(file)
+        val graph = DirectedGraph(tileSet)
+        println("graph constructed")
+
+        var function = tryToFindSolution(vertexRules, graph)
         if (function != null) {
             return function
         }
 
-        function = tryToFindSolution(rotateRuleSet(vertexRules), n, m, k)
+        function = tryToFindSolution(rotateRuleSet(vertexRules), graph)
         if (function != null) {
             println("Found rotated")
             return function.rotate()
@@ -43,14 +57,8 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
     return null
 }
 
-private fun tryToFindSolution(vertexRules: Set<VertexRule>, n: Int, m: Int, k: Int): LabelingFunction? {
-    println("n $n  m $m  k $k")
-    val file = File("generated_tiles/$n-$m-$k.txt")
-    if (!file.exists()) { // if was not precalculated
-        return null
-    }
-    val tileSet = TileSet(file)
-    val graph = DirectedGraph(tileSet)
+private fun tryToFindSolution(vertexRules: Set<VertexRule>, graph: DirectedGraph): LabelingFunction? {
+
     val clauses = toDimacs(graph, vertexRules)
     val solution = solve(clauses, graph.size)
     if (solution != null) { // solution found
@@ -123,9 +131,9 @@ fun parseLineResult(scanner: Scanner): Set<Int> {
     return res
 }
 
-fun toDimacs(graph: DirectedGraph, rules: Set<VertexRule>): Collection<Set<Int>> {
+fun toDimacs(graph: DirectedGraph, rules: Set<VertexRule>): TIntArrayList {
     val reversedRules = reverseRules(rules)
-    val clauses = ArrayList<Set<Int>>()
+    val clauses = TIntArrayList()
     graph.neighbourhoods.forEach { neighbourhood ->
         formClause(neighbourhood, reversedRules, clauses)
     }
@@ -133,9 +141,9 @@ fun toDimacs(graph: DirectedGraph, rules: Set<VertexRule>): Collection<Set<Int>>
 }
 
 private fun formClause(neighbourhood: Neighbourhood, reversedRules: Set<VertexRule>,
-                       clauses: ArrayList<Set<Int>>) {
+                       clauses: TIntArrayList) {
     for (reversedRule in reversedRules) {
-        val clause = HashSet<Int>()
+        val clause = TIntHashSet()
         var isAlwaysTrue = false
         for (position in positions) {
             val id = neighbourhood.neighbours[position]!!.id
@@ -153,7 +161,8 @@ private fun formClause(neighbourhood: Neighbourhood, reversedRules: Set<VertexRu
             clause.add(value)
         }
         if (!isAlwaysTrue) {
-            clauses.add(clause)
+            clauses.addAll(clause)
+            clauses.add(0)
         }
     }
 }
