@@ -1,4 +1,4 @@
-package com.github.kornilova_l
+package com.github.kornilova_l.algorithm_synthesis.grid2D
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
@@ -71,7 +71,8 @@ fun tryToFindSolutionForWindowOfRules(from: Int, to: Int) {
                 val n = Integer.parseInt(parts[0])
                 val m = Integer.parseInt(parts[1])
                 val k = Integer.parseInt(parts[2].split(".")[0])
-                if (n < 3 || m < 3) {
+                if (n < 3 || m < 3 ||
+                        n > m) {
                     continue
                 }
                 if (tooBig(n, m, k)) {
