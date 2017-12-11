@@ -60,6 +60,7 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
 private fun tryToFindSolution(vertexRules: Set<VertexRule>, graph: DirectedGraph): LabelingFunction? {
 
     val clauses = toDimacs(graph, vertexRules)
+    println(clauses.size)
     val solution = solve(clauses, graph.size)
     if (solution != null) { // solution found
         return LabelingFunction(solution, graph)
@@ -131,9 +132,10 @@ fun parseLineResult(scanner: Scanner): Set<Int> {
     return res
 }
 
-fun toDimacs(graph: DirectedGraph, rules: Set<VertexRule>): TIntArrayList {
+fun toDimacs(graph: DirectedGraph, rules: Set<VertexRule>): List<TIntArrayList> {
     val reversedRules = reverseRules(rules)
-    val clauses = TIntArrayList()
+    val clauses = ArrayList<TIntArrayList>()
+    clauses.add(TIntArrayList())
     graph.neighbourhoods.forEach { neighbourhood ->
         formClause(neighbourhood, reversedRules, clauses)
     }
@@ -141,7 +143,8 @@ fun toDimacs(graph: DirectedGraph, rules: Set<VertexRule>): TIntArrayList {
 }
 
 private fun formClause(neighbourhood: Neighbourhood, reversedRules: Set<VertexRule>,
-                       clauses: TIntArrayList) {
+                       clauses: MutableList<TIntArrayList>) {
+    val currentArrayList = clauses.last()
     for (reversedRule in reversedRules) {
         val clause = TIntHashSet()
         var isAlwaysTrue = false
@@ -161,8 +164,12 @@ private fun formClause(neighbourhood: Neighbourhood, reversedRules: Set<VertexRu
             clause.add(value)
         }
         if (!isAlwaysTrue) {
-            clauses.addAll(clause)
-            clauses.add(0)
+            currentArrayList.addAll(clause)
+            currentArrayList.add(0)
+            if (currentArrayList.size() > 1_000_000) {
+                clauses.add(TIntArrayList(500_000))
+            }
         }
     }
 }
+

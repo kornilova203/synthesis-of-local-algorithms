@@ -6,7 +6,7 @@ import jnisat.JPicoSat
 /**
  * @return null if not satisfiable
  */
-fun isSolvable(clauses: TIntArrayList): Boolean {
+fun isSolvable(clauses: List<TIntArrayList>): Boolean {
     val sat = initSat(clauses)
     return sat.solve()
 }
@@ -15,7 +15,7 @@ fun isSolvable(clauses: TIntArrayList): Boolean {
  * @return null if not satisfiable
  * @param clauses a list of ints. Clauses are separated by 0
  */
-fun solve(clauses: TIntArrayList, varCount: Int): List<Int>? {
+fun solve(clauses: List<TIntArrayList>, varCount: Int): List<Int>? {
     val sat = initSat(clauses)
     val res = sat.solve()
     if (!res) {
@@ -33,17 +33,16 @@ fun solve(clauses: TIntArrayList, varCount: Int): List<Int>? {
     return solution
 }
 
-private fun initSat(clauses: TIntArrayList): JPicoSat {
+private fun initSat(clausesList: List<TIntArrayList>): JPicoSat {
     val sat = JPicoSat()
-    var startIndex = 0
-    for (i in 0 until clauses.size()) {
-        if (clauses[i] == 0) {
-            sat.addClause(*clauses.subList(startIndex, i).toArray())
-            startIndex = i + 1
+    for (clauses in clausesList) {
+        var startIndex = 0
+        for (i in 0 until clauses.size()) {
+            if (clauses[i] == 0) {
+                sat.addClause(*clauses.subList(startIndex, i).toArray())
+                startIndex = i + 1
+            }
         }
-    }
-    if (clauses[clauses.size() - 1] != 0) { // if there is no last zero
-        sat.addClause(startIndex, clauses.size())
     }
     return sat
 }

@@ -240,37 +240,51 @@ open class Tile {
         return x * m + y + 1
     }
 
-    internal fun toDimacsIsTileValid(): TIntArrayList? {
+    internal fun toDimacsIsTileValid(): List<TIntArrayList>? {
         val newN = n + k * 2
         val newM = m + k * 2
         val biggerTile = Tile(newN, newM, this)
         val intersection = TileIntersection(newN, newM, n, m)
 
-        val clauses = TIntArrayList()
+        val clauses = ArrayList<TIntArrayList>()
+
+        var currentList = TIntArrayList()
+
+        clauses.add(currentList)
 
         for (x in 0 until newN) {
             for (y in 0 until newM) {
                 if (intersection.isInside(x, y)) {
-                    appendNewOneValueClause(clauses, cellMustStayTheSame(x, y, biggerTile))
+                    val value = cellMustStayTheSame(x, y, biggerTile)
+                    currentList.add(value)
+                    currentList.add(0)
                     if (biggerTile.isI(x, y)) {
-                        allNeighboursMustBeZero(x, y, biggerTile, newN, newM, k, intersection, clauses)
+                        allNeighboursMustBeZero(x, y, biggerTile, newN, newM, k, intersection, currentList)
                     } else if (biggerTile.canBeI(x, y) && neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
                         val clause = atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k, intersection)
                         if (clause.size() == 0) { // this cannot be satisfied
                             return null
                         }
-                        clauses.addAll(clause)
-                        clauses.add(0)
+                        currentList.addAll(clause)
+                        currentList.add(0)
+                        if (currentList.size() > 1_000_000) {
+                            currentList = TIntArrayList()
+                            clauses.add(currentList)
+                        }
                     }
 
                 } else {
                     if (biggerTile.canBeI(x, y)) {
-                        ifCenterIsOneAllOtherAreNot(x, y, biggerTile, clauses, newN, newM, k, intersection)
+                        ifCenterIsOneAllOtherAreNot(x, y, biggerTile, currentList, newN, newM, k, intersection)
                         if (neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
                             val clause = atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k, intersection)
                             clause.add(biggerTile.getId(x, y)) // center may also be in IS
-                            clauses.addAll(clause)
-                            clause.add(0)
+                            currentList.addAll(clause)
+                            currentList.add(0)
+                            if (currentList.size() > 1_000_000) {
+                                currentList = TIntArrayList()
+                                clauses.add(currentList)
+                            }
                         }
                     } // there is not else branch because if internal cell is in IS then all neighbours are zero
                 }
@@ -283,11 +297,6 @@ open class Tile {
         enum class Expand {
             HEIGHT,
             WIDTH
-        }
-
-        private fun appendNewOneValueClause(clauses: TIntArrayList, value: Int) {
-            clauses.add(value)
-            clauses.add(0)
         }
 
         fun getAllPossibleExtensions(tile: Tile, side: Expand): Set<Tile> {
@@ -349,7 +358,8 @@ open class Tile {
                                     Math.abs(x - i) + Math.abs(y - j) <= k
                         }
                         .forEach { j ->
-                            appendNewOneValueClause(clauses, -biggerTile.getId(i, j))
+                            clauses.add(-biggerTile.getId(i, j))
+                            clauses.add(0)
                         } // must be zero
             }
         }

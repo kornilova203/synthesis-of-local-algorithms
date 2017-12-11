@@ -167,16 +167,18 @@ internal class TileTest {
     }
 
     companion object {
-        fun flatSetToSetOfSet(clauses: TIntArrayList): Set<Set<Int>> {
+        fun flatSetToSetOfSet(clausesList: List<TIntArrayList>): Set<Set<Int>> {
             val newClauses = HashSet<Set<Int>>()
-            var currentClause = HashSet<Int>()
-            for (i in 0 until clauses.size()) {
-                val value = clauses[i]
-                if (value != 0) {
-                    currentClause.add(value)
-                } else {
-                    newClauses.add(currentClause)
-                    currentClause = HashSet<Int>()
+            for(clauses in clausesList) {
+                var currentClause = HashSet<Int>()
+                for (i in 0 until clauses.size()) {
+                    val value = clauses[i]
+                    if (value != 0) {
+                        currentClause.add(value)
+                    } else {
+                        newClauses.add(currentClause)
+                        currentClause = HashSet()
+                    }
                 }
             }
             return newClauses
