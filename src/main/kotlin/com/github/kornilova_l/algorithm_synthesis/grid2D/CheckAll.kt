@@ -17,9 +17,9 @@ val solvableFile = File("results/solvable.txt")
 val unsolvableFile = File("results/unsolvable.txt")
 /* it is more efficient to search solution for several rules combination at one time
  * because graph creating takes a lot of time */
-val iterationSize = 1000
+val iterationSize = 100
 
-val skipFirst = 9000
+val skipFirst = 18900
 
 fun main(args: Array<String>) {
     val solvable = parseLongs(solvableFile)

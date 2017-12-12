@@ -18,7 +18,7 @@ repositories {
     mavenCentral()
 }
 
-mainClassName = "com.github.kornilova_l.TwoOrThreeNeighboursKt"
+mainClassName = "com.github.kornilova_l.algorithm_synthesis.grid2D.CheckAllKt"
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
