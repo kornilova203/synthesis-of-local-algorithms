@@ -78,4 +78,22 @@ class VertexRuleKtTest {
         actual = parseRules("- E]")
         assertEquals(hashSetOf(VertexRule("-"), VertexRule("E")), actual)
     }
+
+    @Test
+    fun rulesToIdTest() {
+        var rules = hashSetOf(VertexRule("XN"), VertexRule("NSW"), VertexRule("S"))
+        var setId = rulesToId(rules)
+        var rulesAgain = toSetOfVertexRules(setId)
+        assertEquals(rules, rulesAgain)
+
+        rules.clear()
+        setId = rulesToId(rules)
+        rulesAgain = toSetOfVertexRules(setId)
+        assertEquals(rules, rulesAgain)
+
+        rules = hashSetOf(VertexRule("E"), VertexRule("NSWE"), VertexRule("X"))
+        setId = rulesToId(rules)
+        rulesAgain = toSetOfVertexRules(setId)
+        assertEquals(rules, rulesAgain)
+    }
 }

@@ -1,6 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.toSetOfVertexRules
 import gnu.trove.list.array.TLongArrayList
 import org.junit.Assert.*
 import org.junit.Test

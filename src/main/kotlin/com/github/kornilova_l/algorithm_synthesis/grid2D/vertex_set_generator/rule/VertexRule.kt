@@ -56,8 +56,34 @@ fun parseRules(line: String): Set<VertexRule> {
     return parts.map { part -> VertexRule(part) }.toSet()
 }
 
-fun isRuleChar(c: Char): Boolean {
+private fun isRuleChar(c: Char): Boolean {
     return c == 'X' || c == 'N' || c == 'E' || c == 'W' || c == 'S' || c == '-'
+}
+
+fun toSetOfVertexRules(combinationNum: Long): Set<VertexRule> {
+    val rules = HashSet<VertexRule>()
+    (0..31).forEach { shift ->
+        if (combinationNum.and(1.toLong().shl(shift)) > 0) { // if rule is included
+            rules.add(allRulesExceptTrivial[shift])
+        }
+    }
+    return rules
+}
+
+fun rulesToId(rules: Set<VertexRule>): Long {
+    var setId: Long = 0
+    for (rule in rules) {
+        var ruleId = -1
+        for (i in 0 until allRulesExceptTrivial.size) {
+            if (rule == allRulesExceptTrivial[i]) {
+                ruleId = i
+                break
+            }
+        }
+        assert(ruleId != -1)
+        setId = setId.or(1.shl(ruleId).toLong())
+    }
+    return setId
 }
 
 val allRulesExceptTrivial = arrayOf(

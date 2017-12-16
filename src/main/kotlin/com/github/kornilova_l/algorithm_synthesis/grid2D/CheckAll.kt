@@ -1,7 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.allRulesExceptTrivial
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.toSetOfVertexRules
 import gnu.trove.list.array.TLongArrayList
 import java.io.BufferedWriter
 import java.io.File
@@ -9,7 +9,6 @@ import java.io.FileWriter
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
-import kotlin.collections.HashSet
 
 /* it is 2 ^ 30 because all-zeros and all-one are always solvable */
 val totalNumberOfCombination = (Math.pow(2.toDouble(), 30.toDouble())).toLong() - 1
@@ -21,13 +20,16 @@ val iterationSize = 100
 
 val skipFirst = 18900
 
+val random = Random(System.currentTimeMillis())
+
 fun main(args: Array<String>) {
     val solvable = parseLongs(solvableFile)
     val unsolvable = parseLongs(unsolvableFile)
 
     val currentIteration = ArrayList<Set<VertexRule>>()
     val rulesToId = HashMap<Set<VertexRule>, Long>()
-    for (combinationNum in totalNumberOfCombination - skipFirst downTo 0) {
+    while (true) {
+        val combinationNum = Math.abs(random.nextLong()) % totalNumberOfCombination
         if (isSolvable(combinationNum, solvable)) {
 //            println("$combinationNum is solvable")
             continue
@@ -93,16 +95,6 @@ fun updateFile(file: File, numbers: TLongArrayList) {
             writer.write("$n ")
         }
     }
-}
-
-fun toSetOfVertexRules(combinationNum: Long): Set<VertexRule> {
-    val rules = HashSet<VertexRule>()
-    (0..31).forEach { shift ->
-        if (combinationNum.and(1.toLong().shl(shift)) > 0) { // if rule is included
-            rules.add(allRulesExceptTrivial[shift])
-        }
-    }
-    return rules
 }
 
 fun isUnsolvable(combinationNum: Long, unsolvableCombinations: TLongArrayList): Boolean {
