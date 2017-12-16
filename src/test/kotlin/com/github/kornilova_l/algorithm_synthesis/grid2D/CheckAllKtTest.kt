@@ -39,4 +39,15 @@ class CheckAllKtTest {
         val rules = toSetOfVertexRules(7)
         assertEquals(hashSetOf(VertexRule("N"), VertexRule("E"), VertexRule("S")), rules)
     }
+
+    @Test
+    fun checkAllSolvable() {
+        val solvable = parseLongs(solvableFile)
+        val rulesCombinations = ArrayList<Set<VertexRule>>()
+        for (s in solvable) {
+            rulesCombinations.add(toSetOfVertexRules(s))
+        }
+        val newSolvable = tryToFindSolutionForEachRulesSet(rulesCombinations)
+        assertEquals(solvable.size(), newSolvable.size)
+    }
 }

@@ -44,20 +44,29 @@ fun main(args: Array<String>) {
         rulesToId.put(rules, combinationNum)
         if (currentIteration.size == iterationSize) {
             val newSolvable = tryToFindSolutionForEachRulesSet(currentIteration)
-            for (entry in rulesToId.entries) {
-                if (newSolvable.contains(entry.key)) {
-                    solvable.add(entry.value)
-                } else {
-                    unsolvable.add(entry.value)
-                }
-            }
-            updateSolvable(solvable)
-            updateUnsolvable(unsolvable)
+            updateSolvableAndUnsolvable(solvable, unsolvable, newSolvable, rulesToId)
             currentIteration.clear()
             rulesToId.clear()
             println("Checked ${totalNumberOfCombination - combinationNum + 1}")
         }
     }
+}
+
+fun updateSolvableAndUnsolvable(solvable: TLongArrayList, unsolvable: TLongArrayList,
+                                newSolvable: Set<Set<VertexRule>>, rulesToId: HashMap<Set<VertexRule>, Long>) {
+    println("Solvable size before: ${solvable.size()}")
+    println("Unsolvable size before: ${unsolvable.size()}")
+    for (entry in rulesToId.entries) {
+        if (newSolvable.contains(entry.key)) {
+            solvable.add(entry.value)
+        } else {
+            unsolvable.add(entry.value)
+        }
+    }
+    updateSolvable(solvable)
+    updateUnsolvable(unsolvable)
+    println("Solvable size: ${solvable.size()}")
+    println("Unsolvable size: ${unsolvable.size()}")
 }
 
 /**
@@ -81,7 +90,7 @@ fun updateUnsolvable(unsolvable: TLongArrayList) {
     for (s in unsolvable) {
         val unsolvableWithoutOneValue = TLongArrayList(unsolvable)
         unsolvableWithoutOneValue.remove(s)
-        if (isSolvable(s, unsolvableWithoutOneValue)) {
+        if (isUnsolvable(s, unsolvableWithoutOneValue)) {
             doNotAddInformation.add(s)
         }
     }
@@ -92,7 +101,7 @@ fun updateUnsolvable(unsolvable: TLongArrayList) {
 fun updateFile(file: File, numbers: TLongArrayList) {
     BufferedWriter(FileWriter(file)).use { writer ->
         for (n in numbers) {
-            writer.write("$n ")
+            writer.write("$n\n")
         }
     }
 }
