@@ -8,6 +8,7 @@ import java.io.FileInputStream
 import java.io.FileReader
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashSet
 
 /**
  * Contains set of validTiles of one size
@@ -134,10 +135,12 @@ fun generatePossiblyValidTiles(n: Int, m: Int, k: Int): Set<Tile> {
 
     for (i in 0 until n) {
         for (j in 0 until m) {
-            val newTileIS = possiblyValidTiles
-                    .filter { it.canBeI(i, j) }
-                    .map { Tile(it, i, j) }
-                    .toMutableSet()
+            val newTileIS = HashSet<Tile>()
+            for (possiblyValidTile in possiblyValidTiles) {
+                if (possiblyValidTile.canBeI(i, j)) {
+                    newTileIS.add(Tile(possiblyValidTile, i, j))
+                }
+            }
             possiblyValidTiles.addAll(newTileIS)
             newTileIS.clear()
         }

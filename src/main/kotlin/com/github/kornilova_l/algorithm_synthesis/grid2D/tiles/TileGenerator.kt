@@ -83,7 +83,11 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
 
     private fun addValidExtensionsToSet(tile: Tile, expandedTiles: MutableSet<Tile>, side: Tile.Companion.Expand) {
         val extensions = getAllPossibleExtensions(tile, side)
-        extensions.filterTo(expandedTiles) { it.isValid() }
+        for (extension in extensions) {
+            if (extension.isValid()) {
+                expandedTiles.add(extension)
+            }
+        }
     }
 
     /**
@@ -129,7 +133,11 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
          */
         private fun removeNotMaximal(tiles: Set<Tile>): Set<Tile> {
             val maximalTiles = HashSet<Tile>()
-            tiles.filterTo(maximalTiles) { tile -> tile.isValid() }
+            for (tile in tiles) {
+                if (tile.isValid()) {
+                    maximalTiles.add(tile)
+                }
+            }
             return maximalTiles
         }
     }

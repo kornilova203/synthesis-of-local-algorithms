@@ -21,7 +21,10 @@ class SimpleTileGraph(tileSet1: TileSet, tileSet2: TileSet) : TileGraph() {
 
     val edgeCount: Int
         get() {
-            val res = graph.values.sumBy { it.size }
+            var res = 0
+            for (value in graph.values) {
+                res += value.size
+            }
             assert(res % 2 == 0)
 
             return res / 2

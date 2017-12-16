@@ -15,8 +15,10 @@ class IndependentSetAlgorithm(grid2d: Grid2D, power: Int) {
     }
 
     private fun doColourReductionIteration(gridCopy: Array<IntArray>, power: Int) {
-        gridCopy.forEachIndexed { i, array ->
-            array.forEachIndexed { j, id ->
+        for (i in 0 until gridCopy.size) {
+            val array = gridCopy[i]
+            for (j in 0 until array.size) {
+                val id = array[j]
                 if (id > 1 && isLocalMaxima(gridCopy, i, j, power)) { // if cell did not stop and is a local maxima
                     if (canBeIS(gridCopy, i, j, power)) {
                         gridCopy[i][j] = 1
@@ -30,7 +32,6 @@ class IndependentSetAlgorithm(grid2d: Grid2D, power: Int) {
 
     private fun canBeIS(grid: Array<IntArray>, x: Int, y: Int, power: Int): Boolean {
         for (i in x - power..x + power) {
-            @Suppress("LoopToCallChain")
             for (j in y - power..y + power) {
                 if (Math.abs(x - i) + Math.abs(y - j) <= power) {
                     if (grid[(i + n) % n][(j + m) % m] == 1) {
@@ -45,7 +46,6 @@ class IndependentSetAlgorithm(grid2d: Grid2D, power: Int) {
 
     private fun isLocalMaxima(grid: Array<IntArray>, x: Int, y: Int, power: Int): Boolean {
         for (i in x - power..x + power) {
-            @Suppress("LoopToCallChain")
             for (j in y - power..y + power) {
                 if (Math.abs(x - i) + Math.abs(y - j) <= power) {
                     if (grid[(i + n) % n][(j + m) % m] > grid[x][y]) {
@@ -64,8 +64,9 @@ class IndependentSetAlgorithm(grid2d: Grid2D, power: Int) {
 
     override fun toString(): String {
         val stringBuilder = StringBuilder()
-        independentSet.forEach { array ->
-            array.forEachIndexed { index, cell ->
+        for (array in independentSet) {
+            for (index in 0 until array.size) {
+                val cell = array[index]
                 stringBuilder.append(if (cell) 1 else 0)
                 if (index < m - 1) {
                     stringBuilder.append(" ")

@@ -3,12 +3,12 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Neighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tilesFilePattern
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tooBig
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.positions
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.reverseRules
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.rotateRuleSet
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tilesFilePattern
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tooBig
 import gnu.trove.list.array.TIntArrayList
 import gnu.trove.set.hash.TIntHashSet
 import java.io.BufferedWriter
@@ -140,7 +140,7 @@ fun toDimacs(graph: DirectedGraph, rules: Set<VertexRule>): List<TIntArrayList> 
     val reversedRules = reverseRules(rules)
     val clauses = ArrayList<TIntArrayList>()
     clauses.add(TIntArrayList())
-    graph.neighbourhoods.forEach { neighbourhood ->
+    for (neighbourhood in graph.neighbourhoods) {
         formClause(neighbourhood, reversedRules, clauses)
     }
     return clauses

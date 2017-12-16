@@ -138,8 +138,11 @@ open class Tile {
         n = newN
         m = newM
         grid = OpenBitSet((newN * newM).toLong())
-        (0L until tile.n * tile.m).filter { i -> tile.grid.get(i) }
-                .forEach { i -> grid.set(getIndex(i / tile.m + (newN - tile.n) / 2, i % tile.m + (newM - tile.m) / 2)) }
+        for (i in 0L until tile.n * tile.m) {
+            if (tile.grid.get(i)) {
+                grid.set(getIndex(i / tile.m + (newN - tile.n) / 2, i % tile.m + (newM - tile.m) / 2))
+            }
+        }
     }
 
     constructor(independentSet: Array<BooleanArray>, x: Int, y: Int, n: Int, m: Int, k: Int) {
@@ -153,9 +156,11 @@ open class Tile {
         val sizeM = independentSet[0].size
         grid = OpenBitSet((n * m).toLong())
         for (i in 0 until n) {
-            (0 until m)
-                    .filter { j -> independentSet[(x - n / 2 + i + sizeN) % sizeN][(y - m / 2 + j + sizeM) % sizeM] }
-                    .forEach { j -> grid.set(getIndex(i, j)) }
+            for (j in 0 until m) {
+                if (independentSet[(x - n / 2 + i + sizeN) % sizeN][(y - m / 2 + j + sizeM) % sizeM]) {
+                    grid.set(getIndex(i, j))
+                }
+            }
         }
     }
 
@@ -218,9 +223,11 @@ open class Tile {
         val endX = Math.min(n - 1, x + k)
         val endY = Math.min(m - 1, y + k)
         for (i in Math.max(0, x - k)..endX) {
-            (Math.max(0, y - k)..endY)
-                    .filter { j -> Math.abs(i - x) + Math.abs(j - y) <= k && grid.get(getIndex(i, j)) }
-                    .forEach { return false }
+            for (j in Math.max(0, y - k)..endY) {
+                if (Math.abs(i - x) + Math.abs(j - y) <= k && grid.get(getIndex(i, j))) {
+                    return false
+                }
+            }
         }
         return true
     }
@@ -307,9 +314,11 @@ open class Tile {
                 extensions.add(Tile(newN, newM, tile))
                 for (i in 0 until tile.n) {
                     val newExtensions = HashSet<Tile>()
-                    extensions
-                            .filter { it.canBeI(i, tile.m) }
-                            .mapTo(newExtensions) { Tile(it, i, tile.m) }
+                    for (extension in extensions) {
+                        if (extension.canBeI(i, tile.m)) {
+                            newExtensions.add(Tile(extension, i, tile.m))
+                        }
+                    }
                     extensions.addAll(newExtensions)
                 }
                 return extensions
@@ -320,9 +329,11 @@ open class Tile {
                 extensions.add(Tile(newN, newM, tile))
                 for (j in 0 until tile.m) {
                     val newExtensions = HashSet<Tile>()
-                    extensions
-                            .filter { it.canBeI(tile.n, j) }
-                            .mapTo(newExtensions) { Tile(it, tile.n, j) }
+                    for (extension in extensions) {
+                        if (extension.canBeI(tile.n, j)) {
+                            newExtensions.add(Tile(extension, tile.n, j))
+                        }
+                    }
                     extensions.addAll(newExtensions)
                 }
                 return extensions
@@ -350,17 +361,15 @@ open class Tile {
         private fun allNeighboursMustBeZero(x: Int, y: Int, biggerTile: Tile, newN: Int, newM: Int, k: Int,
                                             intersection: TileIntersection, clauses: TIntArrayList) {
             for (i in x - k..x + k) {
-                (y - k..y + k)
-                        .filter { j ->
-                            !intersection.isInside(i, j) && // cells inside are already ok
-                                    i >= 0 && j >= 0 && i < newN && j < newM &&
-                                    !(i == x && j == y) && // not center
-                                    Math.abs(x - i) + Math.abs(y - j) <= k
-                        }
-                        .forEach { j ->
-                            clauses.add(-biggerTile.getId(i, j))
-                            clauses.add(0)
-                        } // must be zero
+                for (j in y - k..y + k) {
+                    if (!intersection.isInside(i, j) && // cells inside are already ok
+                            i >= 0 && j >= 0 && i < newN && j < newM &&
+                            !(i == x && j == y) && // not center
+                            Math.abs(x - i) + Math.abs(y - j) <= k) {
+                        clauses.add(-biggerTile.getId(i, j)) // must be zero
+                        clauses.add(0)
+                    }
+                }
             }
         }
 
@@ -370,17 +379,15 @@ open class Tile {
         private fun ifCenterIsOneAllOtherAreNot(x: Int, y: Int, biggerTile: Tile, clauses: TIntArrayList,
                                                 newN: Int, newM: Int, k: Int, intersection: TileIntersection) {
             for (i in x - k..x + k) {
-                (y - k..y + k)
-                        .filter { j ->
-                            !intersection.isInside(i, j) && // cells inside cannot be changed
-                                    i >= 0 && j >= 0 && i < newN && j < newM && !(i == x && j == y) && // not center
-                                    Math.abs(x - i) + Math.abs(y - j) <= k
-                        }
-                        .forEach { j ->
-                            clauses.add(-biggerTile.getId(x, y))
-                            clauses.add(-biggerTile.getId(i, j))
-                            clauses.add(0)
-                        }
+                for (j in y - k..y + k) {
+                    if (!intersection.isInside(i, j) && // cells inside cannot be changed
+                            i >= 0 && j >= 0 && i < newN && j < newM && !(i == x && j == y) && // not center
+                            Math.abs(x - i) + Math.abs(y - j) <= k) {
+                        clauses.add(-biggerTile.getId(x, y))
+                        clauses.add(-biggerTile.getId(i, j))
+                        clauses.add(0)
+                    }
+                }
             }
         }
 
@@ -388,14 +395,14 @@ open class Tile {
                                                  newM: Int, k: Int, intersection: TileIntersection): TIntHashSet {
             val clause = TIntHashSet()
             for (i in x - k..x + k) {
-                (y - k..y + k)
-                        .filter { j ->
-                            !intersection.isInside(i, j) && // inside tiles cannot be changed
-                                    i >= 0 && j >= 0 && i < newN && j < newM &&
-                                    !(i == x && j == y) && // not center
-                                    Math.abs(x - i) + Math.abs(y - j) <= k
-                        }
-                        .forEach { j -> clause.add(biggerTile.getId(i, j)) }
+                for (j in y - k..y + k) {
+                    if (!intersection.isInside(i, j) && // inside tiles cannot be changed
+                            i >= 0 && j >= 0 && i < newN && j < newM &&
+                            !(i == x && j == y) && // not center
+                            Math.abs(x - i) + Math.abs(y - j) <= k) {
+                        clause.add(biggerTile.getId(i, j))
+                    }
+                }
             }
             return clause
         }
@@ -440,11 +447,11 @@ open class Tile {
      */
     fun rotate(): Tile {
         val rotatedGrid = OpenBitSet(n * m.toLong())
-        (0L until n).forEach { i ->
-            (0L until m).filter { j ->
-                grid.get(getIndex(i, j))
-            }.forEach { j ->
-                rotatedGrid.set(getIndex(j, n - i - 1, n))
+        for (i in 0L until n) {
+            for (j in 0L until m) {
+                if (grid.get(getIndex(i, j))) {
+                    rotatedGrid.set(getIndex(j, n - i - 1, n))
+                }
             }
         }
         return Tile(rotatedGrid, m, n, k)

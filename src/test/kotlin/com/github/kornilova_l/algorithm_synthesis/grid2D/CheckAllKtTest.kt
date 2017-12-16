@@ -36,6 +36,6 @@ class CheckAllKtTest {
     @Test
     fun toSetOfVertexRulesTest() {
         val rules = toSetOfVertexRules(7)
-        assertEquals(hashSetOf(VertexRule("-"), VertexRule("N"), VertexRule("E")), rules)
+        assertEquals(hashSetOf(VertexRule("N"), VertexRule("E"), VertexRule("S")), rules)
     }
 }

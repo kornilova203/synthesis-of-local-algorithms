@@ -49,6 +49,7 @@ compileTestKotlin {
 }
 
 jmh {
-    include = 'ToDimacsBenchmark'
+//    include = 'ToDimacsBenchmark'
+    include = 'DirectedGraphBenchmark'
     jvmArgs = '-Xmx1024m -Xms1024m'
 }
