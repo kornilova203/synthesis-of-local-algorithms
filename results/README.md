@@ -1,2 +1,2 @@
-374,985,350 unsolvable  
-19,944 solvable
+536,276,117 unsolvable  
+21,108 solvable
