@@ -70,6 +70,17 @@ fun toSetOfVertexRules(combinationNum: Long): Set<VertexRule> {
     return rules
 }
 
+fun getNextRuleId(combinationNum: Long, allowedRules: Set<VertexRule>): Long? {
+    val allowedRulesId = rulesToId(allowedRules)
+    for (i in combinationNum - 1 downTo 0) {
+        val xor = allowedRulesId.xor(i)
+        if (xor.and(i) == 0L) {
+            return i
+        }
+    }
+    return null
+}
+
 fun rulesToId(rules: Set<VertexRule>): Long {
     var setId: Long = 0
     for (rule in rules) {

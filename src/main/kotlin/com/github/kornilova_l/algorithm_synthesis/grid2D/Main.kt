@@ -11,12 +11,12 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.vi
 fun main(args: Array<String>) {
 //    val rules = independentSet()
 //    val rules = columnIS()
-    val rules = toSetOfVertexRules(1073732864)
+//    val rules = toSetOfVertexRules(1073732864)
 //    val rules = parseRules("XN, XE, NE, XNE, XS, NS, XNS, ES, XES, NES, XNES, XW, NW, XNW, EW, XEW, NEW, XNEW, SW, XSW, NSW, XNSW, ESW, XESW")
 //    val rules = columnMinimalDominatingSet()
 //    val rules = oneZeroAndOneOne()
 //    val rules = test()
-//    val rules = gameOfLife()
+    val rules = gameOfLife()
 //    val rules = invertedIndependentSet()
 
     for (rule in rules) {
@@ -103,12 +103,12 @@ fun oneZeroAndOneOne(): HashSet<VertexRule> {
 fun gameOfLife(): HashSet<VertexRule> {
     val rules = HashSet<VertexRule>()
     /* cell survives if it has 2 or 3 neighbours */
+    rules.addAll(getRulePermutations(1, true))
     rules.addAll(getRulePermutations(2, true))
     rules.addAll(getRulePermutations(3, true))
     /* cell does not survive if it has 4 of 1 neighbour */
-    rules.addAll(getRulePermutations(0, false))
-    rules.addAll(getRulePermutations(1, false))
-    rules.addAll(getRulePermutations(4, false))
+    rules.addAll(getRulePermutations(2, false))
+    rules.addAll(getRulePermutations(3, false))
     return rules
 }
 

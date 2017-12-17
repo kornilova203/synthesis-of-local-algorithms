@@ -96,4 +96,16 @@ class VertexRuleKtTest {
         rulesAgain = toSetOfVertexRules(setId)
         assertEquals(rules, rulesAgain)
     }
+
+    @Test
+    fun getNextRuleIdTest() {
+        val allowedRules = hashSetOf(VertexRule("N"), VertexRule("S"), VertexRule("XSW"))
+        val setId = rulesToId(allowedRules)
+
+        assertEquals(rulesToId(hashSetOf(VertexRule("S"), VertexRule("XSW"))),
+                getNextRuleId(setId, allowedRules))
+
+        assertEquals(rulesToId(hashSetOf(VertexRule("XSW"), VertexRule("N"))),
+                getNextRuleId(rulesToId(hashSetOf(VertexRule("S"), VertexRule("XSW"))), allowedRules))
+    }
 }
