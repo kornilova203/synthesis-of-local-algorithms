@@ -20,10 +20,17 @@ class CountSolvableAndUnsolvableTest {
     }
 
     @Test
-    fun calcSolvableTest() {
+    fun countSolvableTest() {
         val solvable = parseLongs(File("src/test/resources/calc_solvable_and_unsolvable/solvable.txt"))
-        val expectedSolvableCount = countSolvableExpected(solvable)
-        assertEquals(expectedSolvableCount, countSolvable(solvable))
+//        val expectedSolvableCount = countSolvableExpected(solvable)
+        assertEquals(16778, countSolvable(solvable))
+    }
+
+    @Test
+    fun countUnsolvableTest() {
+        val unsolvable = parseLongs(File("src/test/resources/calc_solvable_and_unsolvable/unsolvable.txt"))
+//        val expectedUnsolvableCount = countUnSolvableExpected(unsolvable)
+        assertEquals(44984442, countUnsolvable(unsolvable))
     }
 
     private fun countSolvableExpected(solvable: TLongArrayList): Long {
