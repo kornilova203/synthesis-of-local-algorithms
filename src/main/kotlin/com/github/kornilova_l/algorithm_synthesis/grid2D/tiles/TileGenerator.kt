@@ -70,7 +70,7 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         }
         val side = if (currentN < currentM && currentN < finalN || currentM == finalM) HEIGHT else WIDTH
         println("Expand tiles $currentN x $currentM k: $k. Side: $side\nTiles count = ${tiles.size}")
-        val progressBar = ProgressBar(tiles.size)
+        val progressBar = ProgressBar(tiles.size.toLong())
         val expandedTiles: MutableSet<Tile> = ConcurrentHashMap.newKeySet()
         tiles.parallelStream().forEach { tile ->
             addValidExtensionsToSet(tile, expandedTiles, side)
