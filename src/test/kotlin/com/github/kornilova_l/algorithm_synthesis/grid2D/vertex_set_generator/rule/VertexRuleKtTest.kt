@@ -107,5 +107,16 @@ class VertexRuleKtTest {
 
         assertEquals(problemToId(hashSetOf(VertexRule("XSW"), VertexRule("N"))),
                 getNextProblemId(problemToId(hashSetOf(VertexRule("S"), VertexRule("XSW"))), allowedRules))
+
+        val problem = parseProblem("XN, XE, NE, XNE, XS, NS, XNS, ES, XES, NES, XNES, XW, NW, XNW, EW, XEW, NEW, XNEW, SW, XSW, NSW, XNSW, ESW, XESW")
+        val subproblemsCount = Math.pow(2.toDouble(), problem.size.toDouble()).toLong()
+        var actualSubproblemsCount = 0L
+
+        var problemId: Long? = problemToId(problem)
+        while (problemId != null) {
+            problemId = getNextProblemId(problemId, problem)
+            actualSubproblemsCount++
+        }
+        assertEquals(subproblemsCount, actualSubproblemsCount)
     }
 }
