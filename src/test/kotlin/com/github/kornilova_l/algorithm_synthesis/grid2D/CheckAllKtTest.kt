@@ -50,4 +50,15 @@ class CheckAllKtTest {
         val newSolvable = tryToFindSolutionForEachRulesSet(rulesCombinations)
         assertEquals(solvable.size(), newSolvable.size)
     }
+
+    @Test
+    fun checkSolvableWithUnsolvable() {
+        val solvable = parseLongs(solvableFile)
+        val unsolvable = parseLongs(unsolvableFile)
+        for (s in solvable) {
+            if (isUnsolvable(s, unsolvable)) {
+                assertTrue("Solvable $s is unsolvable :(", false)
+            }
+        }
+    }
 }
