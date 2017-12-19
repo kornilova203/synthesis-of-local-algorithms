@@ -2,13 +2,13 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.idToProblem
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.problemToId
 import gnu.trove.list.array.TLongArrayList
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 /* it is 2 ^ 30 because all-zeros and all-one are always solvable */
 val totalNumberOfCombination = (Math.pow(2.toDouble(), 30.toDouble())).toLong() - 1
@@ -27,7 +27,6 @@ fun main(args: Array<String>) {
     val unsolvable = parseLongs(unsolvableFile)
 
     val currentIteration = ArrayList<Set<VertexRule>>()
-    val rulesToId = HashMap<Set<VertexRule>, Long>()
     for (combinationNum in totalNumberOfCombination - skipFirst downTo 0) {
 //        val combinationNum = Math.abs(random.nextLong()) % totalNumberOfCombination
         if (isSolvable(combinationNum, solvable)) {
@@ -41,26 +40,24 @@ fun main(args: Array<String>) {
         // here we do not know if it is solvable or not
         val rules = idToProblem(combinationNum)
         currentIteration.add(rules)
-        rulesToId.put(rules, combinationNum)
         if (currentIteration.size == iterationSize) {
             val newSolvable = tryToFindSolutionForEachRulesSet(currentIteration)
-            updateSolvableAndUnsolvable(solvable, unsolvable, newSolvable, rulesToId)
+            updateSolvableAndUnsolvable(solvable, unsolvable, newSolvable, currentIteration)
             currentIteration.clear()
-            rulesToId.clear()
             println("Checked ${totalNumberOfCombination - combinationNum + 1}")
         }
     }
 }
 
 fun updateSolvableAndUnsolvable(solvable: TLongArrayList, unsolvable: TLongArrayList,
-                                newSolvable: Set<Set<VertexRule>>, rulesToId: HashMap<Set<VertexRule>, Long>) {
+                                newSolvable: Set<Set<VertexRule>>, allCheckedProblems: List<Set<VertexRule>>) {
     println("Solvable size before: ${solvable.size()}")
     println("Unsolvable size before: ${unsolvable.size()}")
-    for (entry in rulesToId.entries) {
-        if (newSolvable.contains(entry.key)) {
-            solvable.add(entry.value)
+    for (problem in allCheckedProblems) {
+        if (newSolvable.contains(problem)) {
+            solvable.add(problemToId(problem))
         } else {
-            unsolvable.add(entry.value)
+            unsolvable.add(problemToId(problem))
         }
     }
     updateSolvable(solvable)
