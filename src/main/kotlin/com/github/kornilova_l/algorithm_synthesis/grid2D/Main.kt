@@ -5,26 +5,27 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.getLabelingFunction
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getVertexRules
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.parseProblem
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.patternToProblem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.visualization.drawLabels
 
 fun main(args: Array<String>) {
-//    val rules = independentSet()
-//    val rules = columnIS()
-//    val rules = toSetOfVertexRules(1073732864)
-//    val rules = parseRules("XN, XE, NE, XNE, XS, NS, XNS, ES, XES, NES, XNES, XW, NW, XNW, EW, XEW, NEW, XNEW, SW, XSW, NSW, XNSW, ESW, XESW")
-//    val rules = columnMinimalDominatingSet()
-//    val rules = oneZeroAndOneOne()
-//    val rules = test()
-    val rules = gameOfLife()
-//    val rules = invertedIndependentSet()
+//    val problem = independentSet()
+//    val problem = columnIS()
+//    val problem = idToProblem(1073732864)
+    val problem = parseProblem("XN, XE, NE, XNE, XS, NS, XNS, ES, XES, NES, XNES, XW, NW, XNW, EW, XEW, NEW, XNEW, SW, XSW, NSW, XNSW, ESW, XESW")
+//    val problem = columnMinimalDominatingSet()
+//    val problem = atLeastOneIncludedAndOneExcluded()
+//    val problem = test()
+//    val problem = gameOfLife()
+//    val problem = invertedIndependentSet()
 
-    for (rule in rules) {
+    for (rule in problem) {
         print("$rule ")
     }
     println()
 
-    val labelingFunction = getLabelingFunction(rules)
+    val labelingFunction = getLabelingFunction(problem)
 
     if (labelingFunction == null) {
         println("not found")
@@ -70,25 +71,25 @@ fun invertedIndependentSet(): HashSet<VertexRule> {
  */
 fun columnIS(): HashSet<VertexRule> {
     val rules = HashSet<VertexRule>()
-    rules.addAll(getVertexRules("10?0?"))
-    rules.addAll(getVertexRules("01?0?"))
-    rules.addAll(getVertexRules("00?1?"))
-    rules.addAll(getVertexRules("01?1?"))
+    rules.addAll(patternToProblem("10?0?"))
+    rules.addAll(patternToProblem("01?0?"))
+    rules.addAll(patternToProblem("00?1?"))
+    rules.addAll(patternToProblem("01?1?"))
     return rules
 }
 
 fun columnMinimalDominatingSet(): HashSet<VertexRule> {
     val rules = HashSet<VertexRule>()
-    rules.addAll(getVertexRules("10?0?"))
-    rules.addAll(getVertexRules("01?0?"))
-    rules.addAll(getVertexRules("00?1?"))
-    rules.addAll(getVertexRules("01?1?"))
-    rules.addAll(getVertexRules("11?0?"))
-    rules.addAll(getVertexRules("10?1?"))
+    rules.addAll(patternToProblem("10?0?"))
+    rules.addAll(patternToProblem("01?0?"))
+    rules.addAll(patternToProblem("00?1?"))
+    rules.addAll(patternToProblem("01?1?"))
+    rules.addAll(patternToProblem("11?0?"))
+    rules.addAll(patternToProblem("10?1?"))
     return rules
 }
 
-fun oneZeroAndOneOne(): HashSet<VertexRule> {
+fun atLeastOneIncludedAndOneExcluded(): HashSet<VertexRule> {
     val rules = HashSet<VertexRule>()
     rules.addAll(getRulePermutations(1, true))
     rules.addAll(getRulePermutations(2, true))

@@ -8,7 +8,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.ru
  * Each character tells if this position XNESW is included (1), not included (0) or may be any (?)
  * For example this pattern 11?0? will generate set of 4 rules
  */
-fun getVertexRules(pattern: String): Set<VertexRule> {
+fun patternToProblem(pattern: String): Set<VertexRule> {
     validatePattern(pattern)
     val arrays = hashSetOf(BooleanArray(5))
     pattern.forEachIndexed { i, c ->
@@ -37,11 +37,11 @@ private fun validatePattern(pattern: String) {
     }
 }
 
-fun rotateRuleSet(rules: Set<VertexRule>, rotationsCount: Int = 1): Set<VertexRule> {
+fun rotateProblem(rules: Set<VertexRule>, rotationsCount: Int = 1): Set<VertexRule> {
     return rules.map { rule -> rule.rotate(rotationsCount) }.toSet()
 }
 
-fun parseRules(line: String): Set<VertexRule> {
+fun parseProblem(line: String): Set<VertexRule> {
     /* remove '[' and ']' or any other trailing symbols */
     var startIndex = 0
     while (!isRuleChar(line[startIndex])) {
@@ -60,7 +60,7 @@ private fun isRuleChar(c: Char): Boolean {
     return c == 'X' || c == 'N' || c == 'E' || c == 'W' || c == 'S' || c == '-'
 }
 
-fun toSetOfVertexRules(combinationNum: Long): Set<VertexRule> {
+fun idToProblem(combinationNum: Long): Set<VertexRule> {
     val rules = HashSet<VertexRule>()
     (0..31).forEach { shift ->
         if (combinationNum.and(1.toLong().shl(shift)) > 0) { // if rule is included
@@ -70,8 +70,8 @@ fun toSetOfVertexRules(combinationNum: Long): Set<VertexRule> {
     return rules
 }
 
-fun getNextRuleId(combinationNum: Long, allowedRules: Set<VertexRule>): Long? {
-    val allowedRulesId = rulesToId(allowedRules)
+fun getNextProblemId(combinationNum: Long, allowedRules: Set<VertexRule>): Long? {
+    val allowedRulesId = problemToId(allowedRules)
     for (i in combinationNum - 1 downTo 0) {
         val xor = allowedRulesId.xor(i)
         if (xor.and(i) == 0L) {
@@ -81,7 +81,7 @@ fun getNextRuleId(combinationNum: Long, allowedRules: Set<VertexRule>): Long? {
     return null
 }
 
-fun rulesToId(rules: Set<VertexRule>): Long {
+fun problemToId(rules: Set<VertexRule>): Long {
     var setId: Long = 0
     for (rule in rules) {
         var ruleId = -1

@@ -16,7 +16,7 @@ fun main(args: Array<String>) {
     val solvable = parseLongs(solvableFile)
     val unsolvable = parseLongs(unsolvableFile)
     val rules = getTwoOrThreeNeighboursRules()
-    var combinationNum: Long? = rulesToId(rules)
+    var combinationNum: Long? = problemToId(rules)
 
     val currentIteration = ArrayList<Set<VertexRule>>()
     val rulesToId = HashMap<Set<VertexRule>, Long>()
@@ -28,7 +28,7 @@ fun main(args: Array<String>) {
         }
         if (!isUnsolvable(combinationNum, unsolvable) && !isSolvable(combinationNum, solvable)) {
             println("add $combinationNum")
-            currentIteration.add(toSetOfVertexRules(combinationNum))
+            currentIteration.add(idToProblem(combinationNum))
             rulesToId.put(rules, combinationNum)
         } else {
 //            println("Solution exist")
@@ -39,7 +39,7 @@ fun main(args: Array<String>) {
             currentIteration.clear()
             rulesToId.clear()
         }
-        combinationNum = getNextRuleId(combinationNum, rules)
+        combinationNum = getNextProblemId(combinationNum, rules)
     }
     if (currentIteration.size != 0) {
         val newSolvable = tryToFindSolutionForEachRulesSet(currentIteration)
@@ -89,7 +89,7 @@ fun useFileToFindSolutions(rulesCombinations: List<Set<VertexRule>>, file: File,
             }
             var function = tryToFindSolution(rulesCombination, graph)
             if (function == null && n != m) {
-                function = tryToFindSolution(rotateRuleSet(rulesCombination), graph)
+                function = tryToFindSolution(rotateProblem(rulesCombination), graph)
             }
             if (function != null) {
                 println("Found solution for $rulesCombination")

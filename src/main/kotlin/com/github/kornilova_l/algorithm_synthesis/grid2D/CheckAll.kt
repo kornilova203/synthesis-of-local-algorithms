@@ -1,7 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.toSetOfVertexRules
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.idToProblem
 import gnu.trove.list.array.TLongArrayList
 import java.io.BufferedWriter
 import java.io.File
@@ -28,8 +28,8 @@ fun main(args: Array<String>) {
 
     val currentIteration = ArrayList<Set<VertexRule>>()
     val rulesToId = HashMap<Set<VertexRule>, Long>()
-    while (true) {
-        val combinationNum = Math.abs(random.nextLong()) % totalNumberOfCombination
+    for (combinationNum in totalNumberOfCombination - skipFirst downTo 0) {
+//        val combinationNum = Math.abs(random.nextLong()) % totalNumberOfCombination
         if (isSolvable(combinationNum, solvable)) {
 //            println("$combinationNum is solvable")
             continue
@@ -39,7 +39,7 @@ fun main(args: Array<String>) {
             continue
         }
         // here we do not know if it is solvable or not
-        val rules = toSetOfVertexRules(combinationNum)
+        val rules = idToProblem(combinationNum)
         currentIteration.add(rules)
         rulesToId.put(rules, combinationNum)
         if (currentIteration.size == iterationSize) {

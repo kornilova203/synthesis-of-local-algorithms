@@ -8,7 +8,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.Direc
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getVertexRules
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.patternToProblem
 import org.junit.Assert.*
 import org.junit.Test
 import java.io.File
@@ -105,12 +105,12 @@ class VertexSetSolverKtTest {
     @Test
     fun columnMinimalDominatingSet() {
         val rules = HashSet<VertexRule>()
-        rules.addAll(getVertexRules("10?0?"))
-        rules.addAll(getVertexRules("01?0?"))
-        rules.addAll(getVertexRules("00?1?"))
-        rules.addAll(getVertexRules("01?1?"))
-        rules.addAll(getVertexRules("11?0?"))
-        rules.addAll(getVertexRules("10?1?"))
+        rules.addAll(patternToProblem("10?0?"))
+        rules.addAll(patternToProblem("01?0?"))
+        rules.addAll(patternToProblem("00?1?"))
+        rules.addAll(patternToProblem("01?1?"))
+        rules.addAll(patternToProblem("11?0?"))
+        rules.addAll(patternToProblem("10?1?"))
         testLabelingFunction(rules)
     }
 

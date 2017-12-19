@@ -3,7 +3,7 @@ package com.github.kornilova_l.benchmarks
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getVertexRules
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.patternToProblem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.toDimacs
 import org.openjdk.jmh.annotations.*
 import java.io.File
@@ -19,7 +19,7 @@ open class ToDimacsBenchmark {
 
     @Setup
     fun doSetup() {
-        rules = getVertexRules("0?1?1")
+        rules = patternToProblem("0?1?1")
         graph = DirectedGraph(TileSet(File("generated_tiles/5-7-1.txt")))
     }
 

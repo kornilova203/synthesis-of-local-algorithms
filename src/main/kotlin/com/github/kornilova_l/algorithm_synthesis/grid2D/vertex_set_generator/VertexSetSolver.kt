@@ -8,7 +8,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tooBig
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.positions
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.reverseRules
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.rotateRuleSet
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.rotateProblem
 import gnu.trove.list.array.TIntArrayList
 import gnu.trove.set.hash.TIntHashSet
 import java.io.BufferedWriter
@@ -52,7 +52,7 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
                 return function
             }
 
-            function = tryToFindSolution(rotateRuleSet(vertexRules), graph)
+            function = tryToFindSolution(rotateProblem(vertexRules), graph)
             if (function != null) {
                 println("Found rotated")
                 return function.rotate()
