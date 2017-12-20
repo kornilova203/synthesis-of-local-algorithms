@@ -81,17 +81,22 @@ class VertexRuleKtTest {
 
     @Test
     fun rulesToIdTest() {
-        var rules = hashSetOf(VertexRule("XN"), VertexRule("NSW"), VertexRule("S"))
+        var rules: Set<VertexRule> = hashSetOf(VertexRule("XN"), VertexRule("NSW"), VertexRule("S"))
         var setId = problemToId(rules)
         var rulesAgain = idToProblem(setId)
         assertEquals(rules, rulesAgain)
 
-        rules.clear()
+        rules = hashSetOf()
         setId = problemToId(rules)
         rulesAgain = idToProblem(setId)
         assertEquals(rules, rulesAgain)
 
         rules = hashSetOf(VertexRule("E"), VertexRule("NSWE"), VertexRule("X"))
+        setId = problemToId(rules)
+        rulesAgain = idToProblem(setId)
+        assertEquals(rules, rulesAgain)
+
+        rules = parseProblem("XN, XE, NE, XNE, XS, NS, XNS, ES, XES, NES, XNES, XW, NW, XNW, EW, XEW, NEW, XNEW, SW, XSW, NSW, XNSW, ESW, XESW")
         setId = problemToId(rules)
         rulesAgain = idToProblem(setId)
         assertEquals(rules, rulesAgain)
@@ -112,7 +117,7 @@ class VertexRuleKtTest {
         val subproblemsCount = Math.pow(2.toDouble(), problem.size.toDouble()).toLong()
         var actualSubproblemsCount = 0L
 
-        var problemId: Long? = problemToId(problem)
+        var problemId: Int? = problemToId(problem)
         while (problemId != null) {
             problemId = getNextProblemId(problemId, problem)
             actualSubproblemsCount++

@@ -5,26 +5,26 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.ru
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.idToProblem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.problemToId
 import com.github.kornilova_l.util.ProgressBar
-import gnu.trove.list.array.TLongArrayList
+import gnu.trove.list.array.TIntArrayList
 
 private val rulesCount = 30
-private val combinationsCount = Math.pow(2.toDouble(), rulesCount.toDouble()).toLong()
+private val combinationsCount = Math.pow(2.toDouble(), rulesCount.toDouble()).toInt()
 
 fun main(args: Array<String>) {
-    ReportPrinter(parseLongs(solvableFile), parseLongs(unsolvableFile))
-            .printReport(getTwoOrThreeNeighboursRules(), true)
-//    ReportPrinter(parseLongs(solvableFile), parseLongs(unsolvableFile)).printReport()
+    ReportPrinter(parseInts(solvableFile), parseInts(unsolvableFile))
+            .printReport(atLeastOneIncludedAndOneExcluded(), true)
+//    ReportPrinter(parseInts(solvableFile), parseInts(unsolvableFile)).printReport()
 }
 
 
-class ReportPrinter(private val solvable: TLongArrayList, private val unsolvable: TLongArrayList) {
+class ReportPrinter(private val solvable: TIntArrayList, private val unsolvable: TIntArrayList) {
     /**
      * Checks all 2 ^ 30 problems
      */
     fun printReport() {
         val progressBar = ProgressBar(combinationsCount, "Count solvable and unsolvable")
-        var solvableCount = 0L
-        var unsolvableCount = 0L
+        var solvableCount = 0
+        var unsolvableCount = 0
         for (i in 0 until combinationsCount) {
             if (isUnsolvable(i, unsolvable)) {
                 unsolvableCount++
@@ -42,12 +42,12 @@ class ReportPrinter(private val solvable: TLongArrayList, private val unsolvable
      * set of rules from original problem
      */
     fun printReport(problem: Set<VertexRule>, printSolvable: Boolean = false) {
-        val combinationsCount = Math.pow(2.toDouble(), problem.size.toDouble()).toLong()
+        val combinationsCount = Math.pow(2.toDouble(), problem.size.toDouble()).toInt()
         val progressBar = ProgressBar(combinationsCount, "Count solvable and unsolvable")
-        var solvableCount = 0L
-        var unsolvableCount = 0L
-        var combinationNum: Long? = problemToId(problem)
-        val foundSolvable = ArrayList<Long>()
+        var solvableCount = 0
+        var unsolvableCount = 0
+        var combinationNum: Int? = problemToId(problem)
+        val foundSolvable = ArrayList<Int>()
 
         while (combinationNum != null) {
             if (isUnsolvable(combinationNum, unsolvable)) {
@@ -71,7 +71,7 @@ class ReportPrinter(private val solvable: TLongArrayList, private val unsolvable
         }
     }
 
-    private fun printReport(solvableCount: Long, unsolvableCount: Long, combinationsCount: Long) {
+    private fun printReport(solvableCount: Int, unsolvableCount: Int, combinationsCount: Int) {
         println("Solvable problems count: $solvableCount")
         println("Unsolvable problems count: $unsolvableCount")
         println("Unknown: ${combinationsCount - solvableCount - unsolvableCount}")

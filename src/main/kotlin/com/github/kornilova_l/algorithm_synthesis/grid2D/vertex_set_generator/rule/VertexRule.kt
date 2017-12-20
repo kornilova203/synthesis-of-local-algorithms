@@ -60,29 +60,29 @@ private fun isRuleChar(c: Char): Boolean {
     return c == 'X' || c == 'N' || c == 'E' || c == 'W' || c == 'S' || c == '-'
 }
 
-fun idToProblem(combinationNum: Long): Set<VertexRule> {
+fun idToProblem(combinationNum: Int): Set<VertexRule> {
     val rules = HashSet<VertexRule>()
     (0..31).forEach { shift ->
-        if (combinationNum.and(1.toLong().shl(shift)) > 0) { // if rule is included
+        if (combinationNum.and(1.shl(shift)) > 0) { // if rule is included
             rules.add(allRulesExceptTrivial[shift])
         }
     }
     return rules
 }
 
-fun getNextProblemId(combinationNum: Long, allowedRules: Set<VertexRule>): Long? {
+fun getNextProblemId(combinationNum: Int, allowedRules: Set<VertexRule>): Int? {
     val allowedRulesId = problemToId(allowedRules)
     for (i in combinationNum - 1 downTo 0) {
         val xor = allowedRulesId.xor(i)
-        if (xor.and(i) == 0L) {
+        if (xor.and(i) == 0) {
             return i
         }
     }
     return null
 }
 
-fun problemToId(rules: Set<VertexRule>): Long {
-    var setId: Long = 0
+fun problemToId(rules: Set<VertexRule>): Int {
+    var setId = 0
     for (rule in rules) {
         var ruleId = -1
         for (i in 0 until allRulesExceptTrivial.size) {
@@ -92,7 +92,7 @@ fun problemToId(rules: Set<VertexRule>): Long {
             }
         }
         assert(ruleId != -1)
-        setId = setId.or(1.shl(ruleId).toLong())
+        setId = setId.or(1.shl(ruleId))
     }
     return setId
 }

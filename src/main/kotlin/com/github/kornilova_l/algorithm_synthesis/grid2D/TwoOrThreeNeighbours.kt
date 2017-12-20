@@ -10,10 +10,10 @@ import java.util.regex.Pattern
 val tilesFilePattern = Pattern.compile("\\d+-\\d+-\\d+\\.txt")!!
 
 fun main(args: Array<String>) {
-    val solvable = parseLongs(solvableFile)
-    val unsolvable = parseLongs(unsolvableFile)
-    val rules = getTwoOrThreeNeighboursRules()
-    var combinationNum: Long? = problemToId(rules)
+    val solvable = parseInts(solvableFile)
+    val unsolvable = parseInts(unsolvableFile)
+    val rules = atLeastOneIncludedAndOneExcluded()
+    var combinationNum: Int? = problemToId(rules)
 
     val currentIteration = ArrayList<Set<VertexRule>>()
     var i = 0
@@ -28,7 +28,7 @@ fun main(args: Array<String>) {
         } else {
 //            println("Solution exist")
         }
-        if (currentIteration.size == 3) {
+        if (currentIteration.size == 10) {
             val newSolvable = tryToFindSolutionForEachRulesSet(currentIteration)
             updateSolvableAndUnsolvable(solvable, unsolvable, newSolvable, currentIteration)
             currentIteration.clear()
@@ -95,7 +95,8 @@ fun useFileToFindSolutions(rulesCombinations: List<Set<VertexRule>>, file: File,
 }
 
 fun tooBig(n: Int, m: Int, k: Int): Boolean {
-    return n == 6 && m == 7 && k == 1 ||
+    return k == 2 ||
+            n == 6 && m == 7 && k == 1 ||
             n == 7 && m == 7 && k == 1 ||
             n == 7 && m == 7 && k == 2 ||
             n == 5 && m == 8 && k == 1 ||

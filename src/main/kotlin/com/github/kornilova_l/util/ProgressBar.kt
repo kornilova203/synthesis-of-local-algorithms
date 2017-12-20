@@ -2,13 +2,14 @@ package com.github.kornilova_l.util
 
 import java.text.DecimalFormat
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 
-class ProgressBar(private val total: Long, private val title: String = "") {
+class ProgressBar(private val total: Int, private val title: String = "") {
     private val startTime = AtomicLong(System.currentTimeMillis())
     private val timer: Timer = Timer()
     private var lastUpdateTime = AtomicLong()
-    private var current = AtomicLong()
+    private var current = AtomicInteger()
 
     init {
         timer.schedule(object : TimerTask() {
@@ -28,7 +29,7 @@ class ProgressBar(private val total: Long, private val title: String = "") {
     }
 
     fun redraw() {
-        var percent = current.get() * 100 / total.toDouble()
+        var percent = current.get().toDouble() * 100 / total
         percent /= 2
         val resizingTotal = 50
         val string = StringBuilder(140)
@@ -62,8 +63,8 @@ class ProgressBar(private val total: Long, private val title: String = "") {
     }
 
     @Synchronized
-    fun updateProgress(addToProgress: Long) {
-        if (addToProgress == 0L && (System.currentTimeMillis() - lastUpdateTime.get()) / 1000 == 0L) {
+    fun updateProgress(addToProgress: Int) {
+        if (addToProgress == 0 && (System.currentTimeMillis() - lastUpdateTime.get()) / 1000 == 0L) {
             return
         }
         current.addAndGet(addToProgress)

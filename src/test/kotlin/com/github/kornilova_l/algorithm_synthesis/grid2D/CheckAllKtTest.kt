@@ -2,7 +2,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.idToProblem
-import gnu.trove.list.array.TLongArrayList
+import gnu.trove.list.array.TIntArrayList
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -10,7 +10,7 @@ class CheckAllKtTest {
 
     @Test
     fun isUnsolvableTest() {
-        val unsolvable = TLongArrayList()
+        val unsolvable = TIntArrayList()
         unsolvable.add(15)
         assertTrue(isUnsolvable(7, unsolvable))
 
@@ -21,7 +21,7 @@ class CheckAllKtTest {
 
     @Test
     fun isSolvableTest() {
-        val solvable = TLongArrayList()
+        val solvable = TIntArrayList()
         solvable.add(15)
         assertFalse(isSolvable(7, solvable))
 
@@ -42,7 +42,7 @@ class CheckAllKtTest {
 
     @Test
     fun checkAllSolvable() {
-        val solvable = parseLongs(solvableFile)
+        val solvable = parseInts(solvableFile)
         val rulesCombinations = ArrayList<Set<VertexRule>>()
         for (s in solvable) {
             rulesCombinations.add(idToProblem(s))
@@ -53,8 +53,8 @@ class CheckAllKtTest {
 
     @Test
     fun checkSolvableWithUnsolvable() {
-        val solvable = parseLongs(solvableFile)
-        val unsolvable = parseLongs(unsolvableFile)
+        val solvable = parseInts(solvableFile)
+        val unsolvable = parseInts(unsolvableFile)
         for (s in solvable) {
             if (isUnsolvable(s, unsolvable)) {
                 assertTrue("Solvable $s is unsolvable :(", false)
