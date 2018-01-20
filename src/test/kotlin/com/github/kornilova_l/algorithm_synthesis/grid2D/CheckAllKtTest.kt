@@ -2,6 +2,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.idToProblem
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tryToFindSolutionForEachRulesSet
 import gnu.trove.list.array.TIntArrayList
 import org.junit.Assert.*
 import org.junit.Test

@@ -4,22 +4,17 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.Direc
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Neighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraphWithTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tilesFilePattern
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tooBig
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.positions
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.reverseRules
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.rotateProblem
 import gnu.trove.list.array.TIntArrayList
 import gnu.trove.set.hash.TIntHashSet
-import java.io.BufferedWriter
 import java.io.File
-import java.io.IOException
-import java.io.OutputStreamWriter
-import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashSet
+import java.util.regex.Pattern
 
+val tilesFilePattern = Pattern.compile("\\d+-\\d+-\\d+\\.txt")!!
+val graphFilePattern = Pattern.compile("\\d+-\\d+-\\d+\\.graph")!!
 
 /**
  * Try to find tile size such that it is possible to get labels so
@@ -28,8 +23,51 @@ import kotlin.collections.HashSet
  * To use this function all tile sets must be precalculated and stored in generated_tiles directory
  */
 fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
+    val files = File("directed_graphs").listFiles()
+    for (i in 0 until files.size) {
+        val file = files[i]
+        if (graphFilePattern.matcher(file.name).matches()) {
+            val graph = DirectedGraph.createInstance(file)
+            println("n = ${graph.n} m = ${graph.m} k = ${graph.k}")
+            val function = getLabelingFunction(vertexRules, graph)
+
+            if (function != null) {
+                println("Found")
+                return function
+            }
+        }
+    }
+    return null
+}
+
+private fun getLabelingFunction(vertexRules: Set<VertexRule>, graph: DirectedGraph): LabelingFunction? {
+    var solution = tryToFindSolution(vertexRules, graph)
+    if (solution != null) { // solution found
+        return LabelingFunction(solution,
+                DirectedGraphWithTiles.createInstance(File("directed_graphs/${graph.n}-${graph.m}-${graph.k}.tiles"), graph))
+    }
+
+    solution = tryToFindSolution(rotateProblem(vertexRules), graph)
+    if (solution != null) { // solution found
+        return LabelingFunction(solution,
+                DirectedGraphWithTiles.createInstance(File("directed_graphs/${graph.n}-${graph.m}-${graph.k}.tiles"), graph))
+                .rotate()
+    }
+    return null
+}
+
+fun tryToFindSolution(vertexRules: Set<VertexRule>, graph: DirectedGraph): List<Int>? {
+    val clauses = toDimacs(graph, vertexRules)
+    return solve(clauses, graph.size)
+}
+
+fun tryToFindSolutionForEachRulesSet(rulesCombinations: List<Set<VertexRule>>): Set<Set<VertexRule>> {
+    val solvable = HashSet<Set<VertexRule>>()
     val files = File("generated_tiles").listFiles()
     for (i in 0 until files.size) {
+        if (solvable.size == rulesCombinations.size) { // if everything is solved
+            return solvable
+        }
         val file = files[i]
         if (tilesFilePattern.matcher(file.name).matches()) {
             val parts = file.name.split("-")
@@ -40,101 +78,39 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
                     n > m) {
                 continue
             }
-            if (tooBig(n, m, k)) {
+            if (k == 2) {
                 continue
             }
-            print("n $n  m $m  k $k ")
-            val tileSet = TileSet(file)
-            val graph = DirectedGraphWithTiles.createInstance(tileSet)
-            println("graph constructed")
-
-            var function = tryToFindSolution(vertexRules, graph)
-            if (function != null) {
-                return function
-            }
-
-            function = tryToFindSolution(rotateProblem(vertexRules), graph)
-            if (function != null) {
-                println("Found rotated")
-                return function.rotate()
-            }
+            useFileToFindSolutions(rulesCombinations, file, solvable, n, m, k)
         }
     }
-    return null
+    println("COMPLETE")
+    return solvable
 }
 
-fun tryToFindSolution(vertexRules: Set<VertexRule>, graph: DirectedGraphWithTiles): LabelingFunction? {
-
-    val clauses = toDimacs(graph, vertexRules)
-    val solution = solve(clauses, graph.size)
-    if (solution != null) { // solution found
-        return LabelingFunction(solution, graph)
-    }
-    return null
-}
-
-/**
- * @return null if not satisfiable
- */
-fun findAllSolutionsWithSatSolver(clauses: Set<Set<Int>>, varCount: Int): HashSet<Set<Int>>? {
-    val builder = ProcessBuilder("python", File("python_sat/sat/start_sat.py").toString())
-
-    builder.redirectErrorStream(true)
+fun useFileToFindSolutions(rulesCombinations: List<Set<VertexRule>>, file: File,
+                           solutions: MutableSet<Set<VertexRule>>, n: Int, m: Int, k: Int) {
+    println("Try n=$n m=$m k=$k")
     try {
-        val process = builder.start()
-        val writer = BufferedWriter(OutputStreamWriter(process.outputStream))
-        writer.write("Find all solutions\n")
-        writer.write("p cnf $varCount ${clauses.size}\n")
-        for (clause in clauses) {
-            for (variable in clause) {
-                writer.write("$variable ")
+        val tileSet = TileSet(file)
+        val graph = DirectedGraphWithTiles.createInstance(tileSet)
+
+        for (rulesCombination in rulesCombinations) {
+            if (solutions.contains(rulesCombination)) { // if solution was found
+                continue
             }
-            writer.write("\n")
+            var function = tryToFindSolution(rulesCombination, graph)
+            if (function == null && n != m) {
+                function = tryToFindSolution(rotateProblem(rulesCombination), graph)
+            }
+            if (function != null) {
+                println("Found solution for $rulesCombination")
+                solutions.add(rulesCombination)
+            }
         }
-        writer.flush()
-        writer.close()
-        val scanner = Scanner(process.inputStream)
-        process!!.waitFor()
-        val solutions = HashSet<Set<Int>>()
-        var hasSolution = false
-//        while (scanner.hasNextLine()) {
-//            println(scanner.nextLine())
-//        }
-        while (scanner.hasNextLine() && scanner.nextLine() == "OK") {
-            hasSolution = true
-            solutions.add(parseLineResult(scanner))
-        }
-        if (hasSolution) {
-            return solutions
-        }
-        return null
-    } catch (e: IOException) {
-        e.printStackTrace()
-    } catch (e: InterruptedException) {
-        e.printStackTrace()
+    } catch (e: OutOfMemoryError) {
+        System.err.println("OutOfMemoryError n=$n m=$m k=$k")
     }
-    return null
-}
-
-fun parseResult(scanner: Scanner): List<Int> {
-    val res = ArrayList<Int>()
-    while (scanner.hasNextInt()) {
-        res.add(scanner.nextInt())
-    }
-    scanner.nextLine() // end of line
-    val end = scanner.nextLine()
-    if (end != "END") {
-        throw RuntimeException("Cannot find end of result")
-    }
-    return res
-}
-
-fun parseLineResult(scanner: Scanner): Set<Int> {
-    val res = HashSet<Int>()
-    val line = scanner.nextLine()
-    val numbers = line.split(" ")
-    numbers.mapTo(res) { Integer.parseInt(it) }
-    return res
 }
 
 fun toDimacs(graph: DirectedGraph, rules: Set<VertexRule>): List<TIntArrayList> {

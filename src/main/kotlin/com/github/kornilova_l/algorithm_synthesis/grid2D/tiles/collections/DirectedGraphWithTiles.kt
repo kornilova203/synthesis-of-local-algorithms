@@ -2,8 +2,8 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet.Companion.parseSet
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tilesFilePattern
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tilesFilePattern
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
 import java.io.BufferedReader
 import java.io.File
@@ -34,9 +34,9 @@ fun main(args: Array<String>) {
             val tileSet = TileSet(file)
             val graph = DirectedGraphWithTiles.createInstance(tileSet)
             println("Start export")
-            graph.exportTiles(File("$dirName/$n-$m-$k.tiles"))
+            graph.exportTiles(File("$dirName/${graph.n}-${graph.m}-${graph.k}.tiles"))
             println("Export graph")
-            graph.export(File("$dirName/$n-$m-$k.graph"))
+            graph.export(File("$dirName/${graph.n}-${graph.m}-${graph.k}.graph"))
         }
     }
 }
@@ -120,7 +120,11 @@ class DirectedGraphWithTiles(n: Int,
                 }
                 val tilesCount = Integer.parseInt(reader.readLine())
                 for (i in 0 until tilesCount) {
-                    val id = Integer.parseInt(reader.readLine())
+                    var line = reader.readLine()
+                    while (line.isEmpty()) {
+                        line = reader.readLine()
+                    }
+                    val id = Integer.parseInt(line)
                     val grid = parseSet(reader, n, m)
                     ids[Tile(grid, n, m, k)] = id
                 }
