@@ -38,11 +38,11 @@ class DirectedGraphWithTiles(n: Int,
             for (tile in tileSet.validTiles) {
                 neighbourhoods.add(
                         Neighbourhood(
+                                getId(Tile(tile, POSITION.X), ids),
                                 getId(Tile(tile, POSITION.N), ids),
                                 getId(Tile(tile, POSITION.E), ids),
                                 getId(Tile(tile, POSITION.S), ids),
-                                getId(Tile(tile, POSITION.W), ids),
-                                getId(Tile(tile, POSITION.X), ids)
+                                getId(Tile(tile, POSITION.W), ids)
                         ))
             }
             if (neighbourhoods.size == 0) {

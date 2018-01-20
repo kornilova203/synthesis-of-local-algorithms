@@ -32,11 +32,11 @@ open class DirectedGraph(override val n: Int,
         return uniqueIds.size()
     }
 
-    class Neighbourhood(private val northId: Int,
+    class Neighbourhood(private val centerId: Int,
+                        private val northId: Int,
                         private val eastId: Int,
                         private val southId: Int,
-                        private val westId: Int,
-                        private val centerId: Int) {
+                        private val westId: Int) {
 
         fun get(position: POSITION): Int {
             return when (position) {
@@ -64,6 +64,6 @@ open class DirectedGraph(override val n: Int,
                     other.westId == westId
         }
 
-        override fun toString(): String = "$northId $eastId $southId $westId $centerId"
+        override fun toString(): String = "$centerId $eastId $southId $westId $northId"
     }
 }
