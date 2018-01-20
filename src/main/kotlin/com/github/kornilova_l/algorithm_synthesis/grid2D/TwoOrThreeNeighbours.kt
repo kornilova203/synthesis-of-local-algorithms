@@ -1,6 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraphWithTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.*
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tryToFindSolution
@@ -73,7 +73,7 @@ fun useFileToFindSolutions(rulesCombinations: List<Set<VertexRule>>, file: File,
     println("Try n=$n m=$m k=$k")
     try {
         val tileSet = TileSet(file)
-        val graph = DirectedGraph(tileSet)
+        val graph = DirectedGraphWithTiles.createInstance(tileSet)
 
         for (rulesCombination in rulesCombinations) {
             if (solutions.contains(rulesCombination)) { // if solution was found

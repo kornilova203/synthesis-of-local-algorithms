@@ -2,6 +2,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Neighbourhood
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraphWithTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tilesFilePattern
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tooBig
@@ -44,7 +45,7 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
             }
             print("n $n  m $m  k $k ")
             val tileSet = TileSet(file)
-            val graph = DirectedGraph(tileSet)
+            val graph = DirectedGraphWithTiles.createInstance(tileSet)
             println("graph constructed")
 
             var function = tryToFindSolution(vertexRules, graph)
@@ -62,7 +63,7 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
     return null
 }
 
-fun tryToFindSolution(vertexRules: Set<VertexRule>, graph: DirectedGraph): LabelingFunction? {
+fun tryToFindSolution(vertexRules: Set<VertexRule>, graph: DirectedGraphWithTiles): LabelingFunction? {
 
     val clauses = toDimacs(graph, vertexRules)
     val solution = solve(clauses, graph.size)
@@ -153,7 +154,7 @@ private fun formClause(neighbourhood: Neighbourhood, reversedRules: Set<VertexRu
         val clause = TIntHashSet()
         var isAlwaysTrue = false
         for (position in positions) {
-            val id = neighbourhood.neighbours[position]!!.id
+            val id = neighbourhood.get(position)
             if (id == 0) {
                 throw AssertionError("id must be bigger than 0")
             }
