@@ -3,7 +3,6 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Neighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraphWithTiles
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.positions
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.reverseRules
@@ -56,60 +55,47 @@ private fun getLabelingFunction(vertexRules: Set<VertexRule>, graph: DirectedGra
     return null
 }
 
-fun tryToFindSolution(vertexRules: Set<VertexRule>, graph: DirectedGraph): List<Int>? {
+private fun tryToFindSolution(vertexRules: Set<VertexRule>, graph: DirectedGraph): List<Int>? {
     val clauses = toDimacs(graph, vertexRules)
     return solve(clauses, graph.size)
 }
 
 fun tryToFindSolutionForEachRulesSet(rulesCombinations: List<Set<VertexRule>>): Set<Set<VertexRule>> {
     val solvable = HashSet<Set<VertexRule>>()
-    val files = File("generated_tiles").listFiles()
+    val files = File("directed_graphs").listFiles()
     for (i in 0 until files.size) {
         if (solvable.size == rulesCombinations.size) { // if everything is solved
             return solvable
         }
         val file = files[i]
-        if (tilesFilePattern.matcher(file.name).matches()) {
-            val parts = file.name.split("-")
-            val n = Integer.parseInt(parts[0])
-            val m = Integer.parseInt(parts[1])
-            val k = Integer.parseInt(parts[2].split(".")[0])
-            if (n < 3 || m < 3 ||
-                    n > m) {
-                continue
-            }
-            if (k == 2) {
-                continue
-            }
-            useFileToFindSolutions(rulesCombinations, file, solvable, n, m, k)
+        if (graphFilePattern.matcher(file.name).matches()) {
+            val graph = DirectedGraph.createInstance(file)
+            useFileToFindSolutions(rulesCombinations, graph, solvable)
         }
     }
     println("COMPLETE")
     return solvable
 }
 
-fun useFileToFindSolutions(rulesCombinations: List<Set<VertexRule>>, file: File,
-                           solutions: MutableSet<Set<VertexRule>>, n: Int, m: Int, k: Int) {
-    println("Try n=$n m=$m k=$k")
+private fun useFileToFindSolutions(rulesCombinations: List<Set<VertexRule>>, graph: DirectedGraph,
+                                   solutions: MutableSet<Set<VertexRule>>) {
+    println("Try n=${graph.n} m=${graph.m} k=${graph.k}")
     try {
-        val tileSet = TileSet(file)
-        val graph = DirectedGraphWithTiles.createInstance(tileSet)
-
         for (rulesCombination in rulesCombinations) {
             if (solutions.contains(rulesCombination)) { // if solution was found
                 continue
             }
-            var function = tryToFindSolution(rulesCombination, graph)
-            if (function == null && n != m) {
-                function = tryToFindSolution(rotateProblem(rulesCombination), graph)
+            var solution = tryToFindSolution(rulesCombination, graph)
+            if (solution == null && graph.n != graph.m) {
+                solution = tryToFindSolution(rotateProblem(rulesCombination), graph)
             }
-            if (function != null) {
+            if (solution != null) {
                 println("Found solution for $rulesCombination")
                 solutions.add(rulesCombination)
             }
         }
     } catch (e: OutOfMemoryError) {
-        System.err.println("OutOfMemoryError n=$n m=$m k=$k")
+        System.err.println("OutOfMemoryError n=${graph.n} m=${graph.m} k=${graph.k}")
     }
 }
 

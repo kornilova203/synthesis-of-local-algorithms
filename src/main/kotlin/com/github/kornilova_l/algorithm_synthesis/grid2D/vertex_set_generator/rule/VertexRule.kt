@@ -183,7 +183,14 @@ class VertexRule {
         id = tempId
     }
 
-    fun isIncluded(position: POSITION): Boolean = array[positionIndexes[position]!!]
+    fun isIncluded(position: POSITION): Boolean =
+            when (position) {
+                POSITION.X -> array[0]
+                POSITION.N -> array[1]
+                POSITION.E -> array[2]
+                POSITION.S -> array[3]
+                POSITION.W -> array[4]
+            }
 
     fun rotate(rotationsCount: Int = 1): VertexRule {
         val array = array.copyOf()

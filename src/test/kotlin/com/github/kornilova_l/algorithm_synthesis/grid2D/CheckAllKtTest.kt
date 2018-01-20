@@ -48,6 +48,7 @@ class CheckAllKtTest {
         for (s in solvable) {
             rulesCombinations.add(idToProblem(s))
         }
+        println(solvable.size())
         val newSolvable = tryToFindSolutionForEachRulesSet(rulesCombinations)
         assertEquals(solvable.size(), newSolvable.size)
     }
