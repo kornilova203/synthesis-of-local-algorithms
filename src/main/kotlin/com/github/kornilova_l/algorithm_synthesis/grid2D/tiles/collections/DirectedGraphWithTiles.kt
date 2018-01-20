@@ -2,11 +2,44 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet.Companion.parseSet
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tilesFilePattern
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
+import java.io.BufferedReader
 import java.io.File
+import java.io.FileReader
 import java.util.*
 
+
+/**
+ * Precalculate graphs and export them to files.
+ * So [DirectedGraph] instances can be created and used.
+ */
+fun main(args: Array<String>) {
+    val dirName = "directed_graphs"
+    val files = File("generated_tiles").listFiles()
+    for (i in 0 until files.size) {
+        val file = files[i]
+        if (tilesFilePattern.matcher(file.name).matches()) {
+            val parts = file.name.split("-")
+            val n = Integer.parseInt(parts[0])
+            val m = Integer.parseInt(parts[1])
+            val k = Integer.parseInt(parts[2].split(".")[0])
+            if (n < 3 || m < 3 ||
+                    n > m ||
+                    k == 2) {
+                continue
+            }
+            print("n $n  m $m  k $k\n")
+            val tileSet = TileSet(file)
+            val graph = DirectedGraphWithTiles.createInstance(tileSet)
+            println("Start export")
+            graph.exportTiles(File("$dirName/$n-$m-$k.tiles"))
+            println("Export graph")
+            graph.export(File("$dirName/$n-$m-$k.graph"))
+        }
+    }
+}
 
 /**
  * Constructs graph of tiles.
@@ -75,19 +108,20 @@ class DirectedGraphWithTiles(n: Int,
 
         fun createInstance(tilesFile: File, directedGraph: DirectedGraph): DirectedGraphWithTiles {
             val ids = DualHashBidiMap<Tile, Int>()
-            tilesFile.inputStream().use { inputStream ->
-                val scanner = Scanner(inputStream)
-                val n = scanner.nextInt()
-                val m = scanner.nextInt()
-                val k = scanner.nextInt()
+            BufferedReader(FileReader(tilesFile)).use { reader ->
+                val firstLine = reader.readLine()
+                val parts = firstLine.split(" ")
+                val n = Integer.parseInt(parts[0])
+                val m = Integer.parseInt(parts[1])
+                val k = Integer.parseInt(parts[2])
                 if (n != directedGraph.n || m != directedGraph.m || k != directedGraph.k) {
                     throw IllegalArgumentException("Parameters of graph do not match size of tiles. Graph: n = ${directedGraph.n} " +
                             "m = ${directedGraph.m} k = ${directedGraph.k}. Tile: n = $n m = $m k = $k.")
                 }
-                val tilesCount = scanner.nextLong()
+                val tilesCount = Integer.parseInt(reader.readLine())
                 for (i in 0 until tilesCount) {
-                    val id = scanner.nextInt()
-                    val grid = parseSet(scanner, n, m)
+                    val id = Integer.parseInt(reader.readLine())
+                    val grid = parseSet(reader, n, m)
                     ids[Tile(grid, n, m, k)] = id
                 }
                 return DirectedGraphWithTiles(directedGraph.n, directedGraph.m, directedGraph.k, directedGraph.neighbourhoods, ids)

@@ -4,10 +4,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import org.apache.lucene.util.OpenBitSet
 import java.io.BufferedReader
 import java.io.File
-import java.io.FileInputStream
-import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashSet
+import java.io.FileReader
 
 /**
  * Contains set of validTiles of one size
@@ -31,15 +28,16 @@ class TileSet {
             throw IllegalArgumentException("File does not exist or it is not a file")
         }
         var validTiles: ArrayList<Tile>? = null
-        Scanner(FileInputStream(file)).use { scanner ->
-            n = scanner.nextInt()
-            m = scanner.nextInt()
-            k = scanner.nextInt()
-            val size = scanner.nextInt()
-            scanner.useDelimiter("") // read characters
+        BufferedReader(FileReader(file)).use { reader ->
+            val firstLine = reader.readLine()
+            val parts = firstLine.split(" ")
+            n = Integer.parseInt(parts[0])
+            m = Integer.parseInt(parts[1])
+            k = Integer.parseInt(parts[2])
+            val size = Integer.parseInt(reader.readLine())
             validTiles = ArrayList(size)
             for (i in 0 until size) {
-                val grid = parseSet(scanner, n, m)
+                val grid = parseSet(reader, n, m)
                 validTiles!!.add(Tile(grid, n, m, k))
             }
             if (size != validTiles!!.size) {
@@ -53,14 +51,11 @@ class TileSet {
     }
 
     companion object {
-        /**
-         * @param scanner before calling this method set delimiter of scanner to ""
-         */
-        fun parseSet(scanner: Scanner, n: Int, m: Int): OpenBitSet {
+        fun parseSet(reader: BufferedReader, n: Int, m: Int): OpenBitSet {
             val grid = OpenBitSet(n * m.toLong())
             var i = 0L
             while (i < n * m) {
-                val c = scanner.next()[0]
+                val c = reader.read().toChar()
                 if (c == '1' || c == '0') {
                     if (c == '1') {
                         grid.set(i)
@@ -69,21 +64,6 @@ class TileSet {
                 }
             }
             return grid
-        }
-
-        fun skipTwoLines(reader: BufferedReader) {
-            var r = reader.read()
-            var linesCount = 0
-            while (r != -1) {
-                val c = r.toChar()
-                if (c == '\n') {
-                    linesCount++
-                    if (linesCount == 2) {
-                        return
-                    }
-                }
-                r = reader.read()
-            }
         }
     }
 
