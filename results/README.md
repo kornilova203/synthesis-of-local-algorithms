@@ -1,4 +1,4 @@
-Solvable problems count: 21,548  
-Unsolvable problems count: 567,380,754  
+Solvable problems count: 25,498  
+Unsolvable problems count: 587,600,306  
 
-Unknown: 506,339,522
+Unknown: 486,116,020
