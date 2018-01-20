@@ -16,12 +16,6 @@ open class Tile {
     val k: Int
     val n: Int
     val m: Int
-    /**
-     * Optional field. It is used for building clauses
-     * So it is not needed to search id in map
-     * 0 means that id was not set
-     */
-    var id = 0
 
     /**
      * Check if this tile is valid

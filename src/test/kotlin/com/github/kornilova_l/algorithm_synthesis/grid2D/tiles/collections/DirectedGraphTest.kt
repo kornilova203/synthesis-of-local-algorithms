@@ -3,9 +3,9 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Neighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
-
-import org.junit.Assert.*
 import java.io.File
 
 class DirectedGraphTest {
@@ -24,46 +24,45 @@ class DirectedGraphTest {
 
     @Test
     fun twoByThreeTiles() {
-        val tile1 = Tile("0 0 0\n0 0 0", 4)
-        val tile2 = Tile("1 0 0\n0 0 0", 4)
-        val tile3 = Tile("0 1 0\n0 0 0", 4)
-        val tile4 = Tile("0 0 1\n0 0 0", 4)
-        val tile5 = Tile("0 0 0\n1 0 0", 4)
-        val tile6 = Tile("0 0 0\n0 1 0", 4)
-        val tile7 = Tile("0 0 0\n0 0 1", 4)
-
         val tileSet = TileSet(File("generated_tiles/4-5-4.txt"))
+        val graph = DirectedGraph(tileSet)
 
-        val graph = DirectedGraph(tileSet).neighbourhoods
+        val id1 = graph.getId(Tile("0 0 0\n0 0 0", 4))
+        val id2 = graph.getId(Tile("1 0 0\n0 0 0", 4))
+        val id3 = graph.getId(Tile("0 1 0\n0 0 0", 4))
+        val id4 = graph.getId(Tile("0 0 1\n0 0 0", 4))
+        val id5 = graph.getId(Tile("0 0 0\n1 0 0", 4))
+        val id6 = graph.getId(Tile("0 0 0\n0 1 0", 4))
+        val id7 = graph.getId(Tile("0 0 0\n0 0 1", 4))
 
-        val neighbourhood = Neighbourhood(tile1, tile1, tile2, tile6, tile5)
-        assertTrue(graph.contains(neighbourhood))
+        val neighbourhood = Neighbourhood(id1, id1, id2, id6, id5)
+        assertTrue(graph.neighbourhoods.contains(neighbourhood))
 
         val expected = hashSetOf(
-                Neighbourhood(tile1, tile1, tile6, tile1, tile1),
-                Neighbourhood(tile1, tile4, tile5, tile1, tile1),
-                Neighbourhood(tile1, tile7, tile1, tile1, tile1),
-                Neighbourhood(tile1, tile1, tile7, tile1, tile1),
-                Neighbourhood(tile1, tile1, tile1, tile1, tile1),
-                Neighbourhood(tile1, tile1, tile5, tile1, tile1),
-                Neighbourhood(tile1, tile1, tile1, tile5, tile1),
-                Neighbourhood(tile4, tile1, tile1, tile1, tile1),
-                Neighbourhood(tile1, tile4, tile1, tile1, tile1),
-                Neighbourhood(tile1, tile1, tile1, tile2, tile1),
-                Neighbourhood(tile2, tile7, tile1, tile1, tile1),
-                Neighbourhood(tile1, tile7, tile1, tile2, tile1),
-                Neighbourhood(tile3, tile1, tile1, tile1, tile1),
-                Neighbourhood(tile1, tile1, tile7, tile2, tile1),
-                Neighbourhood(tile4, tile1, tile1, tile5, tile1),
-                Neighbourhood(tile2, tile1, tile7, tile1, tile1),
-                Neighbourhood(tile1, tile4, tile1, tile5, tile1),
-                Neighbourhood(tile2, tile1, tile1, tile1, tile1),
-                Neighbourhood(tile4, tile1, tile5, tile1, tile1)
+                Neighbourhood(id1, id1, id6, id1, id1),
+                Neighbourhood(id1, id4, id5, id1, id1),
+                Neighbourhood(id1, id7, id1, id1, id1),
+                Neighbourhood(id1, id1, id7, id1, id1),
+                Neighbourhood(id1, id1, id1, id1, id1),
+                Neighbourhood(id1, id1, id5, id1, id1),
+                Neighbourhood(id1, id1, id1, id5, id1),
+                Neighbourhood(id4, id1, id1, id1, id1),
+                Neighbourhood(id1, id4, id1, id1, id1),
+                Neighbourhood(id1, id1, id1, id2, id1),
+                Neighbourhood(id2, id7, id1, id1, id1),
+                Neighbourhood(id1, id7, id1, id2, id1),
+                Neighbourhood(id3, id1, id1, id1, id1),
+                Neighbourhood(id1, id1, id7, id2, id1),
+                Neighbourhood(id4, id1, id1, id5, id1),
+                Neighbourhood(id2, id1, id7, id1, id1),
+                Neighbourhood(id1, id4, id1, id5, id1),
+                Neighbourhood(id2, id1, id1, id1, id1),
+                Neighbourhood(id4, id1, id5, id1, id1)
         )
         for (n in expected) {
-            assertTrue(graph.contains(n))
+            assertTrue(graph.neighbourhoods.contains(n))
         }
-        val count = graph.count { it.neighbours[POSITION.X] == tile1 }
+        val count = graph.neighbourhoods.count { it.get(POSITION.X) == 1 }
         assertEquals(expected.size, count)
     }
 }
