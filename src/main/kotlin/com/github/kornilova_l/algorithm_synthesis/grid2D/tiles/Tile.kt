@@ -230,7 +230,7 @@ open class Tile {
         val stringBuilder = StringBuilder()
         for (i in 0 until n) {
             for (j in 0 until m) {
-                stringBuilder.append(if (grid.get(getIndex(i, j))) 1 else 0).append(if (j == m - 1) "" else " ")
+                stringBuilder.append(if (grid.get(getIndex(i, j))) 1 else 0)
             }
             stringBuilder.append("\n")
         }

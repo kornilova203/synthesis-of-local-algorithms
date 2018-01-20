@@ -1,8 +1,11 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet.Companion.parseSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
+import java.io.File
+import java.util.*
 
 
 /**
@@ -23,6 +26,25 @@ class DirectedGraphWithTiles(n: Int,
     fun getId(tile: Tile): Int = ids[tile]!!
 
     fun getTile(id: Int): Tile? = ids.getKey(id)
+
+    /**
+     * Format:
+     * <n> <m> <k>
+     * <number of tiles>
+     * for each tile:
+     * <id>
+     * <tile>
+     */
+    fun exportTiles(file: File) {
+        file.outputStream().use { outputStream ->
+            outputStream.write("$n $m $k\n".toByteArray())
+            outputStream.write("${ids.size}\n".toByteArray())
+            for (tileAndId in ids) {
+                outputStream.write("${tileAndId.value}\n".toByteArray())
+                outputStream.write("${tileAndId.key}\n".toByteArray())
+            }
+        }
+    }
 
     companion object {
         fun createInstance(tileSet: TileSet): DirectedGraphWithTiles {
@@ -49,6 +71,27 @@ class DirectedGraphWithTiles(n: Int,
                 throw IllegalArgumentException("Cannot construct graph")
             }
             return DirectedGraphWithTiles(n, m, k, neighbourhoods, ids)
+        }
+
+        fun createInstance(tilesFile: File, directedGraph: DirectedGraph): DirectedGraphWithTiles {
+            val ids = DualHashBidiMap<Tile, Int>()
+            tilesFile.inputStream().use { inputStream ->
+                val scanner = Scanner(inputStream)
+                val n = scanner.nextInt()
+                val m = scanner.nextInt()
+                val k = scanner.nextInt()
+                if (n != directedGraph.n || m != directedGraph.m || k != directedGraph.k) {
+                    throw IllegalArgumentException("Parameters of graph do not match size of tiles. Graph: n = ${directedGraph.n} " +
+                            "m = ${directedGraph.m} k = ${directedGraph.k}. Tile: n = $n m = $m k = $k.")
+                }
+                val tilesCount = scanner.nextLong()
+                for (i in 0 until tilesCount) {
+                    val id = scanner.nextInt()
+                    val grid = parseSet(scanner, n, m)
+                    ids[Tile(grid, n, m, k)] = id
+                }
+                return DirectedGraphWithTiles(directedGraph.n, directedGraph.m, directedGraph.k, directedGraph.neighbourhoods, ids)
+            }
         }
 
         /**

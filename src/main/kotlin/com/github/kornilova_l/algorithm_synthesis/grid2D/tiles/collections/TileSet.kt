@@ -5,7 +5,6 @@ import org.apache.lucene.util.OpenBitSet
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileReader
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
@@ -31,57 +30,60 @@ class TileSet {
         if (!file.exists() || !file.isFile) {
             throw IllegalArgumentException("File does not exist or it is not a file")
         }
-        var size = 0
+        var validTiles: ArrayList<Tile>? = null
         Scanner(FileInputStream(file)).use { scanner ->
             n = scanner.nextInt()
             m = scanner.nextInt()
             k = scanner.nextInt()
-            size = scanner.nextInt()
+            val size = scanner.nextInt()
+            scanner.useDelimiter("") // read characters
+            validTiles = ArrayList(size)
+            for (i in 0 until size) {
+                val grid = parseSet(scanner, n, m)
+                validTiles!!.add(Tile(grid, n, m, k))
+            }
+            if (size != validTiles!!.size) {
+                throw IllegalArgumentException("File contains less tiles that it states in the beginning of the file")
+            }
         }
-        if (n == 0) {
-            throw IllegalArgumentException("Could not open file")
+        if (validTiles == null) {
+            throw IllegalArgumentException("Cannot read files from file")
         }
-        validTiles = ArrayList(size)
-        BufferedReader(FileReader(file)).use { reader ->
+        this.validTiles = validTiles!!
+    }
+
+    companion object {
+        /**
+         * @param scanner before calling this method set delimiter of scanner to ""
+         */
+        fun parseSet(scanner: Scanner, n: Int, m: Int): OpenBitSet {
+            val grid = OpenBitSet(n * m.toLong())
             var i = 0L
-            val n = n.toLong()
-            val m = m.toLong()
-            var grid = OpenBitSet(n * m)
-            skipTwoLines(reader)
-            var r = reader.read()
-            while (r != -1) {
-                val c = r.toChar()
+            while (i < n * m) {
+                val c = scanner.next()[0]
                 if (c == '1' || c == '0') {
                     if (c == '1') {
                         grid.set(i)
                     }
                     i++
-                    if (i == m * n) {
-                        validTiles.add(Tile(grid, this.n, this.m, k))
-                        i = 0
-                        grid = OpenBitSet(n * m)
+                }
+            }
+            return grid
+        }
+
+        fun skipTwoLines(reader: BufferedReader) {
+            var r = reader.read()
+            var linesCount = 0
+            while (r != -1) {
+                val c = r.toChar()
+                if (c == '\n') {
+                    linesCount++
+                    if (linesCount == 2) {
+                        return
                     }
                 }
                 r = reader.read()
             }
-            if (size != validTiles.size) {
-                throw IllegalArgumentException("File contains less tiles that it states in the beginning of the file")
-            }
-        }
-    }
-
-    private fun skipTwoLines(reader: BufferedReader) {
-        var r = reader.read()
-        var linesCount = 0
-        while (r != -1) {
-            val c = r.toChar()
-            if (c == '\n') {
-                linesCount++
-                if (linesCount == 2) {
-                    return
-                }
-            }
-            r = reader.read()
         }
     }
 
