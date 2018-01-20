@@ -8,7 +8,6 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.ru
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.reverseRules
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.rotateProblem
 import gnu.trove.list.array.TIntArrayList
-import gnu.trove.set.hash.TIntHashSet
 import java.io.File
 import java.util.regex.Pattern
 
@@ -113,7 +112,8 @@ private fun formClause(neighbourhood: Neighbourhood, reversedRules: Set<VertexRu
                        clauses: MutableList<TIntArrayList>) {
     val currentArrayList = clauses.last()
     for (reversedRule in reversedRules) {
-        val clause = TIntHashSet()
+        var i = 0
+        val clause = IntArray(5)
         var isAlwaysTrue = false
         for (position in positions) {
             val id = neighbourhood.get(position)
@@ -128,11 +128,16 @@ private fun formClause(neighbourhood: Neighbourhood, reversedRules: Set<VertexRu
                 isAlwaysTrue = true
                 break
             }
-            clause.add(value)
+            if (!clause.contains(value)) { // if does not contain duplicate
+                clause[i] = value
+                i++
+            }
         }
         if (!isAlwaysTrue) {
-            currentArrayList.addAll(clause)
-            currentArrayList.add(0)
+            for (j in 0 until i) { // add new clause
+                currentArrayList.add(clause[j])
+            }
+            currentArrayList.add(0) // end of clause
             if (currentArrayList.size() > 1_000_000) {
                 clauses.add(TIntArrayList(500_000))
             }
