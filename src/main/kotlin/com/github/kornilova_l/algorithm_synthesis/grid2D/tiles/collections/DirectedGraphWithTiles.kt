@@ -51,7 +51,7 @@ fun main(args: Array<String>) {
 class DirectedGraphWithTiles(n: Int,
                              m: Int,
                              k: Int,
-                             neighbourhoods: HashSet<Neighbourhood>,
+                             neighbourhoods: Set<Neighbourhood>,
                              private val ids: DualHashBidiMap<Tile, Int>) : DirectedGraph(n, m, k, neighbourhoods) {
     override val size: Int
         get() = ids.size

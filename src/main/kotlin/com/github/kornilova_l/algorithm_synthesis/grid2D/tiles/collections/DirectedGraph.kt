@@ -17,15 +17,21 @@ import java.util.*
 open class DirectedGraph(override val n: Int,
                          override val m: Int,
                          override val k: Int,
-                         val neighbourhoods: HashSet<Neighbourhood>) : TileGraph() {
+                         val neighbourhoods: Set<Neighbourhood>) : TileGraph() {
+    private var cachedSize = -1
 
     override val size: Int
-        get() = calcUniqueIds(neighbourhoods)
+        get() {
+            if (cachedSize == -1) {
+                cachedSize = calcUniqueIds(neighbourhoods)
+            }
+            return cachedSize
+        }
 
     val edgeCount: Int
         get() = neighbourhoods.size * 4
 
-    private fun calcUniqueIds(neighbourhoods: HashSet<Neighbourhood>): Int {
+    private fun calcUniqueIds(neighbourhoods: Set<Neighbourhood>): Int {
         val uniqueIds = TIntHashSet()
         for (neighbourhood in neighbourhoods) {
             for (position in positions) {
@@ -103,7 +109,7 @@ open class DirectedGraph(override val n: Int,
                 val m = Integer.parseInt(parts[1])
                 val k = Integer.parseInt(parts[2])
                 val neighbourhoodsCount = Integer.parseInt(reader.readLine())
-                val neighbourhoods = HashSet<Neighbourhood>()
+                val neighbourhoods = ArrayList<Neighbourhood>(neighbourhoodsCount)
                 for (i in 0 until neighbourhoodsCount) {
                     val centerId = Integer.parseInt(reader.readLine())
                     val northId = Integer.parseInt(reader.readLine())
@@ -113,7 +119,7 @@ open class DirectedGraph(override val n: Int,
                     reader.readLine()
                     neighbourhoods.add(Neighbourhood(centerId, northId, eastId, southId, westId))
                 }
-                return DirectedGraph(n, m, k, neighbourhoods)
+                return DirectedGraph(n, m, k, neighbourhoods.toSet())
             }
         }
     }
