@@ -25,7 +25,7 @@ fun getRulePermutations(numberOfIncludedNeighbours: Int, isCenterIncluded: Boole
     }
     val rulePermutations = HashSet<VertexRule>()
     when (numberOfIncludedNeighbours) {
-        0 -> rulePermutations.add(VertexRule(""))
+        0 -> rulePermutations.add(VertexRule("-"))
         1 -> rulePermutations.addAll(hashSetOf(
                 VertexRule("N"),
                 VertexRule("E"),

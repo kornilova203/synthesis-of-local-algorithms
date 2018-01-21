@@ -2,34 +2,14 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileTest.Clauses
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileTest.Companion.flatSetToSetOfSet
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraphWithTiles
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.patternToProblem
-import org.junit.Assert.*
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.io.File
 
 class VertexSetSolverKtTest {
-    @Test
-    fun toDimacsTest() {
-        var file = File("generated_tiles/3-3-1.txt")
-        var graph = DirectedGraphWithTiles.createInstance(TileSet(file))
-        var clauses = toDimacs(graph, hashSetOf(VertexRule(1)))
-//        println(clauses.joinToString("", "", transform={ "${it.joinToString(" ", "")}\n" }))
-        var expected = parseClauses(File("src/test/resources/vertexSetSolver/to_dimacs_1_1_1.txt").readText())
-        assertEquals(Clauses(expected), Clauses(flatSetToSetOfSet(clauses)))
-
-        file = File("generated_tiles/3-4-1.txt")
-        graph = DirectedGraphWithTiles.createInstance(TileSet(file))
-        clauses = toDimacs(graph, hashSetOf(VertexRule(1)))
-//        println(clauses.joinToString("", "", transform={ "${it.joinToString(" ", "")}\n" }))
-        expected = Companion.parseClauses(File("src/test/resources/vertexSetSolver/to_dimacs_1_2_1.txt").readText())
-        assertEquals(Clauses(expected), Clauses(flatSetToSetOfSet(clauses)))
-    }
 
     private fun testLabelingFunction(rules: HashSet<VertexRule>) {
         val iterations = 10000

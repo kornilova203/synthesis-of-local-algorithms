@@ -2,9 +2,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.Grid2D
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.VertexSetSolverKtTest
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
-import gnu.trove.list.array.TIntArrayList
 import org.junit.Assert.*
 import org.junit.Test
 import java.io.File
@@ -105,83 +103,5 @@ internal class TileTest {
 
         val tileWest = Tile("0 0 0\n1 0 0\n0 0 0\n0 0 1", 1)
         assertEquals(tileWest, Tile(biggerTile, Tile.Part.E))
-    }
-
-    @Test
-    fun expandTileToDimacsTest() {
-        var tile = Tile(2, 2, 1)
-        var clauses = tile.toDimacsIsTileValid()!!
-
-        var expected = VertexSetSolverKtTest.parseClauses(File("src/test/resources/expand_tile/to_dimacs_3_3.txt").readText())
-        assertEquals(Clauses(expected), Clauses(Companion.flatSetToSetOfSet(clauses)))
-
-
-        tile = Tile(tile, 0, 1)
-        clauses = tile.toDimacsIsTileValid()!!
-
-        expected = VertexSetSolverKtTest.parseClauses(File("src/test/resources/expand_tile/to_dimacs_3_3_has_one.txt").readText())
-        assertEquals(Clauses(expected), Clauses(Companion.flatSetToSetOfSet(clauses)))
-
-
-        tile = Tile("1 0 0 0\n0 1 0 1\n0 0 1 0\n", 1)
-        clauses = tile.toDimacsIsTileValid()!!
-
-        expected = VertexSetSolverKtTest.parseClauses(File("src/test/resources/expand_tile/to_dimacs_3_4.txt").readText())
-        assertEquals(Clauses(expected), Clauses(Companion.flatSetToSetOfSet(clauses)))
-    }
-
-    /**
-     * This class is used for tests
-     * it allows to see difference between clauses conveniently
-     */
-    @Suppress("EqualsOrHashCode")
-    class Clauses(private val clauses: Set<Set<Int>>) {
-        override fun equals(other: Any?): Boolean {
-            if (other !is Clauses) {
-                return false
-            }
-            return clauses == other.clauses
-        }
-
-        override fun toString(): String {
-            val sorted = ArrayList<List<Int>>()
-            for (clause in clauses) {
-                val sortedClause = ArrayList<Int>(clause)
-                sortedClause.sort()
-                sorted.add(sortedClause)
-            }
-            val res = sorted.sortedWith(Comparator { o1, o2 ->
-                when {
-                    o1.size < o2.size -> -1
-                    o1.size > o2.size -> 1
-                    else -> when {
-                        Math.abs(o1[0]) < Math.abs(o2[0]) -> -1
-                        Math.abs(o1[0]) > Math.abs(o2[0]) -> 1
-                        else -> 0
-                    }
-                }
-
-            })
-            return res.joinToString("", "", transform = { "${it.joinToString(" ", "")}\n" })
-        }
-    }
-
-    companion object {
-        fun flatSetToSetOfSet(clausesList: List<TIntArrayList>): Set<Set<Int>> {
-            val newClauses = HashSet<Set<Int>>()
-            for(clauses in clausesList) {
-                var currentClause = HashSet<Int>()
-                for (i in 0 until clauses.size()) {
-                    val value = clauses[i]
-                    if (value != 0) {
-                        currentClause.add(value)
-                    } else {
-                        newClauses.add(currentClause)
-                        currentClause = HashSet()
-                    }
-                }
-            }
-            return newClauses
-        }
     }
 }

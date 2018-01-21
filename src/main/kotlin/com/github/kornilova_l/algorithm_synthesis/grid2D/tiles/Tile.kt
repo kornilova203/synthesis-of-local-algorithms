@@ -1,8 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.isSolvable
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolver
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
-import gnu.trove.list.array.TIntArrayList
 import gnu.trove.set.hash.TIntHashSet
 import org.apache.lucene.util.OpenBitSet
 import java.util.*
@@ -21,8 +20,11 @@ open class Tile {
      * Check if this tile is valid
      */
     fun isValid(): Boolean {
-        val clauses = toDimacsIsTileValid() ?: return false
-        return isSolvable(clauses)
+        val satSolver = SatSolver()
+        if (!initSatSolverIsTileValid(satSolver)) {
+            return false
+        }
+        return satSolver.isSolvable()
     }
 
     private fun getIndex(x: Int, y: Int): Long {
@@ -241,57 +243,40 @@ open class Tile {
         return x * m + y + 1
     }
 
-    internal fun toDimacsIsTileValid(): List<TIntArrayList>? {
+    private fun initSatSolverIsTileValid(satSolver: SatSolver): Boolean {
         val newN = n + k * 2
         val newM = m + k * 2
         val biggerTile = Tile(newN, newM, this)
         val intersection = TileIntersection(newN, newM, n, m)
 
-        val clauses = ArrayList<TIntArrayList>()
-
-        var currentList = TIntArrayList()
-
-        clauses.add(currentList)
-
         for (x in 0 until newN) {
             for (y in 0 until newM) {
                 if (intersection.isInside(x, y)) {
                     val value = cellMustStayTheSame(x, y, biggerTile)
-                    currentList.add(value)
-                    currentList.add(0)
+                    satSolver.addClause(value)
                     if (biggerTile.isI(x, y)) {
-                        allNeighboursMustBeZero(x, y, biggerTile, newN, newM, k, intersection, currentList)
+                        allNeighboursMustBeZero(x, y, biggerTile, newN, newM, k, intersection, satSolver)
                     } else if (biggerTile.canBeI(x, y) && neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
                         val clause = atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k, intersection)
-                        if (clause.size() == 0) { // this cannot be satisfied
-                            return null
+                        if (clause.isEmpty) { // this cannot be satisfied
+                            return false
                         }
-                        currentList.addAll(clause)
-                        currentList.add(0)
-                        if (currentList.size() > 1_000_000) {
-                            currentList = TIntArrayList()
-                            clauses.add(currentList)
-                        }
+                        satSolver.addClause(clause.toArray())
                     }
 
                 } else {
                     if (biggerTile.canBeI(x, y)) {
-                        ifCenterIsOneAllOtherAreNot(x, y, biggerTile, currentList, newN, newM, k, intersection)
+                        ifCenterIsOneAllOtherAreNot(x, y, biggerTile, satSolver, newN, newM, k, intersection)
                         if (neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
                             val clause = atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k, intersection)
                             clause.add(biggerTile.getId(x, y)) // center may also be in IS
-                            currentList.addAll(clause)
-                            currentList.add(0)
-                            if (currentList.size() > 1_000_000) {
-                                currentList = TIntArrayList()
-                                clauses.add(currentList)
-                            }
+                            satSolver.addClause(clause.toArray())
                         }
                     } // there is not else branch because if internal cell is in IS then all neighbours are zero
                 }
             }
         }
-        return clauses
+        return true
     }
 
     companion object {
@@ -353,15 +338,14 @@ open class Tile {
         }
 
         private fun allNeighboursMustBeZero(x: Int, y: Int, biggerTile: Tile, newN: Int, newM: Int, k: Int,
-                                            intersection: TileIntersection, clauses: TIntArrayList) {
+                                            intersection: TileIntersection, satSolver: SatSolver) {
             for (i in x - k..x + k) {
                 for (j in y - k..y + k) {
                     if (!intersection.isInside(i, j) && // cells inside are already ok
                             i >= 0 && j >= 0 && i < newN && j < newM &&
                             !(i == x && j == y) && // not center
                             Math.abs(x - i) + Math.abs(y - j) <= k) {
-                        clauses.add(-biggerTile.getId(i, j)) // must be zero
-                        clauses.add(0)
+                        satSolver.addClause(-biggerTile.getId(i, j)) // must be zero
                     }
                 }
             }
@@ -370,16 +354,14 @@ open class Tile {
         /**
          * If (x, y) is 1 then non of it's neighbours is 1
          */
-        private fun ifCenterIsOneAllOtherAreNot(x: Int, y: Int, biggerTile: Tile, clauses: TIntArrayList,
+        private fun ifCenterIsOneAllOtherAreNot(x: Int, y: Int, biggerTile: Tile, satSolver: SatSolver,
                                                 newN: Int, newM: Int, k: Int, intersection: TileIntersection) {
             for (i in x - k..x + k) {
                 for (j in y - k..y + k) {
                     if (!intersection.isInside(i, j) && // cells inside cannot be changed
                             i >= 0 && j >= 0 && i < newN && j < newM && !(i == x && j == y) && // not center
                             Math.abs(x - i) + Math.abs(y - j) <= k) {
-                        clauses.add(-biggerTile.getId(x, y))
-                        clauses.add(-biggerTile.getId(i, j))
-                        clauses.add(0)
+                        satSolver.addClause(-biggerTile.getId(x, y), -biggerTile.getId(i, j))
                     }
                 }
             }
