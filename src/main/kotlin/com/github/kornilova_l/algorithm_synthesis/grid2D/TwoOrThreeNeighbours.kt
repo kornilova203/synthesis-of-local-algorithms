@@ -1,7 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.*
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tryToFindSolutionForEachRulesSet
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tryToFindSolutionForEachProblem
 
 
 fun main(args: Array<String>) {
@@ -24,14 +24,14 @@ fun main(args: Array<String>) {
 //            println("Solution exist")
         }
         if (currentIteration.size == 10) {
-            val newSolvable = tryToFindSolutionForEachRulesSet(currentIteration)
+            val newSolvable = tryToFindSolutionForEachProblem(currentIteration)
             updateSolvableAndUnsolvable(solvable, unsolvable, newSolvable, currentIteration)
             currentIteration.clear()
         }
         combinationNum = getNextProblemId(combinationNum, rules)
     }
     if (currentIteration.size != 0) {
-        val newSolvable = tryToFindSolutionForEachRulesSet(currentIteration)
+        val newSolvable = tryToFindSolutionForEachProblem(currentIteration)
         updateSolvableAndUnsolvable(solvable, unsolvable, newSolvable, currentIteration)
     }
 }

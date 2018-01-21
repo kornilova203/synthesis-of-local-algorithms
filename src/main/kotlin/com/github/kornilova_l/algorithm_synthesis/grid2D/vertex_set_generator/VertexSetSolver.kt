@@ -37,7 +37,7 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
     return null
 }
 
-fun isSolutionExists(problem: Set<VertexRule>): Boolean {
+fun doesSolutionExist(problem: Set<VertexRule>): Boolean {
     val files = File("directed_graphs").listFiles()
     for (i in 0 until files.size) {
         val file = files[i]
@@ -80,38 +80,43 @@ private fun tryToFindSolution(vertexRules: Set<VertexRule>, graph: DirectedGraph
     return satSolver.solve(graph.size)
 }
 
-fun tryToFindSolutionForEachRulesSet(rulesCombinations: List<Set<VertexRule>>): Set<Set<VertexRule>> {
+/**
+ * This method is more effective than calling isSolvable for each problem
+ * because it constructs a graph only ones for all problems
+ * @return solvable problems
+ */
+fun tryToFindSolutionForEachProblem(problems: List<Set<VertexRule>>): Set<Set<VertexRule>> {
     val solvable = HashSet<Set<VertexRule>>()
     val files = File("directed_graphs").listFiles()
     for (i in 0 until files.size) {
-        if (solvable.size == rulesCombinations.size) { // if everything is solved
+        if (solvable.size == problems.size) { // if everything is solved
             return solvable
         }
         val file = files[i]
         if (graphFilePattern.matcher(file.name).matches()) {
             val graph = DirectedGraph.createInstance(file)
-            useFileToFindSolutions(rulesCombinations, graph, solvable)
+            useGraphToFindSolutions(problems, graph, solvable)
         }
     }
     println("COMPLETE")
     return solvable
 }
 
-private fun useFileToFindSolutions(rulesCombinations: List<Set<VertexRule>>, graph: DirectedGraph,
-                                   solutions: MutableSet<Set<VertexRule>>) {
+private fun useGraphToFindSolutions(problems: List<Set<VertexRule>>, graph: DirectedGraph,
+                                    solutions: MutableSet<Set<VertexRule>>) {
     println("Try n=${graph.n} m=${graph.m} k=${graph.k}")
     try {
-        for (rulesCombination in rulesCombinations) {
-            if (solutions.contains(rulesCombination)) { // if solution was found
+        for (problem in problems) {
+            if (solutions.contains(problem)) { // if solution was found
                 continue
             }
-            var solution = tryToFindSolution(rulesCombination, graph)
+            var solution = tryToFindSolution(problem, graph)
             if (solution == null && graph.n != graph.m) {
-                solution = tryToFindSolution(rotateProblem(rulesCombination), graph)
+                solution = tryToFindSolution(rotateProblem(problem), graph)
             }
             if (solution != null) {
-                println("Found solution for $rulesCombination")
-                solutions.add(rulesCombination)
+                println("Found solution for $problem")
+                solutions.add(problem)
             }
         }
     } catch (e: OutOfMemoryError) {
@@ -151,9 +156,9 @@ private fun formClause(neighbourhood: Neighbourhood, reversedRules: Set<VertexRu
         }
         if (!isAlwaysTrue) {
             var zeroPos = -1
-            for (i in 0 until clause.size) {
-                if (clause[i] == 0) {
-                    zeroPos = i
+            for (j in 0 until clause.size) {
+                if (clause[j] == 0) {
+                    zeroPos = j
                     break
                 }
             }

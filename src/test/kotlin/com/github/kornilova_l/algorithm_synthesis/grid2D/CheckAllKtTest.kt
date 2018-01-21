@@ -2,7 +2,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.idToProblem
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tryToFindSolutionForEachRulesSet
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tryToFindSolutionForEachProblem
 import gnu.trove.list.array.TIntArrayList
 import org.junit.Assert.*
 import org.junit.Test
@@ -49,7 +49,7 @@ class CheckAllKtTest {
             rulesCombinations.add(idToProblem(s))
         }
         println(solvable.size())
-        val newSolvable = tryToFindSolutionForEachRulesSet(rulesCombinations)
+        val newSolvable = tryToFindSolutionForEachProblem(rulesCombinations)
         assertEquals(solvable.size(), newSolvable.size)
     }
 

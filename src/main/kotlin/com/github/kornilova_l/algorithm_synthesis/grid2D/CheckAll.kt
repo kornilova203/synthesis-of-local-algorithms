@@ -3,7 +3,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.idToProblem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.problemToId
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tryToFindSolutionForEachRulesSet
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tryToFindSolutionForEachProblem
 import gnu.trove.list.array.TIntArrayList
 import java.io.BufferedWriter
 import java.io.File
@@ -42,7 +42,7 @@ fun main(args: Array<String>) {
         val rules = idToProblem(combinationNum)
         currentIteration.add(rules)
         if (currentIteration.size == iterationSize) {
-            val newSolvable = tryToFindSolutionForEachRulesSet(currentIteration)
+            val newSolvable = tryToFindSolutionForEachProblem(currentIteration)
             updateSolvableAndUnsolvable(solvable, unsolvable, newSolvable, currentIteration)
             currentIteration.clear()
             println("Checked ${totalNumberOfCombination - combinationNum + 1}")
