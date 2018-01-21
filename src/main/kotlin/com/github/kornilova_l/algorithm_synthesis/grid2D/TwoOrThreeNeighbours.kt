@@ -1,16 +1,19 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.*
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getNextProblemId
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tryToFindSolutionForEachProblem
 
 
 fun main(args: Array<String>) {
     val solvable = parseInts(solvableFile)
     val unsolvable = parseInts(unsolvableFile)
-    val rules = atLeastOneIncludedAndOneExcluded()
-    var combinationNum: Int? = problemToId(rules)
+    val problem = atLeastOneIncludedAndOneExcluded()
+    var combinationNum: Int? = problem.getId()
 
-    val currentIteration = ArrayList<Set<VertexRule>>()
+    val currentIteration = ArrayList<Problem>()
     var i = 0
     while (combinationNum != null) {
         i++
@@ -19,7 +22,7 @@ fun main(args: Array<String>) {
         }
         if (!isUnsolvable(combinationNum, unsolvable) && !isSolvable(combinationNum, solvable)) {
             println("add $combinationNum")
-            currentIteration.add(idToProblem(combinationNum))
+            currentIteration.add(Problem(combinationNum))
         } else {
 //            println("Solution exist")
         }
@@ -28,7 +31,7 @@ fun main(args: Array<String>) {
             updateSolvableAndUnsolvable(solvable, unsolvable, newSolvable, currentIteration)
             currentIteration.clear()
         }
-        combinationNum = getNextProblemId(combinationNum, rules)
+        combinationNum = getNextProblemId(combinationNum, problem)
     }
     if (currentIteration.size != 0) {
         val newSolvable = tryToFindSolutionForEachProblem(currentIteration)
@@ -40,7 +43,7 @@ fun main(args: Array<String>) {
  * @return all possible combinations of rules
  * where center has two or three neighbours
  */
-fun getTwoOrThreeNeighboursRules(): Set<VertexRule> {
+fun getTwoOrThreeNeighboursRules(): Problem {
     val rules = HashSet<VertexRule>()
     rules.addAll(getRulePermutations(1, true))
     rules.addAll(getRulePermutations(2, true))
@@ -48,6 +51,6 @@ fun getTwoOrThreeNeighboursRules(): Set<VertexRule> {
     rules.addAll(getRulePermutations(2, false))
     rules.addAll(getRulePermutations(3, false))
 
-    return rules
+    return Problem(rules)
 }
 

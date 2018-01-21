@@ -4,9 +4,9 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgo
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.LabelingFunction
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.getLabelingFunction
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.patternToProblem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.visualization.drawLabels
 
 fun main(args: Array<String>) {
@@ -23,8 +23,8 @@ fun main(args: Array<String>) {
     tryToSolve(problem)
 }
 
-fun tryToSolve(problem: HashSet<VertexRule>) {
-    printProblem(problem)
+fun tryToSolve(problem: Problem) {
+    println(problem)
 
     val labelingFunction = getLabelingFunction(problem)
 
@@ -50,15 +50,8 @@ fun printResult(labelingFunction: LabelingFunction) {
     drawLabels(labeledGrid, independentSet)
 }
 
-fun printProblem(problem: HashSet<VertexRule>) {
-    for (rule in problem) {
-        print("$rule ")
-    }
-    println()
-}
-
-fun invertedIndependentSet(): HashSet<VertexRule> {
-    return hashSetOf(
+fun invertedIndependentSet(): Problem {
+    return Problem(hashSetOf(
             VertexRule("X"),
             VertexRule("XN"),
             VertexRule("XE"),
@@ -75,33 +68,33 @@ fun invertedIndependentSet(): HashSet<VertexRule> {
             VertexRule("XNSW"),
             VertexRule("XESW"),
             VertexRule("NESW")
-    )
+    ))
 }
 
 /**
  * X N XE NE S NS ES NES XW NW XEW NEW SW NSW ESW NESW
  */
-fun columnIS(): HashSet<VertexRule> {
+fun columnIS(): Problem {
     val rules = HashSet<VertexRule>()
-    rules.addAll(patternToProblem("10?0?"))
-    rules.addAll(patternToProblem("01?0?"))
-    rules.addAll(patternToProblem("00?1?"))
-    rules.addAll(patternToProblem("01?1?"))
-    return rules
+    rules.addAll(Problem("10?0?").rules)
+    rules.addAll(Problem("01?0?").rules)
+    rules.addAll(Problem("00?1?").rules)
+    rules.addAll(Problem("01?1?").rules)
+    return Problem(rules)
 }
 
-fun columnMinimalDominatingSet(): HashSet<VertexRule> {
+fun columnMinimalDominatingSet(): Problem {
     val rules = HashSet<VertexRule>()
-    rules.addAll(patternToProblem("10?0?"))
-    rules.addAll(patternToProblem("01?0?"))
-    rules.addAll(patternToProblem("00?1?"))
-    rules.addAll(patternToProblem("01?1?"))
-    rules.addAll(patternToProblem("11?0?"))
-    rules.addAll(patternToProblem("10?1?"))
-    return rules
+    rules.addAll(Problem("10?0?").rules)
+    rules.addAll(Problem("01?0?").rules)
+    rules.addAll(Problem("00?1?").rules)
+    rules.addAll(Problem("01?1?").rules)
+    rules.addAll(Problem("11?0?").rules)
+    rules.addAll(Problem("10?1?").rules)
+    return Problem(rules)
 }
 
-fun atLeastOneIncludedAndOneExcluded(): HashSet<VertexRule> {
+fun atLeastOneIncludedAndOneExcluded(): Problem {
     val rules = HashSet<VertexRule>()
     rules.addAll(getRulePermutations(1, true))
     rules.addAll(getRulePermutations(2, true))
@@ -110,10 +103,10 @@ fun atLeastOneIncludedAndOneExcluded(): HashSet<VertexRule> {
     rules.addAll(getRulePermutations(1, false))
     rules.addAll(getRulePermutations(2, false))
     rules.addAll(getRulePermutations(3, false))
-    return rules
+    return Problem(rules)
 }
 
-fun gameOfLife(): HashSet<VertexRule> {
+fun gameOfLife(): Problem {
     val rules = HashSet<VertexRule>()
     /* cell survives if it has 2 or 3 neighbours */
     rules.addAll(getRulePermutations(1, true))
@@ -122,7 +115,7 @@ fun gameOfLife(): HashSet<VertexRule> {
     /* cell does not survive if it has 4 of 1 neighbour */
     rules.addAll(getRulePermutations(1, false))
 //    rules.addAll(getRulePermutations(3, false))
-    return rules
+    return Problem(rules)
 }
 
 fun test(): HashSet<VertexRule> {
@@ -131,9 +124,9 @@ fun test(): HashSet<VertexRule> {
     )
 }
 
-fun independentSet(): HashSet<VertexRule> {
+fun independentSet(): Problem {
     /* independent set */
-    return hashSetOf(
+    return Problem(hashSetOf(
             VertexRule("X"),
             VertexRule("N"),
             VertexRule("E"),
@@ -150,6 +143,6 @@ fun independentSet(): HashSet<VertexRule> {
             VertexRule("NSW"),
             VertexRule("ESW"),
             VertexRule("NESW")
-    )
+    ))
 }
 

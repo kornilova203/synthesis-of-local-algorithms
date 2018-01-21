@@ -3,10 +3,8 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Neighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraphWithTiles
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.positions
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.reverseRules
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.rotateProblem
 import java.io.File
 import java.util.regex.Pattern
 
@@ -19,14 +17,14 @@ val graphFilePattern = Pattern.compile("\\d+-\\d+-\\d+\\.graph")!!
  *
  * To use this function all tile sets must be precalculated and stored in generated_tiles directory
  */
-fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
+fun getLabelingFunction(problem: Problem): LabelingFunction? {
     val files = File("directed_graphs").listFiles()
     for (i in 0 until files.size) {
         val file = files[i]
         if (graphFilePattern.matcher(file.name).matches()) {
             val graph = DirectedGraph.createInstance(file)
             println("n = ${graph.n} m = ${graph.m} k = ${graph.k}")
-            val function = getLabelingFunction(vertexRules, graph)
+            val function = getLabelingFunction(problem, graph)
 
             if (function != null) {
                 println("Found")
@@ -37,7 +35,7 @@ fun getLabelingFunction(vertexRules: Set<VertexRule>): LabelingFunction? {
     return null
 }
 
-fun doesSolutionExist(problem: Set<VertexRule>): Boolean {
+fun doesSolutionExist(problem: Problem): Boolean {
     val files = File("directed_graphs").listFiles()
     for (i in 0 until files.size) {
         val file = files[i]
@@ -49,7 +47,7 @@ fun doesSolutionExist(problem: Set<VertexRule>): Boolean {
                 return true
             }
 
-            solution = tryToFindSolution(rotateProblem(problem), graph)
+            solution = tryToFindSolution(problem.rotate(), graph)
             if (solution != null) { // solution found
                 return true
             }
@@ -58,14 +56,14 @@ fun doesSolutionExist(problem: Set<VertexRule>): Boolean {
     return false
 }
 
-private fun getLabelingFunction(vertexRules: Set<VertexRule>, graph: DirectedGraph): LabelingFunction? {
-    var solution = tryToFindSolution(vertexRules, graph)
+private fun getLabelingFunction(problem: Problem, graph: DirectedGraph): LabelingFunction? {
+    var solution = tryToFindSolution(problem, graph)
     if (solution != null) { // solution found
         return LabelingFunction(solution,
                 DirectedGraphWithTiles.createInstance(File("directed_graphs/${graph.n}-${graph.m}-${graph.k}.tiles"), graph))
     }
 
-    solution = tryToFindSolution(rotateProblem(vertexRules), graph)
+    solution = tryToFindSolution(problem.rotate(), graph)
     if (solution != null) { // solution found
         return LabelingFunction(solution,
                 DirectedGraphWithTiles.createInstance(File("directed_graphs/${graph.n}-${graph.m}-${graph.k}.tiles"), graph))
@@ -74,9 +72,9 @@ private fun getLabelingFunction(vertexRules: Set<VertexRule>, graph: DirectedGra
     return null
 }
 
-private fun tryToFindSolution(vertexRules: Set<VertexRule>, graph: DirectedGraph): List<Int>? {
+private fun tryToFindSolution(problem: Problem, graph: DirectedGraph): List<Int>? {
     val satSolver = SatSolver()
-    addClausesToSatSolver(graph, vertexRules, satSolver)
+    addClausesToSatSolver(graph, problem, satSolver)
     return satSolver.solve(graph.size)
 }
 
@@ -85,8 +83,8 @@ private fun tryToFindSolution(vertexRules: Set<VertexRule>, graph: DirectedGraph
  * because it constructs a graph only ones for all problems
  * @return solvable problems
  */
-fun tryToFindSolutionForEachProblem(problems: List<Set<VertexRule>>): Set<Set<VertexRule>> {
-    val solvable = HashSet<Set<VertexRule>>()
+fun tryToFindSolutionForEachProblem(problems: List<Problem>): Set<Problem> {
+    val solvable = HashSet<Problem>()
     val files = File("directed_graphs").listFiles()
     for (i in 0 until files.size) {
         if (solvable.size == problems.size) { // if everything is solved
@@ -102,8 +100,8 @@ fun tryToFindSolutionForEachProblem(problems: List<Set<VertexRule>>): Set<Set<Ve
     return solvable
 }
 
-private fun useGraphToFindSolutions(problems: List<Set<VertexRule>>, graph: DirectedGraph,
-                                    solutions: MutableSet<Set<VertexRule>>) {
+private fun useGraphToFindSolutions(problems: List<Problem>, graph: DirectedGraph,
+                                    solutions: MutableSet<Problem>) {
     println("Try n=${graph.n} m=${graph.m} k=${graph.k}")
     try {
         for (problem in problems) {
@@ -112,7 +110,7 @@ private fun useGraphToFindSolutions(problems: List<Set<VertexRule>>, graph: Dire
             }
             var solution = tryToFindSolution(problem, graph)
             if (solution == null && graph.n != graph.m) {
-                solution = tryToFindSolution(rotateProblem(problem), graph)
+                solution = tryToFindSolution(problem.rotate(), graph)
             }
             if (solution != null) {
                 println("Found solution for $problem")
@@ -124,15 +122,15 @@ private fun useGraphToFindSolutions(problems: List<Set<VertexRule>>, graph: Dire
     }
 }
 
-fun addClausesToSatSolver(graph: DirectedGraph, rules: Set<VertexRule>, satSolver: SatSolver) {
-    val reversedRules = reverseRules(rules)
+fun addClausesToSatSolver(graph: DirectedGraph, problem: Problem, satSolver: SatSolver) {
+    val reversedProblem = problem.reverse()
     for (neighbourhood in graph.neighbourhoods) {
-        formClause(neighbourhood, reversedRules, satSolver)
+        formClause(neighbourhood, reversedProblem, satSolver)
     }
 }
 
-private fun formClause(neighbourhood: Neighbourhood, reversedRules: Set<VertexRule>, satSolver: SatSolver) {
-    for (reversedRule in reversedRules) {
+private fun formClause(neighbourhood: Neighbourhood, reversedProblem: Problem, satSolver: SatSolver) {
+    for (reversedRule in reversedProblem.rules) {
         var i = 0
         val clause = IntArray(5)
         var isAlwaysTrue = false

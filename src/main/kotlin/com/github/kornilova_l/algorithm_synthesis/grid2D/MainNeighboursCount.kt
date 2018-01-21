@@ -1,5 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tryToFindSolutionForEachProblem
@@ -28,14 +29,14 @@ val includedNeighboursCountLists = (1..31).map { i ->
  *
  */
 fun main(args: Array<String>) {
-    val problems = ArrayList<Set<VertexRule>>()
+    val problems = ArrayList<Problem>()
     for (includedNeighboursCountList in includedNeighboursCountLists) {
-        val problem = HashSet<VertexRule>()
+        val rules = HashSet<VertexRule>()
         for (includedNeighboursCount in includedNeighboursCountList) {
-            problem.addAll(getRulePermutations(includedNeighboursCount, true))
-            problem.addAll(getRulePermutations(includedNeighboursCount, false))
+            rules.addAll(getRulePermutations(includedNeighboursCount, true))
+            rules.addAll(getRulePermutations(includedNeighboursCount, false))
         }
-        problems.add(problem)
+        problems.add(Problem(rules))
     }
     val solvableProblems = tryToFindSolutionForEachProblem(problems)
     println(solvableProblems)

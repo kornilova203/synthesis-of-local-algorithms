@@ -1,7 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.idToProblem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tryToFindSolutionForEachProblem
 import gnu.trove.list.array.TIntArrayList
 import org.junit.Assert.*
@@ -37,19 +37,19 @@ class CheckAllKtTest {
 
     @Test
     fun toSetOfVertexRulesTest() {
-        val rules = idToProblem(7)
-        assertEquals(hashSetOf(VertexRule("N"), VertexRule("E"), VertexRule("S")), rules)
+        val problem = Problem(7)
+        assertEquals(hashSetOf(VertexRule("N"), VertexRule("E"), VertexRule("S")), problem.rules)
     }
 
     @Test
     fun checkAllSolvable() {
         val solvable = parseInts(solvableFile)
-        val rulesCombinations = ArrayList<Set<VertexRule>>()
+        val problems = ArrayList<Problem>()
         for (s in solvable) {
-            rulesCombinations.add(idToProblem(s))
+            problems.add(Problem(s))
         }
         println(solvable.size())
-        val newSolvable = tryToFindSolutionForEachProblem(rulesCombinations)
+        val newSolvable = tryToFindSolutionForEachProblem(problems)
         assertEquals(solvable.size(), newSolvable.size)
     }
 

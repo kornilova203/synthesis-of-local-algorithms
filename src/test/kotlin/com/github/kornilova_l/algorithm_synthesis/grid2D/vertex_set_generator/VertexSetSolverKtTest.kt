@@ -2,25 +2,25 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.patternToProblem
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class VertexSetSolverKtTest {
 
-    private fun testLabelingFunction(rules: HashSet<VertexRule>) {
+    private fun testLabelingFunction(problem: Problem) {
         val iterations = 10000
-        val labelingFunction = getLabelingFunction(rules)
+        val labelingFunction = getLabelingFunction(problem)
         assertNotNull(labelingFunction)
         for (i in 0 until iterations) {
             val grid = generateGrid(10, 10)
             val independentSet = IndependentSetAlgorithm(grid, labelingFunction!!.k).independentSet
             val labeledGrid = labelingFunction.getLabels(independentSet)
             assertNotNull(labeledGrid)
-            assertTrue(isRight(labeledGrid!!, rules))
+            assertTrue(isRight(labeledGrid!!, problem))
         }
     }
 
@@ -44,7 +44,7 @@ class VertexSetSolverKtTest {
                 VertexRule("ESW"),
                 VertexRule("NESW")
         )
-        testLabelingFunction(independentSetRules)
+        testLabelingFunction(Problem(independentSetRules))
     }
 
     @Test
@@ -67,7 +67,7 @@ class VertexSetSolverKtTest {
                 VertexRule("XESW"),
                 VertexRule("NESW")
         )
-        testLabelingFunction(invertedISRules)
+        testLabelingFunction(Problem(invertedISRules))
     }
 
     @Test
@@ -79,22 +79,22 @@ class VertexSetSolverKtTest {
         rules.addAll(getRulePermutations(3, false))
         rules.addAll(getRulePermutations(1, false))
 
-        testLabelingFunction(rules)
+        testLabelingFunction(Problem(rules))
     }
 
     @Test
     fun columnMinimalDominatingSet() {
         val rules = HashSet<VertexRule>()
-        rules.addAll(patternToProblem("10?0?"))
-        rules.addAll(patternToProblem("01?0?"))
-        rules.addAll(patternToProblem("00?1?"))
-        rules.addAll(patternToProblem("01?1?"))
-        rules.addAll(patternToProblem("11?0?"))
-        rules.addAll(patternToProblem("10?1?"))
-        testLabelingFunction(rules)
+        rules.addAll(Problem("10?0?").rules)
+        rules.addAll(Problem("01?0?").rules)
+        rules.addAll(Problem("00?1?").rules)
+        rules.addAll(Problem("01?1?").rules)
+        rules.addAll(Problem("11?0?").rules)
+        rules.addAll(Problem("10?1?").rules)
+        testLabelingFunction(Problem(rules))
     }
 
-    private fun isRight(labeledGrid: Array<BooleanArray>, rules: HashSet<VertexRule>): Boolean {
+    private fun isRight(labeledGrid: Array<BooleanArray>, problem: Problem): Boolean {
         val n = labeledGrid.size
         val m = labeledGrid[0].size
         for (i in 0 until n) {
@@ -115,24 +115,11 @@ class VertexSetSolverKtTest {
                 if (labeledGrid[i][(j - 1 + m) % m]) {
                     vertexSet.append("W")
                 }
-                if (!rules.contains(VertexRule(vertexSet.toString()))) {
+                if (!problem.rules.contains(VertexRule(vertexSet.toString()))) {
                     return false
                 }
             }
         }
         return true
-    }
-
-    companion object {
-        fun parseClauses(text: String): Set<Set<Int>> {
-            val lines = text.split("\n")
-            val clauses = HashSet<Set<Int>>()
-            for (line in lines) {
-                val clause = HashSet<Int>()
-                line.split(" ").filter { it != "" }.mapTo(clause) { Integer.parseInt(it) }
-                clauses.add(clause)
-            }
-            return clauses
-        }
     }
 }

@@ -3,20 +3,6 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.r
 import kotlin.experimental.and
 
 
-/**
- * @return new set which contains all possible rules but without
- * the rules which are given as a parameter. Size of new set is 32 - rules.size()
- */
-fun reverseRules(rules: Set<VertexRule>): Set<VertexRule> {
-    val ids = HashSet<Int>() // convert rules to ids for convenient compare
-    rules.mapTo(ids) { it.id }
-
-    val reversedRules = HashSet<VertexRule>()
-    (0..31).filter { !ids.contains(it) }
-            .forEach { reversedRules.add(VertexRule(it)) }
-    return reversedRules
-}
-
 fun getBit(num: Int, position: Int): Boolean = (num shr position).toByte() and 1 == 1.toByte()
 
 fun getRulePermutations(numberOfIncludedNeighbours: Int, isCenterIncluded: Boolean): Set<VertexRule> {

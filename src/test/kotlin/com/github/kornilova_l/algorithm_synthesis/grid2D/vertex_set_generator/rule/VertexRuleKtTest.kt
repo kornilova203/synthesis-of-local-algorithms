@@ -1,5 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem.Companion.parseProblem
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -26,33 +27,33 @@ class VertexRuleKtTest {
     @Test
     fun reverseRulesTest() {
         assertEquals(2, hashSetOf(VertexRule(1), VertexRule(2), VertexRule(1)).size)
-        assertEquals(30, reverseRules(hashSetOf(VertexRule(1), VertexRule(2), VertexRule(1))).size)
+        assertEquals(30, Problem(hashSetOf(VertexRule(1), VertexRule(2), VertexRule(1))).reverse().rules.size)
     }
 
     @Test
     fun setFromPatternTest() {
-        var rules = patternToProblem("00000")
-        assertEquals(1, rules.size)
-        assertEquals(VertexRule("-"), rules.first())
+        var problem = Problem("00000")
+        assertEquals(1, problem.rules.size)
+        assertEquals(VertexRule("-"), problem.rules.first())
 
 
-        rules = patternToProblem("01001")
-        assertEquals(1, rules.size)
-        assertEquals(VertexRule("NW"), rules.first())
+        problem = Problem("01001")
+        assertEquals(1, problem.rules.size)
+        assertEquals(VertexRule("NW"), problem.rules.first())
 
-        rules = patternToProblem("?1001")
-        assertEquals(hashSetOf(VertexRule("NW"), VertexRule("XNW")), rules)
+        problem = Problem("?1001")
+        assertEquals(hashSetOf(VertexRule("NW"), VertexRule("XNW")), problem)
 
-        rules = patternToProblem("??001")
+        problem = Problem("??001")
         assertEquals(hashSetOf(
                 VertexRule("NW"),
                 VertexRule("XNW"),
                 VertexRule("XW"),
                 VertexRule("W")
-        ), rules)
+        ), problem)
 
-        rules = patternToProblem("?????")
-        assertEquals(32, rules.size)
+        problem = Problem("?????")
+        assertEquals(32, problem.rules.size)
     }
 
     @Test
@@ -81,43 +82,43 @@ class VertexRuleKtTest {
 
     @Test
     fun rulesToIdTest() {
-        var rules: Set<VertexRule> = hashSetOf(VertexRule("XN"), VertexRule("NSW"), VertexRule("S"))
-        var setId = problemToId(rules)
-        var rulesAgain = idToProblem(setId)
-        assertEquals(rules, rulesAgain)
+        var problem = Problem(hashSetOf(VertexRule("XN"), VertexRule("NSW"), VertexRule("S")))
+        var setId = problem.getId()
+        var rulesAgain = Problem(setId)
+        assertEquals(problem, rulesAgain)
 
-        rules = hashSetOf()
-        setId = problemToId(rules)
-        rulesAgain = idToProblem(setId)
-        assertEquals(rules, rulesAgain)
+        problem =  Problem(hashSetOf())
+        setId = problem.getId()
+        rulesAgain = Problem(setId)
+        assertEquals(problem, rulesAgain)
 
-        rules = hashSetOf(VertexRule("E"), VertexRule("NSWE"), VertexRule("X"))
-        setId = problemToId(rules)
-        rulesAgain = idToProblem(setId)
-        assertEquals(rules, rulesAgain)
+        problem = Problem(hashSetOf(VertexRule("E"), VertexRule("NSWE"), VertexRule("X")))
+        setId = problem.getId()
+        rulesAgain = Problem(setId)
+        assertEquals(problem, rulesAgain)
 
-        rules = parseProblem("XN, XE, NE, XNE, XS, NS, XNS, ES, XES, NES, XNES, XW, NW, XNW, EW, XEW, NEW, XNEW, SW, XSW, NSW, XNSW, ESW, XESW")
-        setId = problemToId(rules)
-        rulesAgain = idToProblem(setId)
-        assertEquals(rules, rulesAgain)
+        problem = parseProblem("XN, XE, NE, XNE, XS, NS, XNS, ES, XES, NES, XNES, XW, NW, XNW, EW, XEW, NEW, XNEW, SW, XSW, NSW, XNSW, ESW, XESW")
+        setId = problem.getId()
+        rulesAgain = Problem(setId)
+        assertEquals(problem, rulesAgain)
     }
 
     @Test
     fun getNextRuleIdTest() {
-        val allowedRules = hashSetOf(VertexRule("N"), VertexRule("S"), VertexRule("XSW"))
-        val setId = problemToId(allowedRules)
+        val allowedRules = Problem(hashSetOf(VertexRule("N"), VertexRule("S"), VertexRule("XSW")))
+        val setId = allowedRules.getId()
 
-        assertEquals(problemToId(hashSetOf(VertexRule("S"), VertexRule("XSW"))),
+        assertEquals(Problem(hashSetOf(VertexRule("S"), VertexRule("XSW"))).getId(),
                 getNextProblemId(setId, allowedRules))
 
-        assertEquals(problemToId(hashSetOf(VertexRule("XSW"), VertexRule("N"))),
-                getNextProblemId(problemToId(hashSetOf(VertexRule("S"), VertexRule("XSW"))), allowedRules))
+        assertEquals(Problem(hashSetOf(VertexRule("XSW"), VertexRule("N"))).getId(),
+                getNextProblemId(Problem(hashSetOf(VertexRule("S"), VertexRule("XSW"))).getId(), allowedRules))
 
         val problem = parseProblem("XN, XE, NE, XNE, XS, NS, XNS, ES, XES, NES, XNES, XW, NW, XNW, EW, XEW, NEW, XNEW, SW, XSW, NSW, XNSW, ESW, XESW")
-        val subproblemsCount = Math.pow(2.toDouble(), problem.size.toDouble()).toLong()
+        val subproblemsCount = Math.pow(2.toDouble(), problem.rules.size.toDouble()).toLong()
         var actualSubproblemsCount = 0L
 
-        var problemId: Int? = problemToId(problem)
+        var problemId: Int? = problem.getId()
         while (problemId != null) {
             problemId = getNextProblemId(problemId, problem)
             actualSubproblemsCount++

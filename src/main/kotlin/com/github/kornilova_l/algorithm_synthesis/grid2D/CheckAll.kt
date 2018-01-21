@@ -1,8 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.idToProblem
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.problemToId
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tryToFindSolutionForEachProblem
 import gnu.trove.list.array.TIntArrayList
 import java.io.BufferedWriter
@@ -17,9 +15,9 @@ val solvableFile = File("results/solvable.txt")
 val unsolvableFile = File("results/unsolvable.txt")
 /* it is more efficient to search solution for several rules combination at one time
  * because graph creating takes a lot of time */
-val iterationSize = 100
+const val iterationSize = 100
 
-val skipFirst = 18900
+const val skipFirst = 18900
 
 val random = Random(System.currentTimeMillis())
 
@@ -27,7 +25,7 @@ fun main(args: Array<String>) {
     val solvable = parseInts(solvableFile)
     val unsolvable = parseInts(unsolvableFile)
 
-    val currentIteration = ArrayList<Set<VertexRule>>()
+    val currentIteration = ArrayList<Problem>()
     for (combinationNum in totalNumberOfCombination - skipFirst downTo 0) {
 //        val combinationNum = Math.abs(random.nextLong()) % totalNumberOfCombination
         if (isSolvable(combinationNum, solvable)) {
@@ -39,7 +37,7 @@ fun main(args: Array<String>) {
             continue
         }
         // here we do not know if it is solvable or not
-        val rules = idToProblem(combinationNum)
+        val rules = Problem(combinationNum)
         currentIteration.add(rules)
         if (currentIteration.size == iterationSize) {
             val newSolvable = tryToFindSolutionForEachProblem(currentIteration)
@@ -51,14 +49,14 @@ fun main(args: Array<String>) {
 }
 
 fun updateSolvableAndUnsolvable(solvable: TIntArrayList, unsolvable: TIntArrayList,
-                                newSolvable: Set<Set<VertexRule>>, allCheckedProblems: List<Set<VertexRule>>) {
+                                newSolvable: Set<Problem>, allCheckedProblems: List<Problem>) {
     println("Solvable size before: ${solvable.size()}")
     println("Unsolvable size before: ${unsolvable.size()}")
     for (problem in allCheckedProblems) {
         if (newSolvable.contains(problem)) {
-            solvable.add(problemToId(problem))
+            solvable.add(problem.getId())
         } else {
-            unsolvable.add(problemToId(problem))
+            unsolvable.add(problem.getId())
         }
     }
     updateSolvable(solvable)
