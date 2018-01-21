@@ -58,6 +58,17 @@ class Problem(val rules: Set<VertexRule>) {
         return stringBuilder.toString()
     }
 
+    override fun hashCode(): Int {
+        return rules.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other is Problem) {
+            return rules == other.rules
+        }
+        return false
+    }
+
     companion object {
 
         fun parseProblem(line: String): Problem {

@@ -29,6 +29,7 @@ val includedNeighboursCountLists = (1..31).map { i ->
  *
  */
 fun main(args: Array<String>) {
+    val problemToList = HashMap<Problem, List<Int>>()
     val problems = ArrayList<Problem>()
     for (includedNeighboursCountList in includedNeighboursCountLists) {
         val rules = HashSet<VertexRule>()
@@ -36,8 +37,13 @@ fun main(args: Array<String>) {
             rules.addAll(getRulePermutations(includedNeighboursCount, true))
             rules.addAll(getRulePermutations(includedNeighboursCount, false))
         }
-        problems.add(Problem(rules))
+        val problem = Problem(rules)
+        problemToList[problem] = includedNeighboursCountList
+        problems.add(problem)
     }
     val solvableProblems = tryToFindSolutionForEachProblem(problems)
     println(solvableProblems)
+    for (solvableProblem in solvableProblems) {
+        println(problemToList[solvableProblem])
+    }
 }

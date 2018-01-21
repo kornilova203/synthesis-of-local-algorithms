@@ -3,13 +3,13 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Neighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraphWithTiles
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraphsIterator
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.positions
 import java.io.File
 import java.util.regex.Pattern
 
 val tilesFilePattern = Pattern.compile("\\d+-\\d+-\\d+\\.txt")!!
-val graphFilePattern = Pattern.compile("\\d+-\\d+-\\d+\\.graph")!!
 
 /**
  * Try to find tile size such that it is possible to get labels so
@@ -18,41 +18,34 @@ val graphFilePattern = Pattern.compile("\\d+-\\d+-\\d+\\.graph")!!
  * To use this function all tile sets must be precalculated and stored in generated_tiles directory
  */
 fun getLabelingFunction(problem: Problem): LabelingFunction? {
-    val files = File("directed_graphs").listFiles()
-    for (i in 0 until files.size) {
-        val file = files[i]
-        if (graphFilePattern.matcher(file.name).matches()) {
-            val graph = DirectedGraph.createInstance(file)
-            println("n = ${graph.n} m = ${graph.m} k = ${graph.k}")
-            val function = getLabelingFunction(problem, graph)
+    val directedGraphsParser = DirectedGraphsIterator(File("directed_graphs"))
+    for (graph in directedGraphsParser) {
+        println("n = ${graph.n} m = ${graph.m} k = ${graph.k}")
+        val function = getLabelingFunction(problem, graph)
 
-            if (function != null) {
-                println("Found")
-                return function
-            }
+        if (function != null) {
+            println("Found")
+            return function
         }
     }
     return null
 }
 
 fun doesSolutionExist(problem: Problem): Boolean {
-    val files = File("directed_graphs").listFiles()
-    for (i in 0 until files.size) {
-        val file = files[i]
-        if (graphFilePattern.matcher(file.name).matches()) {
-            val graph = DirectedGraph.createInstance(file)
-            println("n = ${graph.n} m = ${graph.m} k = ${graph.k}")
-            var solution = tryToFindSolution(problem, graph)
-            if (solution != null) { // solution found
-                return true
-            }
+    val directedGraphsParser = DirectedGraphsIterator(File("directed_graphs"))
+    for (graph in directedGraphsParser) {
+        println("n = ${graph.n} m = ${graph.m} k = ${graph.k}")
+        var solution = tryToFindSolution(problem, graph)
+        if (solution != null) { // solution found
+            return true
+        }
 
-            solution = tryToFindSolution(problem.rotate(), graph)
-            if (solution != null) { // solution found
-                return true
-            }
+        solution = tryToFindSolution(problem.rotate(), graph)
+        if (solution != null) { // solution found
+            return true
         }
     }
+
     return false
 }
 
@@ -90,17 +83,13 @@ private fun isSolvable(problem: Problem, graph: DirectedGraph): Boolean {
  * @return solvable problems
  */
 fun tryToFindSolutionForEachProblem(problems: List<Problem>): Set<Problem> {
+    val directedGraphsParser = DirectedGraphsIterator(File("directed_graphs"))
     val solvable = HashSet<Problem>()
-    val files = File("directed_graphs").listFiles()
-    for (i in 0 until files.size) {
+    for (graph in directedGraphsParser) {
         if (solvable.size == problems.size) { // if everything is solved
             return solvable
         }
-        val file = files[i]
-        if (graphFilePattern.matcher(file.name).matches()) {
-            val graph = DirectedGraph.createInstance(file)
-            useGraphToFindSolutions(problems, graph, solvable)
-        }
+        useGraphToFindSolutions(problems, graph, solvable)
     }
     println("COMPLETE")
     return solvable

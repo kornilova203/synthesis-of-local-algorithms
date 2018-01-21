@@ -42,7 +42,7 @@ class VertexRuleKtTest {
         assertEquals(VertexRule("NW"), problem.rules.first())
 
         problem = Problem("?1001")
-        assertEquals(hashSetOf(VertexRule("NW"), VertexRule("XNW")), problem)
+        assertEquals(hashSetOf(VertexRule("NW"), VertexRule("XNW")), problem.rules)
 
         problem = Problem("??001")
         assertEquals(hashSetOf(
@@ -50,7 +50,7 @@ class VertexRuleKtTest {
                 VertexRule("XNW"),
                 VertexRule("XW"),
                 VertexRule("W")
-        ), problem)
+        ), problem.rules)
 
         problem = Problem("?????")
         assertEquals(32, problem.rules.size)
@@ -74,10 +74,10 @@ class VertexRuleKtTest {
     @Test
     fun parseRulesTest() {
         var actual = parseProblem("[X, NWE]")
-        assertEquals(hashSetOf(VertexRule("X"), VertexRule("NWE")), actual)
+        assertEquals(hashSetOf(VertexRule("X"), VertexRule("NWE")), actual.rules)
 
         actual = parseProblem("- E]")
-        assertEquals(hashSetOf(VertexRule("-"), VertexRule("E")), actual)
+        assertEquals(hashSetOf(VertexRule("-"), VertexRule("E")), actual.rules)
     }
 
     @Test
