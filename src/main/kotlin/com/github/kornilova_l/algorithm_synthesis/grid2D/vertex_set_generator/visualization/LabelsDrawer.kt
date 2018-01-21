@@ -10,9 +10,9 @@ import javax.imageio.ImageIO
 val blue = Color(110, 145, 255)
 val gray = Color(224, 224, 224)
 val darkBlue = Color(2, 15, 56)
-val cellWidth = 19
-val independentSetWidth = 7
-val gap = 7
+const val cellWidth = 19
+const val independentSetWidth = 7
+private const val gap = 7
 
 fun drawLabels(labels: Array<BooleanArray>, independentSet: Array<BooleanArray>) {
     val imageHeight = labels.size * (cellWidth + gap) + gap
@@ -45,7 +45,7 @@ private fun drawSquares(graphics: Graphics, labels: Array<BooleanArray>, indepen
     }
 }
 
-private fun createGraphics(bufferedImage: BufferedImage, imageWidth: Int, imageHeight: Int): Graphics {
+internal fun createGraphics(bufferedImage: BufferedImage, imageWidth: Int, imageHeight: Int): Graphics {
     val graphics = bufferedImage.createGraphics()
     graphics.color = Color.WHITE
     graphics.fillRect(0, 0, imageWidth, imageHeight)
