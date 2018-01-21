@@ -78,6 +78,12 @@ private fun tryToFindSolution(problem: Problem, graph: DirectedGraph): List<Int>
     return satSolver.solve(graph.size)
 }
 
+private fun isSolvable(problem: Problem, graph: DirectedGraph): Boolean {
+    val satSolver = SatSolver()
+    addClausesToSatSolver(graph, problem, satSolver)
+    return satSolver.isSolvable()
+}
+
 /**
  * This method is more effective than calling isSolvable for each problem
  * because it constructs a graph only ones for all problems
@@ -108,11 +114,11 @@ private fun useGraphToFindSolutions(problems: List<Problem>, graph: DirectedGrap
             if (solutions.contains(problem)) { // if solution was found
                 continue
             }
-            var solution = tryToFindSolution(problem, graph)
-            if (solution == null && graph.n != graph.m) {
-                solution = tryToFindSolution(problem.rotate(), graph)
+            var isSolvable = isSolvable(problem, graph)
+            if (!isSolvable && graph.n != graph.m) {
+                isSolvable = isSolvable(problem.rotate(), graph)
             }
-            if (solution != null) {
+            if (isSolvable) {
                 println("Found solution for $problem")
                 solutions.add(problem)
             }
