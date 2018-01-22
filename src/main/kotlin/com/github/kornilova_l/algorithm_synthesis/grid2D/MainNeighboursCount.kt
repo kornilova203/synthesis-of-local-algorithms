@@ -4,8 +4,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.ru
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tryToFindSolutionForEachProblem
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.visualization.Point
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.visualization.draw
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.visualization.RowDrawer
 import java.util.*
 
 
@@ -50,27 +49,21 @@ fun main(args: Array<String>) {
     }
     val solvableProblems = tryToFindSolutionForEachProblem(problems)
     val solvableCombinations = getSolvableCombinations(solvableProblems, problemToCombination)
-    val points = combinationsToPoints(neighboursCombinationsList, solvableCombinations)
-    draw(points)
+    val rowDrawer = createDrawer(neighboursCombinationsList, solvableCombinations)
+    rowDrawer.outputImage()
 }
 
-/**
- * Convert combinations to list of [Point]
- * It is needed for visualization
- */
-private fun combinationsToPoints(neighboursCombinationsList: List<List<Int>>, solvableCombinations: Set<List<Int>>): List<Point> {
-    val points = ArrayList<Point>()
+private fun createDrawer(neighboursCombinationsList: List<List<Int>>, solvableCombinations: Set<List<Int>>): RowDrawer {
+    val row = BooleanArray(neighboursCombinationsList.size, { false })
+    val labels = ArrayList<String>()
     val sortedCombinations = sortCombinations(neighboursCombinationsList)
-    for (combination in sortedCombinations) {
+    sortedCombinations.forEachIndexed { i, combination ->
         val listToString = combination.toString()
         val label = listToString.substring(1, listToString.length - 1) // remove '[' and ']'
-        if (solvableCombinations.contains(combination)) {
-            points.add(Point(label, true))
-        } else {
-            points.add(Point(label, false))
-        }
+        labels.add(label)
+        row[i] = solvableCombinations.contains(combination)
     }
-    return points
+    return RowDrawer(labels, row)
 }
 
 /**
