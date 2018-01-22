@@ -3,7 +3,9 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.v
 import java.awt.*
 import java.awt.geom.AffineTransform
 import java.awt.image.BufferedImage
+import java.io.BufferedReader
 import java.io.File
+import java.io.FileReader
 import javax.imageio.ImageIO
 
 
@@ -95,6 +97,45 @@ open class GridDrawer(private val verticalLabels: List<String>, private val hori
                 graphics.fillRect(imagePadding + maxVerticalLabelWidth + gapBetweenLabelsAndGrid + j * (cellWidth + gap),
                         imagePadding + i * (cellWidth + gap),
                         cellWidth, cellWidth)
+            }
+        }
+    }
+
+    companion object {
+        /**
+         * Format if file:
+         * <number of rows> <number of columns>
+         * <names of rows. One name per line.>
+         * <names of columns. One name per line.>
+         * 01010...
+         * 10101...
+         * ...
+         */
+        fun createInstance(file: File): GridDrawer {
+            BufferedReader(FileReader(file)).use { reader ->
+                val firstLine = reader.readLine()
+                val parts = firstLine.split(" ")
+                val n = Integer.parseInt(parts[0])
+                val m = Integer.parseInt(parts[1])
+                val verticalLabels = ArrayList<String>(n)
+                for (i in 0 until n) {
+                    verticalLabels.add(reader.readLine())
+                }
+                val horizontalLabels = ArrayList<String>(n)
+                for (i in 0 until m) {
+                    horizontalLabels.add(reader.readLine())
+                }
+                val grid = Array(n, { BooleanArray(m) })
+                for (i in 0 until n) {
+                    for (j in 0 until m) {
+                        var c = reader.read().toChar()
+                        while (c != '1' && c != '0') {
+                            c = reader.read().toChar()
+                        }
+                        grid[i][j] = c == '1'
+                    }
+                }
+                return GridDrawer(verticalLabels, horizontalLabels, grid)
             }
         }
     }
