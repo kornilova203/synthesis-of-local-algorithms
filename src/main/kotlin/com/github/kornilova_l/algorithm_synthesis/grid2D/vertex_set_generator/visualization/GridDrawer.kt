@@ -1,9 +1,11 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.visualization
 
 import java.awt.*
+import java.awt.geom.AffineTransform
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
+
 
 /**
  * Draws grid with horizontal and vertical labels
@@ -39,13 +41,13 @@ open class GridDrawer(private val verticalLabels: List<String>, private val hori
                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON
         )
         drawVerticalLabels(graphics, verticalLabels, maxVerticalLabelWidth)
-        drawHorizontalLabels(graphics, horizontalLabels, maxHorizontalLabelWidth)
+        drawHorizontalLabels(graphics, horizontalLabels, maxVerticalLabelWidth)
         draw(graphics, maxVerticalLabelWidth)
         ImageIO.write(bufferedImage, "png", file)
     }
 
     protected open fun getImageHeight(maxHorizontalLabelWidth: Int): Int =
-            grid.size * (cellWidth + gap) + imagePadding * 2 + gapBetweenLabelsAndGrid + maxHorizontalLabelWidth
+            grid.size * (cellWidth + gap) + imagePadding * 2 + gapBetweenLabelsAndGrid + (maxHorizontalLabelWidth * 0.7).toInt()
 
     private fun getImageWidth(maxVerticalLabelsWidth: Int): Int =
             imagePadding * 2 + maxVerticalLabelsWidth + gapBetweenLabelsAndGrid + grid.first().size * (cellWidth + gap) - gap
@@ -59,8 +61,17 @@ open class GridDrawer(private val verticalLabels: List<String>, private val hori
         }
     }
 
-    private fun drawHorizontalLabels(graphics: Graphics2D, horizontalLabels: List<String>, maxHorizontalLabelWidth: Int) {
-        // todo: implement
+    private fun drawHorizontalLabels(graphics: Graphics2D, horizontalLabels: List<String>, maxVerticalLabelWidth: Int) {
+        val affineTransform = AffineTransform()
+        affineTransform.rotate(Math.toRadians(45.0), 0.0, 0.0)
+        val rotatedFont = font.deriveFont(affineTransform)
+        graphics.font = rotatedFont
+        horizontalLabels.forEachIndexed { j, label ->
+            graphics.drawString(label,
+                    imagePadding + maxVerticalLabelWidth + gapBetweenLabelsAndGrid + j * (cellWidth + gap),
+                    imagePadding + grid.size * (cellWidth + gap) - gap + gapBetweenLabelsAndGrid + 7)
+        }
+        graphics.font = font
     }
 
     private fun getMaxStringWidth(labels: List<String>): Int {
