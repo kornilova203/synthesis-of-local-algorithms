@@ -8,7 +8,8 @@ import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 
-val font = Font("Arial", 0, 14)
+private val green = Color(52, 192, 119)
+private val font = Font("Arial", 0, 14)
 private const val verticalGap = 1
 private const val horizontalGap = 6
 
@@ -58,7 +59,7 @@ fun getMaxStringWidth(points: List<Point>): Int {
 fun draw(graphics: Graphics, points: List<Point>, maxStringWidth: Int) {
     points.forEachIndexed { i, point ->
         if (point.isOn) {
-            graphics.color = blue
+            graphics.color = green
         } else {
             graphics.color = gray
         }
