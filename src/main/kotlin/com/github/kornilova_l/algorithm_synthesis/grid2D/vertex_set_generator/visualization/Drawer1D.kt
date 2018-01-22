@@ -3,6 +3,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.v
 import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics
+import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
@@ -32,6 +33,10 @@ fun draw(points: List<Point>) {
             BufferedImage.TYPE_INT_ARGB)
     val graphics = createGraphics(bufferedImage, imageWidth, imageHeight)
     graphics.font = font
+    graphics.setRenderingHint(
+            RenderingHints.KEY_TEXT_ANTIALIASING,
+            RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+    )
     draw(graphics, points, maxStringWidth)
     val file = File("generated_images/scheme.png")
     ImageIO.write(bufferedImage, "png", file)

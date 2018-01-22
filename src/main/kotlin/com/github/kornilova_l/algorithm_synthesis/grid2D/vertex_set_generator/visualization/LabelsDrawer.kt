@@ -3,6 +3,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.v
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Graphics
+import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
@@ -45,7 +46,7 @@ private fun drawSquares(graphics: Graphics, labels: Array<BooleanArray>, indepen
     }
 }
 
-internal fun createGraphics(bufferedImage: BufferedImage, imageWidth: Int, imageHeight: Int): Graphics {
+internal fun createGraphics(bufferedImage: BufferedImage, imageWidth: Int, imageHeight: Int): Graphics2D {
     val graphics = bufferedImage.createGraphics()
     graphics.color = Color.WHITE
     graphics.fillRect(0, 0, imageWidth, imageHeight)
