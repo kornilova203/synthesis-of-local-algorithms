@@ -1,10 +1,9 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Companion.Expand.HEIGHT
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Companion.Expand.WIDTH
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Companion.getAllPossibleExtensions
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTile.Companion.Expand.HEIGHT
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTile.Companion.Expand.WIDTH
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTile.Companion.getAllPossibleExtensions
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.generatePossiblyValidTiles
 import com.github.kornilova_l.util.ProgressBar
 import java.io.File
 import java.io.FileOutputStream
@@ -37,7 +36,7 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         }
     }
 
-    private fun getInitialTiles(dir: File?): Set<Tile> {
+    private fun getInitialTiles(dir: File?): Set<IndependentSetTile> {
         var currentN = finalN
         var currentM = finalM
         while (currentN >= 3 && currentM >= 3) {
@@ -62,7 +61,7 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
      * Expand each tile by 1 row/column
      * Remove not valid tiles
      */
-    private fun expandTileSet(tiles: Set<Tile>): Set<Tile> {
+    private fun expandTileSet(tiles: Set<IndependentSetTile>): Set<IndependentSetTile> {
         val currentN = tiles.first().n
         val currentM = tiles.first().m
         if (currentN == finalN && currentM == finalM) {
@@ -71,7 +70,7 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         val side = if (currentN < currentM && currentN < finalN || currentM == finalM) HEIGHT else WIDTH
         println("Expand tiles $currentN x $currentM k: $k. Side: $side\nTiles count = ${tiles.size}")
         val progressBar = ProgressBar(tiles.size)
-        val expandedTiles: MutableSet<Tile> = ConcurrentHashMap.newKeySet()
+        val expandedTiles: MutableSet<IndependentSetTile> = ConcurrentHashMap.newKeySet()
         tiles.parallelStream().forEach { tile ->
             addValidExtensionsToSet(tile, expandedTiles, side)
             progressBar.updateProgress(1)
@@ -81,7 +80,34 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         return expandedTiles
     }
 
-    private fun addValidExtensionsToSet(tile: Tile, expandedTiles: MutableSet<Tile>, side: Tile.Companion.Expand) {
+    /**
+     * Generates set of possibly-valid validTiles
+     */
+    private fun generatePossiblyValidTiles(n: Int, m: Int, k: Int): Set<IndependentSetTile> {
+
+        /* It is meaningless to make following piece of code recursive
+         * because all candidate tiles must be placed in possiblyValidTiles set
+         * and it is not possible to reduce memory consumption using recursive method
+         */
+        val possiblyValidTiles = HashSet<IndependentSetTile>()
+        possiblyValidTiles.add(IndependentSetTile(n, m, k))
+
+        for (i in 0 until n) {
+            for (j in 0 until m) {
+                val newTileIS = HashSet<IndependentSetTile>()
+                for (possiblyValidTile in possiblyValidTiles) {
+                    if (possiblyValidTile.canBeI(i, j)) {
+                        newTileIS.add(IndependentSetTile.createInstance(possiblyValidTile, i, j))
+                    }
+                }
+                possiblyValidTiles.addAll(newTileIS)
+                newTileIS.clear()
+            }
+        }
+        return possiblyValidTiles
+    }
+
+    private fun addValidExtensionsToSet(tile: IndependentSetTile, expandedTiles: MutableSet<IndependentSetTile>, side: IndependentSetTile.Companion.Expand) {
         val extensions = getAllPossibleExtensions(tile, side)
         for (extension in extensions) {
             if (extension.isValid()) {
@@ -131,8 +157,8 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         /**
          * Remove all tileSet which does not have maximal IS
          */
-        private fun removeNotMaximal(tiles: Set<Tile>): Set<Tile> {
-            val maximalTiles = HashSet<Tile>()
+        private fun removeNotMaximal(tiles: Set<IndependentSetTile>): Set<IndependentSetTile> {
+            val maximalTiles = HashSet<IndependentSetTile>()
             for (tile in tiles) {
                 if (tile.isValid()) {
                     maximalTiles.add(tile)

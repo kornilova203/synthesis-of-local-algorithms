@@ -1,6 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.colouring
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleTileGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileMap
 import java.io.File
@@ -49,7 +49,7 @@ class ColouringProblem(graph: SimpleTileGraph, coloursCount: Int) {
 
     private fun getResult(scanner: Scanner, graph: SimpleTileGraph, coloursCount: Int): TileMap<Int>? {
         val resultColours = TileMap<Int>(graph.n, graph.m, graph.k)
-        val possibleColours = HashMap<Tile, BooleanArray>()
+        val possibleColours = HashMap<IndependentSetTile, BooleanArray>()
         for (tile in graph.graph.keys) {
             possibleColours.put(tile, BooleanArray(4))
         }
@@ -91,7 +91,7 @@ class ColouringProblem(graph: SimpleTileGraph, coloursCount: Int) {
             val clausesCount = graph.size + graph.edgeCount * coloursCount
             stringBuilder.append("p cnf ").append(graph.size * coloursCount).append(" ").append(clausesCount).append("\n")
 
-            val visitedEdges = HashMap<Tile, HashSet<Tile>>() // to count each edge only ones
+            val visitedEdges = HashMap<IndependentSetTile, HashSet<IndependentSetTile>>() // to count each edge only ones
 
             for (tile in graph.graph.keys) {
                 addTileClause(stringBuilder, graph.getId(tile), coloursCount)

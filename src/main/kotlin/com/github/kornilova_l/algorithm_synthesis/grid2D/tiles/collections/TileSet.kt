@@ -1,6 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTile
 import org.apache.lucene.util.OpenBitSet
 import java.io.BufferedReader
 import java.io.File
@@ -18,7 +18,7 @@ class TileSet {
     /**
      * Do not modify this set externally
      */
-    val validTiles: ArrayList<Tile>
+    val validTiles: ArrayList<IndependentSetTile>
 
     internal val isEmpty: Boolean
         get() = validTiles.isEmpty()
@@ -27,7 +27,7 @@ class TileSet {
         if (!file.exists() || !file.isFile) {
             throw IllegalArgumentException("File does not exist or it is not a file")
         }
-        var validTiles: ArrayList<Tile>? = null
+        var validTiles: ArrayList<IndependentSetTile>? = null
         BufferedReader(FileReader(file)).use { reader ->
             val firstLine = reader.readLine()
             val parts = firstLine.split(" ")
@@ -38,7 +38,7 @@ class TileSet {
             validTiles = ArrayList(size)
             for (i in 0 until size) {
                 val grid = parseSet(reader, n, m)
-                validTiles!!.add(Tile(grid, n, m, k))
+                validTiles!!.add(IndependentSetTile(n, m, k, grid))
             }
             if (size != validTiles!!.size) {
                 throw IllegalArgumentException("File contains less tiles that it states in the beginning of the file")
@@ -67,7 +67,7 @@ class TileSet {
         }
     }
 
-    internal constructor(validTiles: Collection<Tile>) {
+    internal constructor(validTiles: Collection<IndependentSetTile>) {
         val someTile = validTiles.iterator().next()
         n = someTile.n
         m = someTile.m
@@ -101,31 +101,4 @@ class TileSet {
     override fun hashCode(): Int {
         return validTiles.hashCode()
     }
-}
-
-/**
- * Generates set of possibly-valid validTiles
- */
-fun generatePossiblyValidTiles(n: Int, m: Int, k: Int): Set<Tile> {
-
-    /* It is meaningless to make following piece of code recursive
-     * because all candidate tiles must be placed in possiblyValidTiles set
-     * and it is not possible to reduce memory consumption using recursive method
-     */
-    val possiblyValidTiles = HashSet<Tile>()
-    possiblyValidTiles.add(Tile(n, m, k))
-
-    for (i in 0 until n) {
-        for (j in 0 until m) {
-            val newTileIS = HashSet<Tile>()
-            for (possiblyValidTile in possiblyValidTiles) {
-                if (possiblyValidTile.canBeI(i, j)) {
-                    newTileIS.add(Tile(possiblyValidTile, i, j))
-                }
-            }
-            possiblyValidTiles.addAll(newTileIS)
-            newTileIS.clear()
-        }
-    }
-    return possiblyValidTiles
 }

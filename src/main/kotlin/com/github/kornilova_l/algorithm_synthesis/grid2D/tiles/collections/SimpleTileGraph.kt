@@ -1,7 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Part
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTile.Part
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
 import java.util.*
 
@@ -13,8 +13,8 @@ class SimpleTileGraph(tileSet1: TileSet, tileSet2: TileSet) : TileGraph() {
     override val n: Int
     override val m: Int
     override val k: Int
-    val graph = HashMap<Tile, HashSet<Tile>>()
-    private val ids = DualHashBidiMap<Tile, Int>()
+    val graph = HashMap<IndependentSetTile, HashSet<IndependentSetTile>>()
+    private val ids = DualHashBidiMap<IndependentSetTile, Int>()
     private val tileSet1: TileSet
     private val tileSet2: TileSet
 
@@ -54,14 +54,14 @@ class SimpleTileGraph(tileSet1: TileSet, tileSet2: TileSet) : TileGraph() {
         k = tileSet1.k
 
         for (tile in tileSet1.validTiles) { // get vertical neighbours
-            val top = Tile(tile, Part.N)
-            val bottom = Tile(tile, Part.S)
+            val top = IndependentSetTile.createInstance(tile, Part.N)
+            val bottom = IndependentSetTile.createInstance(tile, Part.S)
             graph.computeIfAbsent(top) { HashSet() }.add(bottom)
             graph.computeIfAbsent(bottom) { HashSet() }.add(top)
         }
         for (tile in this.tileSet2.validTiles) { // get horizontal neighbours
-            val left = Tile(tile, Part.W)
-            val right = Tile(tile, Part.E)
+            val left = IndependentSetTile.createInstance(tile, Part.W)
+            val right = IndependentSetTile.createInstance(tile, Part.E)
             graph.computeIfAbsent(left) { HashSet() }.add(right)
             graph.computeIfAbsent(right) { HashSet() }.add(left)
         }
@@ -78,9 +78,9 @@ class SimpleTileGraph(tileSet1: TileSet, tileSet2: TileSet) : TileGraph() {
         }
     }
 
-    fun getId(tile: Tile): Int = ids[tile]!!
+    fun getId(tile: IndependentSetTile): Int = ids[tile]!!
 
-    fun getKey(tileId: Int): Tile = ids.getKey(tileId)
+    fun getKey(tileId: Int): IndependentSetTile = ids.getKey(tileId)
 
     private fun validateTileSets(tileSet1: TileSet, tileSet2: TileSet) {
         if (tileSet1.k != tileSet2.k) {

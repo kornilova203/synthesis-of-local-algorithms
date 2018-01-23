@@ -1,6 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Neighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import org.junit.Assert.assertEquals
@@ -27,13 +27,13 @@ class DirectedGraphTest {
         val tileSet = TileSet(File("generated_tiles/4-5-4.txt"))
         val graph = DirectedGraphWithTiles.createInstance(tileSet)
 
-        val id1 = graph.getId(Tile("0 0 0\n0 0 0", 4))
-        val id2 = graph.getId(Tile("0 0 1\n0 0 0", 4))
-        val id3 = graph.getId(Tile("0 0 0\n0 0 1", 4))
-        val id4 = graph.getId(Tile("0 0 0\n1 0 0", 4))
-        val id5 = graph.getId(Tile("1 0 0\n0 0 0", 4))
-        val id6 = graph.getId(Tile("0 0 0\n0 1 0", 4))
-        val id7 = graph.getId(Tile("0 1 0\n0 0 0", 4))
+        val id1 = graph.getId(IndependentSetTile.createInstance("0 0 0\n0 0 0", 4))
+        val id2 = graph.getId(IndependentSetTile.createInstance("0 0 1\n0 0 0", 4))
+        val id3 = graph.getId(IndependentSetTile.createInstance("0 0 0\n0 0 1", 4))
+        val id4 = graph.getId(IndependentSetTile.createInstance("0 0 0\n1 0 0", 4))
+        val id5 = graph.getId(IndependentSetTile.createInstance("1 0 0\n0 0 0", 4))
+        val id6 = graph.getId(IndependentSetTile.createInstance("0 0 0\n0 1 0", 4))
+        val id7 = graph.getId(IndependentSetTile.createInstance("0 1 0\n0 0 0", 4))
 
         val neighbourhood = Neighbourhood(id4, id1, id1, id5, id6)
         assertTrue(graph.neighbourhoods.contains(neighbourhood))

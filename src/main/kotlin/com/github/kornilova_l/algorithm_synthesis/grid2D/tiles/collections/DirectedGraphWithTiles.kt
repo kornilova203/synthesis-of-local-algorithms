@@ -1,6 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet.Companion.parseSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tilesFilePattern
@@ -52,13 +52,13 @@ class DirectedGraphWithTiles(n: Int,
                              m: Int,
                              k: Int,
                              neighbourhoods: Set<Neighbourhood>,
-                             private val ids: DualHashBidiMap<Tile, Int>) : DirectedGraph(n, m, k, neighbourhoods) {
+                             private val ids: DualHashBidiMap<IndependentSetTile, Int>) : DirectedGraph(n, m, k, neighbourhoods) {
     override val size: Int
         get() = ids.size
 
-    fun getId(tile: Tile): Int = ids[tile]!!
+    fun getId(tile: IndependentSetTile): Int = ids[tile]!!
 
-    fun getTile(id: Int): Tile? = ids.getKey(id)
+    fun getTile(id: Int): IndependentSetTile? = ids.getKey(id)
 
     /**
      * Format:
@@ -87,17 +87,17 @@ class DirectedGraphWithTiles(n: Int,
             if (n <= 0 || m <= 0) {
                 throw IllegalArgumentException("Each dimension of tiles in set must be at least 3")
             }
-            val ids = DualHashBidiMap<Tile, Int>()
+            val ids = DualHashBidiMap<IndependentSetTile, Int>()
             val neighbourhoods = HashSet<Neighbourhood>()
             /* There must exist at most one instance of each tile */
             for (tile in tileSet.validTiles) {
                 neighbourhoods.add(
                         Neighbourhood(
-                                getId(Tile(tile, POSITION.X), ids),
-                                getId(Tile(tile, POSITION.N), ids),
-                                getId(Tile(tile, POSITION.E), ids),
-                                getId(Tile(tile, POSITION.S), ids),
-                                getId(Tile(tile, POSITION.W), ids)
+                                getId(IndependentSetTile.createInstance(tile, POSITION.X), ids),
+                                getId(IndependentSetTile.createInstance(tile, POSITION.N), ids),
+                                getId(IndependentSetTile.createInstance(tile, POSITION.E), ids),
+                                getId(IndependentSetTile.createInstance(tile, POSITION.S), ids),
+                                getId(IndependentSetTile.createInstance(tile, POSITION.W), ids)
                         ))
             }
             if (neighbourhoods.size == 0) {
@@ -107,7 +107,7 @@ class DirectedGraphWithTiles(n: Int,
         }
 
         fun createInstance(tilesFile: File, directedGraph: DirectedGraph): DirectedGraphWithTiles {
-            val ids = DualHashBidiMap<Tile, Int>()
+            val ids = DualHashBidiMap<IndependentSetTile, Int>()
             BufferedReader(FileReader(tilesFile)).use { reader ->
                 val firstLine = reader.readLine()
                 val parts = firstLine.split(" ")
@@ -116,7 +116,7 @@ class DirectedGraphWithTiles(n: Int,
                 val k = Integer.parseInt(parts[2])
                 if (n != directedGraph.n || m != directedGraph.m || k != directedGraph.k) {
                     throw IllegalArgumentException("Parameters of graph do not match size of tiles. Graph: n = ${directedGraph.n} " +
-                            "m = ${directedGraph.m} k = ${directedGraph.k}. Tile: n = $n m = $m k = $k.")
+                            "m = ${directedGraph.m} k = ${directedGraph.k}. IndependentSetTile: n = $n m = $m k = $k.")
                 }
                 val tilesCount = Integer.parseInt(reader.readLine())
                 for (i in 0 until tilesCount) {
@@ -126,7 +126,7 @@ class DirectedGraphWithTiles(n: Int,
                     }
                     val id = Integer.parseInt(line)
                     val grid = parseSet(reader, n, m)
-                    ids[Tile(grid, n, m, k)] = id
+                    ids[IndependentSetTile(n, m, k, grid)] = id
                 }
                 return DirectedGraphWithTiles(directedGraph.n, directedGraph.m, directedGraph.k, directedGraph.neighbourhoods, ids)
             }
@@ -137,7 +137,7 @@ class DirectedGraphWithTiles(n: Int,
          * If so it returns existing id
          * otherwise it adds tile to set and returns new id
          */
-        private fun getId(tile: Tile, ids: DualHashBidiMap<Tile, Int>): Int {
+        private fun getId(tile: IndependentSetTile, ids: DualHashBidiMap<IndependentSetTile, Int>): Int {
             val maybeId = ids[tile]
             return if (maybeId != null) {
                 assert(maybeId > 0)

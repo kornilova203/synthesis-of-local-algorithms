@@ -1,7 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters
 
 /**
- * Tile parameters are: n, m and k
+ * IndependentSetTile parameters are: n, m and k
  * All of them are proportional to computational difficulty
  * This class generated disjoint sets of parameters based of given difficulty
  */
