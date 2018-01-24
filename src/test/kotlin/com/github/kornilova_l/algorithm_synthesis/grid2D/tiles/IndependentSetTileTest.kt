@@ -56,11 +56,11 @@ internal class IndependentSetTileTest {
 
         var tile = Tile(independentSet, 1, 3, 3, 5)
 
-        assertEquals(IndependentSetTile.createInstance("0 0 0 0 0\n0 0 0 1 0\n0 1 0 0 0\n", 2), tile)
+        assertEquals(Tile.createInstance("0 0 0 0 0\n0 0 0 1 0\n0 1 0 0 0\n"), tile)
 
         tile = Tile(independentSet, 0, 0, 3, 5)
 
-        assertEquals(IndependentSetTile.createInstance("0 0 0 0 0\n0 0 1 0 0\n1 0 0 0 0\n", 2), tile)
+        assertEquals(Tile.createInstance("0 0 0 0 0\n0 0 1 0 0\n1 0 0 0 0\n"), tile)
     }
 
     @Test

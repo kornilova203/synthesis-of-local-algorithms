@@ -86,19 +86,30 @@ open class Tile(val n: Int,
         return grid.get(getIndex(i, j))
     }
 
+    override fun toString(): String {
+        val stringBuilder = StringBuilder()
+        for (i in 0 until n) {
+            for (j in 0 until m) {
+                stringBuilder.append(if (grid.get(getIndex(i, j))) 1 else 0)
+            }
+            stringBuilder.append("\n")
+        }
+        return stringBuilder.toString()
+    }
+
     /**
      * Create instance of class and copy all extra information.
      */
     protected open fun createInstanceOfClass(newN: Int, newM: Int, grid: OpenBitSet): Tile = Tile(newN, newM, grid)
 
     fun cloneAndExpand(newN: Int, newM: Int): Tile {
-        val grid = OpenBitSet((newN * newM).toLong())
+        val newGrid = OpenBitSet((newN * newM).toLong())
         for (i in 0L until n * m) {
             if (grid.get(i)) {
-                grid.set(getIndex(i / m + (newN - n) / 2, i % m + (newM - m) / 2, newM))
+                newGrid.set(getIndex(i / m + (newN - n) / 2, i % m + (newM - m) / 2, newM))
             }
         }
-        return createInstanceOfClass(newN, newM, grid)
+        return createInstanceOfClass(newN, newM, newGrid)
     }
 
     /**
@@ -108,6 +119,17 @@ open class Tile(val n: Int,
         val grid = grid.clone() as OpenBitSet
         grid.set(getIndex(x.toLong(), y.toLong(), m))
         return createInstanceOfClass(n, m, grid)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other is Tile) {
+            return n == other.n && m == other.m && grid == other.grid
+        }
+        return false
+    }
+
+    override fun hashCode(): Int {
+        return grid.hashCode()
     }
 
     /**
@@ -160,6 +182,13 @@ open class Tile(val n: Int,
     }
 
     companion object {
+
+        fun createInstance(string: String): Tile {
+            val lines = string.split("\n").filter { it != "" }
+            val n = lines.size
+            val m = calculateM(lines)
+            return Tile(n, m, parseGrid(n, m, lines))
+        }
 
         private fun getGrid(independentSet: Array<BooleanArray>, x: Int, y: Int, n: Int, m: Int): OpenBitSet {
             if (independentSet.size < n || independentSet[0].size < m) {

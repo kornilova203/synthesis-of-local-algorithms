@@ -197,17 +197,6 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
         return true
     }
 
-    override fun toString(): String {
-        val stringBuilder = StringBuilder()
-        for (i in 0 until n) {
-            for (j in 0 until m) {
-                stringBuilder.append(if (grid.get(getIndex(i, j))) 1 else 0)
-            }
-            stringBuilder.append("\n")
-        }
-        return stringBuilder.toString()
-    }
-
     /**
      * @return false if tile is definitely not valid and it is not needed to run SAT solver
      */
