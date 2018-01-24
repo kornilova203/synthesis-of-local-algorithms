@@ -1,8 +1,8 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.colouring
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.parseTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleTileGraph
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.parseTiles
 import java.io.File
 
 private val tiles67 = parseTiles(File("generated_tiles/6-7-3.txt"))

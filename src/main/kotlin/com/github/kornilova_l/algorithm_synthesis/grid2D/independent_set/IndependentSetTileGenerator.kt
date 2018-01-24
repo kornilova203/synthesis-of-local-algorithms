@@ -1,5 +1,6 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
+package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator
 import java.io.File
 import java.io.FileOutputStream
 import java.nio.file.Paths

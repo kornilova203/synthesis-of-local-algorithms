@@ -1,5 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTileGenerator
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.parseTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters.getParametersSet
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull

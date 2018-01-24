@@ -1,8 +1,8 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.colouring
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.parseTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleTileGraph
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.parseTiles
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test

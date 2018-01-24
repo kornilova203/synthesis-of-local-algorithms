@@ -1,5 +1,7 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
+package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileIntersection
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolver
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import gnu.trove.set.hash.TIntHashSet

@@ -1,7 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTileGenerator
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.parseTiles
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTileGenerator
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.parseTiles
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.io.File

@@ -1,4 +1,4 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
+package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
 import java.io.File
 import java.util.*
@@ -10,7 +10,7 @@ import kotlin.collections.HashSet
 /**
  * Iterates through all graphs in given directory
  */
-class DirectedGraphsIterator(val dir: File) : Iterable<IndependentSetDirectedGraph> {
+class IndependentSetDirectedGraphsIterator(val dir: File) : Iterable<IndependentSetDirectedGraph> {
 
     override fun iterator(): Iterator<IndependentSetDirectedGraph> {
         return DGIterator()

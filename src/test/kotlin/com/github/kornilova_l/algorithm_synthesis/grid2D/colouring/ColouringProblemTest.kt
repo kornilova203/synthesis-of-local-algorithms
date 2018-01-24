@@ -1,6 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.colouring
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTileGenerator
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTileGenerator
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleTileGraph
 import org.apache.commons.io.FileUtils
 import org.junit.Test

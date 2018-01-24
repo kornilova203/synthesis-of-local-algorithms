@@ -1,8 +1,9 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTile
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.parseSet
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.parseTiles
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetDirectedGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.parseSet
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.parseTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tilesFilePattern
 import org.apache.commons.collections4.bidimap.DualHashBidiMap

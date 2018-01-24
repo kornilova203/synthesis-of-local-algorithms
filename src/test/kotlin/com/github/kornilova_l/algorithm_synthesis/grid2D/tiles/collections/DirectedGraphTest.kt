@@ -1,8 +1,8 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.parseTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Neighbourhood
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.parseTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

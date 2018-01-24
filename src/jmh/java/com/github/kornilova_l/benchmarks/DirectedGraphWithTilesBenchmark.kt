@@ -1,7 +1,7 @@
 package com.github.kornilova_l.benchmarks
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.parseTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraphWithTiles
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.parseTiles
 import org.openjdk.jmh.annotations.*
 import java.io.File
 import java.util.concurrent.TimeUnit

@@ -1,6 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTileGenerator
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTileGenerator
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters.getParametersSet
 import java.io.File
 

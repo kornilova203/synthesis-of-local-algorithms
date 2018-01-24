@@ -1,10 +1,10 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetDirectedGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetDirectedGraphsIterator
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Neighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraphWithTiles
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraphsIterator
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.IndependentSetDirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.positions
 import java.io.File
@@ -19,7 +19,7 @@ val tilesFilePattern = Pattern.compile("\\d+-\\d+-\\d+\\.txt")!!
  * To use this function all tile sets must be precalculated and stored in generated_tiles directory
  */
 fun getLabelingFunction(problem: Problem): Pair<LabelingFunction, Int>? {
-    val directedGraphsParser = DirectedGraphsIterator(File("directed_graphs"))
+    val directedGraphsParser = IndependentSetDirectedGraphsIterator(File("directed_graphs"))
     for (graph in directedGraphsParser) {
         println("n = ${graph.n} m = ${graph.m} k = ${graph.k}")
         val function = getLabelingFunction(problem, graph)
@@ -33,7 +33,7 @@ fun getLabelingFunction(problem: Problem): Pair<LabelingFunction, Int>? {
 }
 
 fun doesSolutionExist(problem: Problem): Boolean {
-    val directedGraphsParser = DirectedGraphsIterator(File("directed_graphs"))
+    val directedGraphsParser = IndependentSetDirectedGraphsIterator(File("directed_graphs"))
     for (graph in directedGraphsParser) {
         println("n = ${graph.n} m = ${graph.m} k = ${graph.k}")
         var solution = tryToFindSolution(problem, graph)
@@ -84,7 +84,7 @@ private fun isSolvable(problem: Problem, graph: DirectedGraph): Boolean {
  * @return solvable problems
  */
 fun tryToFindSolutionForEachProblem(problems: List<Problem>): Set<Problem> {
-    val directedGraphsParser = DirectedGraphsIterator(File("directed_graphs"))
+    val directedGraphsParser = IndependentSetDirectedGraphsIterator(File("directed_graphs"))
     val solvable = HashSet<Problem>()
     for (graph in directedGraphsParser) {
         if (solvable.size == problems.size) { // if everything is solved
