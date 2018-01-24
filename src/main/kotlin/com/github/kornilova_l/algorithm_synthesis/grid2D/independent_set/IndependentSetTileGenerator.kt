@@ -1,5 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator
 import java.io.File
 import java.io.FileOutputStream
@@ -55,7 +56,7 @@ class IndependentSetTileGenerator(finalN: Int,
 
     companion object {
 
-        private fun getInitialTiles(finalN: Int, finalM: Int, k: Int, dir: File?): Set<IndependentSetTile> {
+        private fun getInitialTiles(finalN: Int, finalM: Int, k: Int, dir: File?): Set<Tile> {
             if (dir == null) {
                 return generateNew(finalN, finalM, k)
             }
@@ -77,18 +78,18 @@ class IndependentSetTileGenerator(finalN: Int,
             return generateNew(finalN, finalM, k)
         }
 
-        private fun generateNew(finalN: Int, finalM: Int, k: Int): Set<IndependentSetTile> {
+        private fun generateNew(finalN: Int, finalM: Int, k: Int): Set<Tile> {
             val currentN = if (finalN < 3) finalN else 3
             val currentM = if (finalM < 3) finalM else 3
-            val tiles = generatePossiblyValidTiles(currentN, currentM, k)
-            return removeNotMaximal(tiles)
+            val tiles = generatePossiblyValidTiles(IndependentSetTile(currentN, currentM, k), currentN, currentM)
+            return removeInvalid(tiles)
         }
 
         /**
          * Remove all tileSet which does not have maximal IS
          */
-        private fun removeNotMaximal(tiles: Set<IndependentSetTile>): Set<IndependentSetTile> {
-            val maximalTiles = HashSet<IndependentSetTile>()
+        fun removeInvalid(tiles: Set<Tile>): Set<Tile> {
+            val maximalTiles = HashSet<Tile>()
             for (tile in tiles) {
                 if (tile.isValid()) {
                     maximalTiles.add(tile)
@@ -100,14 +101,14 @@ class IndependentSetTileGenerator(finalN: Int,
         /**
          * Generates set of possibly-valid tiles
          */
-        private fun generatePossiblyValidTiles(n: Int, m: Int, k: Int): Set<IndependentSetTile> {
+        fun generatePossiblyValidTiles(emptyTile: Tile, n: Int, m: Int): Set<Tile> {
 
             /* It is meaningless to make following piece of code recursive
              * because all candidate tiles must be placed in possiblyValidTiles set
              * and it is not possible to reduce memory consumption using recursive method
              */
-            val possiblyValidTiles = HashSet<IndependentSetTile>()
-            possiblyValidTiles.add(IndependentSetTile(n, m, k))
+            val possiblyValidTiles = HashSet<Tile>()
+            possiblyValidTiles.add(emptyTile)
 
             for (i in 0 until n) {
                 for (j in 0 until m) {

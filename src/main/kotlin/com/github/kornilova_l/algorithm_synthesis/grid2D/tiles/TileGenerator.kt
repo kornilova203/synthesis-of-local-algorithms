@@ -11,28 +11,9 @@ import java.util.concurrent.ConcurrentHashMap
  * It outputs set of [Tile]. I could not find a good way to make [TileGenerator] output
  * set of some particular tiles (for example [IndependentSetTile]).
  * There are wrappers for [TileGenerator] that convert Set<Tile> to Set<Whatever>
- * @param initialTiles tile that will be expanded
  */
 abstract class TileGenerator(private val finalN: Int, private val finalM: Int, initialTiles: Set<Tile>) {
     val tiles: Set<Tile>
-
-    init {
-        var tiles = initialTiles
-        var currentN = tiles.first().n
-        var currentM = tiles.first().m
-
-        while (currentM < finalM || currentN < finalN) {
-            tiles = expandTileSet(tiles)
-            currentN = tiles.first().n
-            currentM = tiles.first().m
-        }
-
-        if (tiles.isEmpty()) {
-            throw IllegalArgumentException("Cannot produce valid set of tiles")
-        } else {
-            this.tiles = tiles
-        }
-    }
 
     /**
      * Expand each tile by 1 row/column
@@ -81,5 +62,21 @@ abstract class TileGenerator(private val finalN: Int, private val finalM: Int, i
             stringBuilder.append(tile).append("\n")
         }
         return stringBuilder.toString()
+    }
+
+    init {
+        var tiles = initialTiles
+        var currentN = tiles.first().n
+        var currentM = tiles.first().m
+        while (currentM < finalM || currentN < finalN) {
+            tiles = expandTileSet(tiles)
+            currentN = tiles.first().n
+            currentM = tiles.first().m
+        }
+        if (tiles.isEmpty()) {
+            throw IllegalArgumentException("Cannot produce valid set of tiles")
+        } else {
+            this.tiles = tiles
+        }
     }
 }

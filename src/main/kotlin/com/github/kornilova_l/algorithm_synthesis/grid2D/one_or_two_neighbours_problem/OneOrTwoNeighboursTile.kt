@@ -20,6 +20,14 @@ import org.apache.lucene.util.OpenBitSet
  */
 class OneOrTwoNeighboursTile(n: Int, m: Int, grid: OpenBitSet) : Tile(n, m, grid) {
 
+    /**
+     * Create an empty tile
+     *
+     * @param n size
+     * @param m size
+     */
+    constructor(n: Int, m: Int) : this(n, m, OpenBitSet((n * m).toLong()))
+
     override fun createInstanceOfClass(newN: Int, newM: Int, grid: OpenBitSet): Tile = OneOrTwoNeighboursTile(newN, newM, grid)
 
     override fun rotate(): OneOrTwoNeighboursTile = OneOrTwoNeighboursTile(m, n, rotateGrid(grid))
