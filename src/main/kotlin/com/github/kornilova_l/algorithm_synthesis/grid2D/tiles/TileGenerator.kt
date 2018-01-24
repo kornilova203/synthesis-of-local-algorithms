@@ -1,8 +1,5 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTile.Companion.Expand.HEIGHT
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTile.Companion.Expand.WIDTH
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTile.Companion.getAllPossibleExtensions
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
 import com.github.kornilova_l.util.ProgressBar
 import java.io.File
@@ -96,7 +93,7 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
             for (j in 0 until m) {
                 val newTileIS = HashSet<IndependentSetTile>()
                 for (possiblyValidTile in possiblyValidTiles) {
-                    if (possiblyValidTile.canBeI(i, j)) {
+                    if (possiblyValidTile.canBeIncluded(i, j)) {
                         newTileIS.add(IndependentSetTile.createInstance(possiblyValidTile, i, j))
                     }
                 }
@@ -107,8 +104,10 @@ class TileGenerator(private val finalN: Int, private val finalM: Int, private va
         return possiblyValidTiles
     }
 
-    private fun addValidExtensionsToSet(tile: IndependentSetTile, expandedTiles: MutableSet<IndependentSetTile>, side: IndependentSetTile.Companion.Expand) {
-        val extensions = getAllPossibleExtensions(tile, side)
+    private fun addValidExtensionsToSet(tile: IndependentSetTile,
+                                        expandedTiles: MutableSet<IndependentSetTile>,
+                                        side: IndependentSetTile.Companion.Expand) {
+        val extensions = tile.getAllExpandedTiles(side)
         for (extension in extensions) {
             if (extension.isValid()) {
                 expandedTiles.add(extension)

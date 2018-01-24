@@ -12,21 +12,21 @@ internal class IndependentSetTileTest {
     fun canBeI() {
         var tile = IndependentSetTile(5, 6, 2)
 
-        assertTrue(tile.canBeI(4, 4))
+        assertTrue(tile.canBeIncluded(4, 4))
         tile = IndependentSetTile.createInstance(tile, 4, 3)
-        assertFalse(tile.canBeI(4, 4))
+        assertFalse(tile.canBeIncluded(4, 4))
 
         IndependentSetTile(5, 6, 2)
 
         /* On diagonal: */
-        assertFalse(tile.canBeI(3, 2))
+        assertFalse(tile.canBeIncluded(3, 2))
         /* On opposite side: */
-        assertTrue(tile.canBeI(0, 3))
+        assertTrue(tile.canBeIncluded(0, 3))
         /* On diagonal and on opposite side: */
-        assertTrue(tile.canBeI(0, 2))
+        assertTrue(tile.canBeIncluded(0, 2))
 
-        assertTrue(tile.canBeI(1, 2))
-        assertTrue(tile.canBeI(0, 1))
+        assertTrue(tile.canBeIncluded(1, 2))
+        assertTrue(tile.canBeIncluded(0, 1))
     }
 
     @Test

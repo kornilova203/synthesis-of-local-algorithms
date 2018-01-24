@@ -19,14 +19,31 @@ import org.apache.lucene.util.OpenBitSet
  * 1 1
  */
 class OneOrTwoNeighboursTile(n: Int, m: Int, grid: OpenBitSet) : Tile(n, m, grid) {
-    /**
-     * Create an empty tile
-     *
-     * @param n size
-     * @param m size
-     * @param k power of graph
-     */
-    constructor(n: Int, m: Int) : this(n, m, OpenBitSet(n * m.toLong()))
+
+    override fun cloneAndChange(x: Int, y: Int): Tile {
+        val grid = grid.clone() as OpenBitSet
+        grid.set(getIndex(x.toLong(), y.toLong(), m))
+        return OneOrTwoNeighboursTile(n, m, grid)
+    }
+
+    override fun cloneAndExpand(newN: Int, newM: Int): Tile {
+        val grid = OpenBitSet((newN * newM).toLong())
+        for (i in 0L until n * m) {
+            if (grid.get(i)) {
+                grid.set(getIndex(i / m + (newN - n) / 2, i % m + (newM - m) / 2, newM))
+            }
+        }
+        return OneOrTwoNeighboursTile(newN, newM, grid)
+    }
+
+    companion object {
+        fun createInstance(string: String): OneOrTwoNeighboursTile {
+            val lines = string.split("\n").filter { it != "" }
+            val n = lines.size
+            val m = calculateM(lines)
+            return OneOrTwoNeighboursTile(n, m, parseGrid(n, m, lines))
+        }
+    }
 
 
     /**
@@ -44,23 +61,42 @@ class OneOrTwoNeighboursTile(n: Int, m: Int, grid: OpenBitSet) : Tile(n, m, grid
         return true
     }
 
+    override fun canBeIncluded(x: Int, y: Int): Boolean {
+        if (grid.get(getIndex(x, y))) {
+            throw IllegalArgumentException("Cell is already included")
+        }
+        /* we need to check four squares */
+        return calcIncluded(x - 1, y - 1) < 2 &&
+                calcIncluded(x, y - 1) < 2 &&
+                calcIncluded(x - 1, y) < 2 &&
+                calcIncluded(x, y) < 2
+    }
+
     /**
      * @param i coordinate of top left corner
      * @param j coordinate of top left corner
      */
     private fun calcIncluded(i: Int, j: Int): Int {
         var calcIncluded = 0
-        if (grid.get(getIndex(i, j))) {
-            calcIncluded++
+        if (i >= 0 && j >= 0) {
+            if (grid.get(getIndex(i, j))) {
+                calcIncluded++
+            }
         }
-        if (grid.get(getIndex(i + 1, j))) {
-            calcIncluded++
+        if (j >= 0 && i < n) {
+            if (grid.get(getIndex(i + 1, j))) {
+                calcIncluded++
+            }
         }
-        if (grid.get(getIndex(i, j + 1))) {
-            calcIncluded++
+        if (i >= 0 && j < m) {
+            if (grid.get(getIndex(i, j + 1))) {
+                calcIncluded++
+            }
         }
-        if (grid.get(getIndex(i + 1, j + 1))) {
-            calcIncluded++
+        if (i < n && j < m) {
+            if (grid.get(getIndex(i + 1, j + 1))) {
+                calcIncluded++
+            }
         }
         return calcIncluded
     }

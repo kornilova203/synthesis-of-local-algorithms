@@ -4,7 +4,6 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.Sa
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import gnu.trove.set.hash.TIntHashSet
 import org.apache.lucene.util.OpenBitSet
-import java.util.*
 
 
 open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Tile(n, m, grid) {
@@ -85,33 +84,7 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
                     (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m + 1, i % m + 1)) }
                             .forEach { i -> grid.set(i) }
             }
-            return IndependentSetTile(n,m,k,grid)
-        }
-
-        /**
-         * Clone tile and set `grid[x][y]` to true
-         */
-        fun createInstance(tile: IndependentSetTile, x: Int, y: Int): IndependentSetTile {
-            val grid = tile.grid.clone() as OpenBitSet
-            grid.set(getIndex(x.toLong(), y.toLong(), tile.m))
-            return IndependentSetTile(tile.n, tile.m, tile.k, grid)
-        }
-
-        private fun getIndex(x: Long, y: Long, m: Int): Long {
-            return x * m + y
-        }
-
-        /**
-         * Clone and expand tile to newN x newM
-         */
-        fun createInstance(newN: Int, newM: Int, tile: IndependentSetTile): IndependentSetTile {
-            val grid = OpenBitSet((newN * newM).toLong())
-            for (i in 0L until tile.n * tile.m) {
-                if (tile.grid.get(i)) {
-                    grid.set(getIndex(i / tile.m + (newN - tile.n) / 2, i % tile.m + (newM - tile.m) / 2, newM))
-                }
-            }
-            return IndependentSetTile(newN, newM, tile.k, grid)
+            return IndependentSetTile(n, m, k, grid)
         }
 
         fun createInstance(independentSet: Array<BooleanArray>, x: Int, y: Int, n: Int, m: Int, k: Int): IndependentSetTile {
@@ -135,81 +108,7 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
             val lines = string.split("\n").filter { it != "" }
             val n = lines.size
             val m = calculateM(lines)
-            val grid = OpenBitSet((n * m).toLong())
-            lines.forEachIndexed { i, line ->
-                var j = 0
-                line.forEach { c ->
-                    if (c == '1') {
-                        grid.set(getIndex(i.toLong(), j.toLong(), m))
-                        j++
-                    } else if (c == '0') {
-                        j++
-                    }
-                }
-            }
-            return IndependentSetTile(n, m, k, grid)
-        }
-
-        private fun calculateM(lines: List<String>): Int {
-            var calcM = 0
-            lines.first().forEach { c ->
-                if (c == '1' || c == '0') {
-                    calcM++
-                }
-            }
-            val m = calcM
-            /* check that all lines have the same number of cells */
-            lines.forEach { line ->
-                calcM = 0
-                line.forEach { c ->
-                    if (c == '1' || c == '0') {
-                        calcM++
-                    }
-                }
-                if (calcM != m) {
-                    throw IllegalArgumentException("Rows have different number of cells")
-                }
-            }
-            return m
-        }
-
-        enum class Expand {
-            HEIGHT,
-            WIDTH
-        }
-
-        fun getAllPossibleExtensions(tile: IndependentSetTile, side: Expand): Set<IndependentSetTile> {
-            if (side == Expand.WIDTH) {
-                val newN = tile.n
-                val newM = tile.m + 1
-                val extensions = HashSet<IndependentSetTile>()
-                extensions.add(IndependentSetTile.createInstance(newN, newM, tile))
-                for (i in 0 until tile.n) {
-                    val newExtensions = HashSet<IndependentSetTile>()
-                    for (extension in extensions) {
-                        if (extension.canBeI(i, tile.m)) {
-                            newExtensions.add(IndependentSetTile.createInstance(extension, i, tile.m))
-                        }
-                    }
-                    extensions.addAll(newExtensions)
-                }
-                return extensions
-            } else {
-                val newN = tile.n + 1
-                val newM = tile.m
-                val extensions = HashSet<IndependentSetTile>()
-                extensions.add(IndependentSetTile.createInstance(newN, newM, tile))
-                for (j in 0 until tile.m) {
-                    val newExtensions = HashSet<IndependentSetTile>()
-                    for (extension in extensions) {
-                        if (extension.canBeI(tile.n, j)) {
-                            newExtensions.add(IndependentSetTile.createInstance(extension, tile.n, j))
-                        }
-                    }
-                    extensions.addAll(newExtensions)
-                }
-                return extensions
-            }
+            return IndependentSetTile(n, m, k, parseGrid(n, m, lines))
         }
 
         private fun neighbourhoodIsInsideTile(x: Int, y: Int, n: Int, m: Int, k: Int): Boolean {
@@ -222,7 +121,7 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
             return true
         }
 
-        private fun cellMustStayTheSame(x: Int, y: Int, biggerTile: IndependentSetTile, satSolver: SatSolver) {
+        private fun cellMustStayTheSame(x: Int, y: Int, biggerTile: Tile, satSolver: SatSolver) {
             val value = if (biggerTile.isI(x, y)) {
                 biggerTile.getId(x, y)
             } else {
@@ -231,7 +130,7 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
             satSolver.addClause(value)
         }
 
-        private fun allNeighboursMustBeZero(x: Int, y: Int, biggerTile: IndependentSetTile, newN: Int, newM: Int, k: Int,
+        private fun allNeighboursMustBeZero(x: Int, y: Int, biggerTile: Tile, newN: Int, newM: Int, k: Int,
                                             intersection: TileIntersection, satSolver: SatSolver) {
             for (i in x - k..x + k) {
                 for (j in y - k..y + k) {
@@ -248,7 +147,7 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
         /**
          * If (x, y) is 1 then non of it's neighbours is 1
          */
-        private fun ifCenterIsOneAllOtherAreNot(x: Int, y: Int, biggerTile: IndependentSetTile, satSolver: SatSolver,
+        private fun ifCenterIsOneAllOtherAreNot(x: Int, y: Int, biggerTile: Tile, satSolver: SatSolver,
                                                 newN: Int, newM: Int, k: Int, intersection: TileIntersection) {
             for (i in x - k..x + k) {
                 for (j in y - k..y + k) {
@@ -261,7 +160,7 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
             }
         }
 
-        private fun atLeastOneNeighbourMustBeOne(x: Int, y: Int, biggerTile: IndependentSetTile, newN: Int,
+        private fun atLeastOneNeighbourMustBeOne(x: Int, y: Int, biggerTile: Tile, newN: Int,
                                                  newM: Int, k: Int, intersection: TileIntersection): TIntHashSet {
             val clause = TIntHashSet()
             for (i in x - k..x + k) {
@@ -286,12 +185,31 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
      * @param m size
      * @param k power of graph
      */
-    constructor(n: Int, m: Int, k: Int) : this(n,m,k,OpenBitSet((n * m).toLong()))
+    constructor(n: Int, m: Int, k: Int) : this(n, m, k, OpenBitSet((n * m).toLong()))
+
+    override fun cloneAndExpand(newN: Int, newM: Int): Tile {
+        val grid = OpenBitSet((newN * newM).toLong())
+        for (i in 0L until n * m) {
+            if (grid.get(i)) {
+                grid.set(getIndex(i / m + (newN - n) / 2, i % m + (newM - m) / 2, newM))
+            }
+        }
+        return IndependentSetTile(newN, newM, k, grid)
+    }
+
+    /**
+     * Clone tile and set `grid[x][y]` to true
+     */
+    override fun cloneAndChange(x: Int, y: Int): Tile {
+        val grid = grid.clone() as OpenBitSet
+        grid.set(getIndex(x.toLong(), y.toLong(), m))
+        return IndependentSetTile(n, m, k, grid)
+    }
 
     /**
      * @return true if grid[x][y] can be an element of an independent set
      */
-    fun canBeI(x: Int, y: Int): Boolean {
+    override fun canBeIncluded(x: Int, y: Int): Boolean {
         if (grid.get(getIndex(x, y))) { // if already I
             return true
         }
@@ -318,17 +236,13 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
         return stringBuilder.toString()
     }
 
-    fun getId(x: Int, y: Int): Int {
-        return x * m + y + 1
-    }
-
     /**
      * @return false if tile is definitely not valid and it is not needed to run SAT solver
      */
     private fun initSatSolverIsTileValid(satSolver: SatSolver): Boolean {
         val newN = n + k * 2
         val newM = m + k * 2
-        val biggerTile = IndependentSetTile.createInstance(newN, newM, this)
+        val biggerTile = this.cloneAndExpand(newN, newM)
         /* intersection is used to check if we can change a cell */
         val intersection = TileIntersection(newN, newM, n, m)
 
@@ -349,8 +263,8 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
 
     private fun processCellOutsideIntersection(x: Int, y: Int, newN: Int,
                                                newM: Int, intersection: TileIntersection,
-                                               biggerTile: IndependentSetTile, satSolver: SatSolver) {
-        if (biggerTile.canBeI(x, y)) {
+                                               biggerTile: Tile, satSolver: SatSolver) {
+        if (biggerTile.canBeIncluded(x, y)) {
             ifCenterIsOneAllOtherAreNot(x, y, biggerTile, satSolver, newN, newM, k, intersection)
             if (neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
                 val clause = atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k, intersection)
@@ -366,11 +280,11 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
     private fun processCellInsideIntersection(x: Int, y: Int,
                                               newN: Int, newM: Int,
                                               intersection: TileIntersection,
-                                              biggerTile: IndependentSetTile, satSolver: SatSolver): Boolean {
+                                              biggerTile: Tile, satSolver: SatSolver): Boolean {
         cellMustStayTheSame(x, y, biggerTile, satSolver)
         if (biggerTile.isI(x, y)) {
             allNeighboursMustBeZero(x, y, biggerTile, newN, newM, k, intersection, satSolver)
-        } else if (biggerTile.canBeI(x, y) && neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
+        } else if (biggerTile.canBeIncluded(x, y) && neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
             val clause = atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k, intersection)
             if (clause.isEmpty) { // this cannot be satisfied
                 return false
@@ -408,10 +322,6 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
         S,
         W,
         E
-    }
-
-    fun isI(i: Int, j: Int): Boolean {
-        return grid.get(getIndex(i, j))
     }
 
     /**
