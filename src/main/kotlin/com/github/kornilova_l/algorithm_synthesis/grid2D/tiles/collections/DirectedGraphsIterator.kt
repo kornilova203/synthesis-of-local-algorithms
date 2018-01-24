@@ -10,13 +10,13 @@ import kotlin.collections.HashSet
 /**
  * Iterates through all graphs in given directory
  */
-class DirectedGraphsIterator(val dir: File) : Iterable<DirectedGraph> {
+class DirectedGraphsIterator(val dir: File) : Iterable<IndependentSetDirectedGraph> {
 
-    override fun iterator(): Iterator<DirectedGraph> {
+    override fun iterator(): Iterator<IndependentSetDirectedGraph> {
         return DGIterator()
     }
 
-    private inner class DGIterator : Iterator<DirectedGraph> {
+    private inner class DGIterator : Iterator<IndependentSetDirectedGraph> {
         private val graphFilePattern = Pattern.compile("\\d+-\\d+-\\d+\\.graph")!!
         private val graphFiles = ArrayList<File>()
         private var index = 0
@@ -61,8 +61,8 @@ class DirectedGraphsIterator(val dir: File) : Iterable<DirectedGraph> {
             return index < graphFiles.size
         }
 
-        override fun next(): DirectedGraph {
-            val graph = DirectedGraph.createInstance(graphFiles[index])
+        override fun next(): IndependentSetDirectedGraph {
+            val graph = IndependentSetDirectedGraph(graphFiles[index])
             index++
             return graph
         }

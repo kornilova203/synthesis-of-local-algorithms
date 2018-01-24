@@ -1,34 +1,36 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraphWithTiles
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileMap
 
 
 class LabelingFunction {
-    private val tileLabels: TileMap<Boolean>
-    val k: Int
+    private val tileLabels: Map<Tile, Boolean>
+    private val n: Int
+    private val m: Int
 
-    constructor(tileLabels: TileMap<Boolean>) {
+    constructor(tileLabels: Map<Tile, Boolean>) {
         this.tileLabels = tileLabels
-        k = tileLabels.k
+        this.n = tileLabels.entries.first().key.n
+        this.m = tileLabels.entries.first().key.m
     }
 
     constructor(solution: List<Int>, graph: DirectedGraphWithTiles) {
-        tileLabels = TileMap(graph.n, graph.m, graph.k)
+        tileLabels = HashMap()
         for (index in solution) {
             val id = Math.abs(index)
             tileLabels.put(graph.getTile(id)!!, index > 0)
         }
-        k = tileLabels.k
+        this.n = tileLabels.entries.first().key.n
+        this.m = tileLabels.entries.first().key.m
     }
 
     fun getLabels(independentSet: Array<BooleanArray>): Array<BooleanArray>? {
         val colouredGraph = Array(independentSet.size) { BooleanArray(independentSet[0].size) }
         for (i in independentSet.indices) {
             for (j in independentSet[i].indices) {
-                val tile = IndependentSetTile.createInstance(independentSet, i, j, tileLabels.n, tileLabels.m, tileLabels.k)
-                val colour = tileLabels[tile]
+                val tile = Tile(independentSet, i, j, n, m)
+                val colour = tileLabels[tile]!!
                 colouredGraph[i][j] = colour
             }
         }
@@ -36,6 +38,10 @@ class LabelingFunction {
     }
 
     fun rotate(): LabelingFunction {
-        return LabelingFunction(tileLabels.rotate())
+        val rotatedTileMap = HashMap<Tile, Boolean>()
+        for (tileLabel in tileLabels) {
+            rotatedTileMap[tileLabel.key.rotate()] = tileLabel.value
+        }
+        return LabelingFunction(rotatedTileMap)
     }
 }

@@ -15,10 +15,11 @@ class VertexSetSolverKtTest {
         val iterations = 10000
         val labelingFunction = getLabelingFunction(problem)
         assertNotNull(labelingFunction)
+        labelingFunction!!
         for (i in 0 until iterations) {
             val grid = generateGrid(10, 10)
-            val independentSet = IndependentSetAlgorithm(grid, labelingFunction!!.k).independentSet
-            val labeledGrid = labelingFunction.getLabels(independentSet)
+            val independentSet = IndependentSetAlgorithm(grid, labelingFunction.second).independentSet
+            val labeledGrid = labelingFunction.first.getLabels(independentSet)
             assertNotNull(labeledGrid)
             assertTrue(isRight(labeledGrid!!, problem))
         }

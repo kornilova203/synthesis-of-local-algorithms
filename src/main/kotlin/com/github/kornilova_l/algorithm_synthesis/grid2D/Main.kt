@@ -26,19 +26,19 @@ fun main(args: Array<String>) {
 fun tryToSolve(problem: Problem) {
     println(problem)
 
-    val labelingFunction = getLabelingFunction(problem)
+    val result = getLabelingFunction(problem)
 
-    if (labelingFunction == null) {
+    if (result == null) {
         println("not found")
     } else {
         println("found")
-        printResult(labelingFunction)
+        printResult(result.first, result.second)
     }
 }
 
-fun printResult(labelingFunction: LabelingFunction) {
+fun printResult(labelingFunction: LabelingFunction, k: Int) {
     val grid = generateGrid(10, 10)
-    val independentSet = IndependentSetAlgorithm(grid, labelingFunction.k).independentSet
+    val independentSet = IndependentSetAlgorithm(grid, k).independentSet
     val labeledGrid = labelingFunction.getLabels(independentSet)
     println(grid)
     for (i in 0 until labeledGrid!!.size) {

@@ -4,9 +4,55 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.Sa
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import gnu.trove.set.hash.TIntHashSet
 import org.apache.lucene.util.OpenBitSet
+import java.io.BufferedReader
+import java.io.File
+import java.io.FileReader
 
+fun parseTiles(file: File): Set<IndependentSetTile> {
+    if (!file.exists() || !file.isFile) {
+        throw IllegalArgumentException("File does not exist or it is not a file")
+    }
+    var validTiles: ArrayList<IndependentSetTile>? = null
+    BufferedReader(FileReader(file)).use { reader ->
+        val firstLine = reader.readLine()
+        val parts = firstLine.split(" ")
+        val n = Integer.parseInt(parts[0])
+        val m = Integer.parseInt(parts[1])
+        val k = Integer.parseInt(parts[2])
+        val size = Integer.parseInt(reader.readLine())
+        validTiles = ArrayList(size)
+        for (i in 0 until size) {
+            val grid = parseSet(reader, n, m)
+            validTiles!!.add(IndependentSetTile(n, m, k, grid))
+        }
+        if (size != validTiles!!.size) {
+            throw IllegalArgumentException("File contains less tiles that it states in the beginning of the file")
+        }
+    }
+    if (validTiles == null) {
+        throw IllegalArgumentException("Cannot read files from file")
+    }
+    return validTiles!!.toSet()
+}
+
+fun parseSet(reader: BufferedReader, n: Int, m: Int): OpenBitSet {
+    val grid = OpenBitSet(n * m.toLong())
+    var i = 0L
+    while (i < n * m) {
+        val c = reader.read().toChar()
+        if (c == '1' || c == '0') {
+            if (c == '1') {
+                grid.set(i)
+            }
+            i++
+        }
+    }
+    return grid
+}
 
 open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Tile(n, m, grid) {
+
+    override fun createInstanceOfClass(newN: Int, newM: Int, grid: OpenBitSet): Tile = IndependentSetTile(newN, newM, k, grid)
 
     /**
      * Check if this tile is valid
@@ -20,44 +66,6 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
     }
 
     companion object {
-
-        /**
-         * Creates a subtile of size
-         * tile.n - 1 x tile.m
-         * or
-         * tile.n x tile.m - 1
-         */
-        fun createInstance(tile: IndependentSetTile, part: Part): IndependentSetTile {
-            val k = tile.k
-            val n: Int
-            val m: Int
-            when (part) {
-                IndependentSetTile.Part.S, IndependentSetTile.Part.N -> {
-                    n = tile.n - 1
-                    m = tile.m
-                }
-                IndependentSetTile.Part.W, IndependentSetTile.Part.E -> {
-                    n = tile.n
-                    m = tile.m - 1
-                }
-            }
-            val grid = OpenBitSet((n * m).toLong())
-            when (part) {
-                IndependentSetTile.Part.N -> // copy first tile.n - 1 rows
-                    (0L until n * m).filter { i -> tile.grid.get(i) }
-                            .forEach { i -> grid.set(i) }
-                IndependentSetTile.Part.S -> // copy last tile.n - 1 rows
-                    (0L until n * m).filter { i -> tile.grid.get(i + m) }
-                            .forEach { i -> grid.set(i) }
-                IndependentSetTile.Part.W ->
-                    (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m, i % m)) }
-                            .forEach { i -> grid.set(i) }
-                IndependentSetTile.Part.E ->
-                    (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m, i % m) + 1) }
-                            .forEach { i -> grid.set(i) }
-            }
-            return IndependentSetTile(n, m, k, grid)
-        }
 
         /**
          * Created a subtile of size tile.n - 2 x tile.m - 2
@@ -83,23 +91,6 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
                 POSITION.X ->
                     (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m + 1, i % m + 1)) }
                             .forEach { i -> grid.set(i) }
-            }
-            return IndependentSetTile(n, m, k, grid)
-        }
-
-        fun createInstance(independentSet: Array<BooleanArray>, x: Int, y: Int, n: Int, m: Int, k: Int): IndependentSetTile {
-            if (independentSet.size < n || independentSet[0].size < m) {
-                throw IllegalArgumentException("Grid is too small")
-            }
-            val sizeN = independentSet.size
-            val sizeM = independentSet[0].size
-            val grid = OpenBitSet((n * m).toLong())
-            for (i in 0 until n) {
-                for (j in 0 until m) {
-                    if (independentSet[(x - n / 2 + i + sizeN) % sizeN][(y - m / 2 + j + sizeM) % sizeM]) {
-                        grid.set(getIndex(i.toLong(), j.toLong(), m))
-                    }
-                }
             }
             return IndependentSetTile(n, m, k, grid)
         }
@@ -186,25 +177,6 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
      * @param k power of graph
      */
     constructor(n: Int, m: Int, k: Int) : this(n, m, k, OpenBitSet((n * m).toLong()))
-
-    override fun cloneAndExpand(newN: Int, newM: Int): Tile {
-        val grid = OpenBitSet((newN * newM).toLong())
-        for (i in 0L until n * m) {
-            if (grid.get(i)) {
-                grid.set(getIndex(i / m + (newN - n) / 2, i % m + (newM - m) / 2, newM))
-            }
-        }
-        return IndependentSetTile(newN, newM, k, grid)
-    }
-
-    /**
-     * Clone tile and set `grid[x][y]` to true
-     */
-    override fun cloneAndChange(x: Int, y: Int): Tile {
-        val grid = grid.clone() as OpenBitSet
-        grid.set(getIndex(x.toLong(), y.toLong(), m))
-        return IndependentSetTile(n, m, k, grid)
-    }
 
     /**
      * @return true if grid[x][y] can be an element of an independent set
@@ -317,25 +289,8 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
 
     override fun hashCode(): Int = grid.hashCode()
 
-    enum class Part {
-        N,
-        S,
-        W,
-        E
-    }
-
     /**
      * Creates a new tile that equals to the original tile rotated clockwise
      */
-    fun rotate(): IndependentSetTile {
-        val rotatedGrid = OpenBitSet(n * m.toLong())
-        for (i in 0L until n) {
-            for (j in 0L until m) {
-                if (grid.get(getIndex(i, j))) {
-                    rotatedGrid.set(getIndex(j, n - i - 1, n))
-                }
-            }
-        }
-        return IndependentSetTile(m, n, k, rotatedGrid)
-    }
+    override fun rotate(): IndependentSetTile = IndependentSetTile(m, n, k, rotateGrid(grid))
 }

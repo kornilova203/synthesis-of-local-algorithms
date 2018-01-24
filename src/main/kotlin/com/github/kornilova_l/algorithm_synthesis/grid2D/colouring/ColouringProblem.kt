@@ -1,8 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.colouring
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleTileGraph
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileMap
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -15,14 +14,14 @@ import kotlin.collections.HashMap
  * Converts graph to dimacs format to solve n-colouring problem
  * Starts python script which starts SAT solver
  */
-class ColouringProblem(graph: SimpleTileGraph, coloursCount: Int) {
+class ColouringProblem(graph: SimpleTileGraph, coloursCount: Int, k: Int) {
     /**
      * Value is null if there is no proper colouring
      */
     val colouringFunction: ColouringFunction? // it is public because it is value
 
     init {
-        var tileColours: TileMap<Int>? = null
+        var tileColours: Map<Tile, Int>? = null
         val dimacsFile = exportDimacs(graph, coloursCount, File("dimacs/"))
         val builder = ProcessBuilder("python",
                 File("python_sat/sat/start_sat.py").toString(),
@@ -44,14 +43,14 @@ class ColouringProblem(graph: SimpleTileGraph, coloursCount: Int) {
             e.printStackTrace()
         }
         dimacsFile.delete()
-        colouringFunction = if (tileColours == null) null else ColouringFunction(tileColours)
+        colouringFunction = if (tileColours == null) null else ColouringFunction(tileColours, k)
     }
 
-    private fun getResult(scanner: Scanner, graph: SimpleTileGraph, coloursCount: Int): TileMap<Int>? {
-        val resultColours = TileMap<Int>(graph.n, graph.m, graph.k)
-        val possibleColours = HashMap<IndependentSetTile, BooleanArray>()
+    private fun getResult(scanner: Scanner, graph: SimpleTileGraph, coloursCount: Int): Map<Tile, Int>? {
+        val resultColours = HashMap<Tile, Int>()
+        val possibleColours = HashMap<Tile, BooleanArray>()
         for (tile in graph.graph.keys) {
-            possibleColours.put(tile, BooleanArray(4))
+            possibleColours[tile] = BooleanArray(4)
         }
         while (scanner.hasNextInt()) {
             val tileColourId = scanner.nextInt()
@@ -72,7 +71,7 @@ class ColouringProblem(graph: SimpleTileGraph, coloursCount: Int) {
                 System.err.println("Cannot find colour for tile:\n" + tile)
                 return null
             }
-            resultColours.put(tile, tileColour)
+            resultColours[tile] = tileColour
         }
         return resultColours
     }
@@ -91,7 +90,7 @@ class ColouringProblem(graph: SimpleTileGraph, coloursCount: Int) {
             val clausesCount = graph.size + graph.edgeCount * coloursCount
             stringBuilder.append("p cnf ").append(graph.size * coloursCount).append(" ").append(clausesCount).append("\n")
 
-            val visitedEdges = HashMap<IndependentSetTile, HashSet<IndependentSetTile>>() // to count each edge only ones
+            val visitedEdges = HashMap<Tile, HashSet<Tile>>() // to count each edge only ones
 
             for (tile in graph.graph.keys) {
                 addTileClause(stringBuilder, graph.getId(tile), coloursCount)

@@ -1,7 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTile
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.IndependentSetTile.Part
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Companion.Part.*
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
 import java.util.*
 
@@ -9,14 +9,13 @@ import java.util.*
  * Constructs graph of tiles.
  * This implementation does not save orientation of edges
  */
-class SimpleTileGraph(tileSet1: TileSet, tileSet2: TileSet) : TileGraph() {
+class SimpleTileGraph(tileSet1: Set<Tile>, tileSet2: Set<Tile>) : TileGraph() {
     override val n: Int
     override val m: Int
-    override val k: Int
-    val graph = HashMap<IndependentSetTile, HashSet<IndependentSetTile>>()
-    private val ids = DualHashBidiMap<IndependentSetTile, Int>()
-    private val tileSet1: TileSet
-    private val tileSet2: TileSet
+    val graph = HashMap<Tile, HashSet<Tile>>()
+    private val ids = DualHashBidiMap<Tile, Int>()
+    private val tileSet1: Set<Tile>
+    private val tileSet2: Set<Tile>
 
 
     val edgeCount: Int
@@ -35,10 +34,10 @@ class SimpleTileGraph(tileSet1: TileSet, tileSet2: TileSet) : TileGraph() {
 
     init {
         validateTileSets(tileSet1, tileSet2)
-        val n1 = tileSet1.n
-        val m1 = tileSet1.m
-        val n2 = tileSet2.n
-        val m2 = tileSet2.m
+        val n1 = tileSet1.first().n
+        val m1 = tileSet1.first().m
+        val n2 = tileSet2.first().n
+        val m2 = tileSet2.first().m
         if (n1 > n2) {
             n = n2
             m = m1
@@ -51,17 +50,15 @@ class SimpleTileGraph(tileSet1: TileSet, tileSet2: TileSet) : TileGraph() {
             this.tileSet2 = tileSet1
         }
 
-        k = tileSet1.k
-
-        for (tile in tileSet1.validTiles) { // get vertical neighbours
-            val top = IndependentSetTile.createInstance(tile, Part.N)
-            val bottom = IndependentSetTile.createInstance(tile, Part.S)
+        for (tile in tileSet1) { // get vertical neighbours
+            val top = tile.clonePart(N)
+            val bottom = tile.clonePart(S)
             graph.computeIfAbsent(top) { HashSet() }.add(bottom)
             graph.computeIfAbsent(bottom) { HashSet() }.add(top)
         }
-        for (tile in this.tileSet2.validTiles) { // get horizontal neighbours
-            val left = IndependentSetTile.createInstance(tile, Part.W)
-            val right = IndependentSetTile.createInstance(tile, Part.E)
+        for (tile in this.tileSet2) { // get horizontal neighbours
+            val left = tile.clonePart(W)
+            val right = tile.clonePart(E)
             graph.computeIfAbsent(left) { HashSet() }.add(right)
             graph.computeIfAbsent(right) { HashSet() }.add(left)
         }
@@ -74,26 +71,23 @@ class SimpleTileGraph(tileSet1: TileSet, tileSet2: TileSet) : TileGraph() {
 
     private fun assignIds() {
         for ((i, tile) in graph.keys.withIndex()) {
-            ids.put(tile, i)
+            ids[tile] = i
         }
     }
 
-    fun getId(tile: IndependentSetTile): Int = ids[tile]!!
+    fun getId(tile: Tile): Int = ids[tile]!!
 
-    fun getKey(tileId: Int): IndependentSetTile = ids.getKey(tileId)
+    fun getKey(tileId: Int): Tile = ids.getKey(tileId)
 
-    private fun validateTileSets(tileSet1: TileSet, tileSet2: TileSet) {
-        if (tileSet1.k != tileSet2.k) {
-            throw IllegalArgumentException("Graph power is different in two sets")
-        }
-        if (tileSet1.isEmpty || tileSet2.isEmpty) {
+    private fun validateTileSets(tileSet1: Set<Tile>, tileSet2: Set<Tile>) {
+        if (tileSet1.isEmpty() || tileSet2.isEmpty()) {
             throw IllegalArgumentException("At least one set is empty")
         }
 
-        val n1 = tileSet1.n
-        val m1 = tileSet1.m
-        val n2 = tileSet2.n
-        val m2 = tileSet2.m
+        val n1 = tileSet1.first().n
+        val m1 = tileSet1.first().m
+        val n2 = tileSet2.first().n
+        val m2 = tileSet2.first().m
         if (n1 > n2) {
             if (n1 != n2 + 1 || m2 != m1 + 1) {
                 throw IllegalArgumentException("If size of kern tile is n*m then size of two tiles set must be n+1*m and n*m+1 (order does not matter)")

@@ -5,5 +5,4 @@ abstract class TileGraph {
     abstract val size: Int
     abstract val n: Int
     abstract val m: Int
-    abstract val k: Int
 }

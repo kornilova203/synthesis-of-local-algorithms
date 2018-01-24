@@ -20,21 +20,9 @@ import org.apache.lucene.util.OpenBitSet
  */
 class OneOrTwoNeighboursTile(n: Int, m: Int, grid: OpenBitSet) : Tile(n, m, grid) {
 
-    override fun cloneAndChange(x: Int, y: Int): Tile {
-        val grid = grid.clone() as OpenBitSet
-        grid.set(getIndex(x.toLong(), y.toLong(), m))
-        return OneOrTwoNeighboursTile(n, m, grid)
-    }
+    override fun createInstanceOfClass(newN: Int, newM: Int, grid: OpenBitSet): Tile = OneOrTwoNeighboursTile(newN, newM, grid)
 
-    override fun cloneAndExpand(newN: Int, newM: Int): Tile {
-        val grid = OpenBitSet((newN * newM).toLong())
-        for (i in 0L until n * m) {
-            if (grid.get(i)) {
-                grid.set(getIndex(i / m + (newN - n) / 2, i % m + (newM - m) / 2, newM))
-            }
-        }
-        return OneOrTwoNeighboursTile(newN, newM, grid)
-    }
+    override fun rotate(): OneOrTwoNeighboursTile = OneOrTwoNeighboursTile(m, n, rotateGrid(grid))
 
     companion object {
         fun createInstance(string: String): OneOrTwoNeighboursTile {
@@ -44,7 +32,6 @@ class OneOrTwoNeighboursTile(n: Int, m: Int, grid: OpenBitSet) : Tile(n, m, grid
             return OneOrTwoNeighboursTile(n, m, parseGrid(n, m, lines))
         }
     }
-
 
     /**
      * Simply check each square

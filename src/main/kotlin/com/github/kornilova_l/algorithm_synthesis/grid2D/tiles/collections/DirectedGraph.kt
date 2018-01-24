@@ -3,9 +3,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.positions
 import gnu.trove.set.hash.TIntHashSet
-import java.io.BufferedReader
 import java.io.File
-import java.io.FileReader
 import java.util.*
 
 /**
@@ -16,7 +14,6 @@ import java.util.*
  */
 open class DirectedGraph(override val n: Int,
                          override val m: Int,
-                         override val k: Int,
                          val neighbourhoods: Set<Neighbourhood>) : TileGraph() {
     private var cachedSize = -1
 
@@ -43,7 +40,7 @@ open class DirectedGraph(override val n: Int,
 
     /**
      * Format:
-     * <n> <m> <k>
+     * <n> <m>
      * <number of neighbourhoods>
      * for each neighbourhood:
      * <id of center>
@@ -53,9 +50,9 @@ open class DirectedGraph(override val n: Int,
      * <id of west>
      * blank line
      */
-    fun export(file: File) {
+    open fun export(file: File) {
         file.outputStream().use { outputStream ->
-            outputStream.write("$n $m $k\n".toByteArray())
+            outputStream.write("$n $m\n".toByteArray())
             outputStream.write("${neighbourhoods.size}\n".toByteArray())
             for (neighbourhood in neighbourhoods) {
                 outputStream.write(("${neighbourhood.get(POSITION.X)}\n${neighbourhood.get(POSITION.N)}\n" +
@@ -98,29 +95,5 @@ open class DirectedGraph(override val n: Int,
         }
 
         override fun toString(): String = "$centerId $northId $eastId $southId $westId"
-    }
-
-    companion object {
-        fun createInstance(graphFile: File): DirectedGraph {
-            BufferedReader(FileReader(graphFile)).use { reader ->
-                val firstLine = reader.readLine()
-                val parts = firstLine.split(" ")
-                val n = Integer.parseInt(parts[0])
-                val m = Integer.parseInt(parts[1])
-                val k = Integer.parseInt(parts[2])
-                val neighbourhoodsCount = Integer.parseInt(reader.readLine())
-                val neighbourhoods = ArrayList<Neighbourhood>(neighbourhoodsCount)
-                for (i in 0 until neighbourhoodsCount) {
-                    val centerId = Integer.parseInt(reader.readLine())
-                    val northId = Integer.parseInt(reader.readLine())
-                    val eastId = Integer.parseInt(reader.readLine())
-                    val southId = Integer.parseInt(reader.readLine())
-                    val westId = Integer.parseInt(reader.readLine())
-                    reader.readLine()
-                    neighbourhoods.add(Neighbourhood(centerId, northId, eastId, southId, westId))
-                }
-                return DirectedGraph(n, m, k, neighbourhoods.toSet())
-            }
-        }
     }
 }

@@ -1,6 +1,6 @@
 package com.github.kornilova_l.benchmarks
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.IndependentSetDirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolver
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.addClausesToSatSolver
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 @Measurement(iterations = 8)
 open class ToDimacsBenchmark {
     private var problem: Problem = Problem("0?1?1")
-    private var graph = DirectedGraph.createInstance(File("directed_graphs/5-7-1.graph"))
+    private var graph = IndependentSetDirectedGraph(File("directed_graphs/5-7-1.graph"))
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)

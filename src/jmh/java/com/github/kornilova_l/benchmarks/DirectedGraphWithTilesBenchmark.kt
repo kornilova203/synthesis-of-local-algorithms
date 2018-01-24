@@ -1,7 +1,7 @@
 package com.github.kornilova_l.benchmarks
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraphWithTiles
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileSet
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.parseTiles
 import org.openjdk.jmh.annotations.*
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
 @Measurement(iterations = 8)
 open class DirectedGraphWithTilesBenchmark {
 
-    private var tiles = TileSet(File("generated_tiles/6-7-1.txt"))
+    private var tiles = parseTiles(File("generated_tiles/6-7-1.txt"))
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)

@@ -4,6 +4,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.Direc
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Neighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraphWithTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraphsIterator
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.IndependentSetDirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.positions
 import java.io.File
@@ -17,7 +18,7 @@ val tilesFilePattern = Pattern.compile("\\d+-\\d+-\\d+\\.txt")!!
  *
  * To use this function all tile sets must be precalculated and stored in generated_tiles directory
  */
-fun getLabelingFunction(problem: Problem): LabelingFunction? {
+fun getLabelingFunction(problem: Problem): Pair<LabelingFunction, Int>? {
     val directedGraphsParser = DirectedGraphsIterator(File("directed_graphs"))
     for (graph in directedGraphsParser) {
         println("n = ${graph.n} m = ${graph.m} k = ${graph.k}")
@@ -25,7 +26,7 @@ fun getLabelingFunction(problem: Problem): LabelingFunction? {
 
         if (function != null) {
             println("Found")
-            return function
+            return Pair(function, graph.k)
         }
     }
     return null
@@ -49,7 +50,7 @@ fun doesSolutionExist(problem: Problem): Boolean {
     return false
 }
 
-private fun getLabelingFunction(problem: Problem, graph: DirectedGraph): LabelingFunction? {
+private fun getLabelingFunction(problem: Problem, graph: IndependentSetDirectedGraph): LabelingFunction? {
     var solution = tryToFindSolution(problem, graph)
     if (solution != null) { // solution found
         return LabelingFunction(solution,
@@ -95,12 +96,12 @@ fun tryToFindSolutionForEachProblem(problems: List<Problem>): Set<Problem> {
     return solvable
 }
 
-private fun useGraphToFindSolutions(problems: List<Problem>, graph: DirectedGraph,
-                                    solutions: MutableSet<Problem>) {
+private fun useGraphToFindSolutions(problems: List<Problem>, graph: IndependentSetDirectedGraph,
+                                    solvedProblems: MutableSet<Problem>) {
     println("Try n=${graph.n} m=${graph.m} k=${graph.k}")
     try {
         for (problem in problems) {
-            if (solutions.contains(problem)) { // if solution was found
+            if (solvedProblems.contains(problem)) { // if solution was found
                 continue
             }
             var isSolvable = isSolvable(problem, graph)
@@ -109,7 +110,7 @@ private fun useGraphToFindSolutions(problems: List<Problem>, graph: DirectedGrap
             }
             if (isSolvable) {
                 println("Found solution for $problem")
-                solutions.add(problem)
+                solvedProblems.add(problem)
             }
         }
     } catch (e: OutOfMemoryError) {
