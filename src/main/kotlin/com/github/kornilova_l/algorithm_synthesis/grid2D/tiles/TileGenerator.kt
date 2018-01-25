@@ -1,5 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Companion.Expand
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Companion.Expand.HEIGHT
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Companion.Expand.WIDTH
@@ -30,7 +31,7 @@ abstract class TileGenerator(protected val finalN: Int, protected val finalM: In
 
     open fun getFileNameWithoutExtension(): String = "$finalN-$finalM"
 
-    abstract fun export(file: File)
+    protected abstract fun export(file: File)
 
     /**
      * Expand each tile by 1 row/column
@@ -46,7 +47,7 @@ abstract class TileGenerator(protected val finalN: Int, protected val finalM: In
         println("Expand tiles $currentN x $currentM. Side: $side\nTiles count = ${tiles.size}")
         val progressBar = ProgressBar(tiles.size)
         val expandedTiles: MutableSet<Tile> = ConcurrentHashMap.newKeySet()
-        tiles.parallelStream().forEach { tile ->
+        for (tile in tiles) {
             addValidExtensionsToSet(tile, expandedTiles, side)
             progressBar.updateProgress(1)
         }

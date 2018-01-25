@@ -1,5 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters
 
+import java.util.*
+
 /**
  * IndependentSetTile parameters are: n, m and k
  * All of them are proportional to computational difficulty
@@ -7,7 +9,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters
  */
 fun getParametersSet(difficulty: Int = 1): Set<Parameters> {
     if (difficulty == 1) {
-        val parameters = java.util.TreeSet<Parameters>()
+        val parameters = TreeSet<Parameters>()
         for (n in 3..8) {
             for (m in n..8) {
                 (1..5)
