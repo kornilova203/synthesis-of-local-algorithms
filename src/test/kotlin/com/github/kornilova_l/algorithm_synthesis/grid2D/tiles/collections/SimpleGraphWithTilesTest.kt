@@ -6,7 +6,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.io.File
 
-internal class SimpleTileGraphTest {
+internal class SimpleGraphWithTilesTest {
     private val tiles32 = IndependentSetTileGenerator(3, 2, 1).tiles
     private val tiles23 = IndependentSetTileGenerator(2, 3, 1).tiles
     private val tiles67 = IndependentSetTile.parseTiles(File("generated_tiles/6-7-3.txt"))
@@ -14,12 +14,12 @@ internal class SimpleTileGraphTest {
 
     @Test
     fun getGraph() {
-        var tileGraph = SimpleTileGraph(tiles32, tiles23)
+        var tileGraph = SimpleGraphWithTiles.createInstance(tiles32, tiles23)
         assertEquals(7, tileGraph.size)
 
         assertEquals(15, tileGraph.edgeCount)
 
-        tileGraph = SimpleTileGraph(tiles67, tiles58)
+        tileGraph = SimpleGraphWithTiles.createInstance(tiles67, tiles58)
         assertEquals(2079, tileGraph.size)
     }
 

@@ -19,7 +19,7 @@ class LabelingFunction {
         tileLabels = HashMap()
         for (index in solution) {
             val id = Math.abs(index)
-            tileLabels.put(graph.getTile(id)!!, index > 0)
+            tileLabels[graph.getTile(id)!!] = index > 0
         }
         this.n = tileLabels.entries.first().key.n
         this.m = tileLabels.entries.first().key.m

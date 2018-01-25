@@ -9,9 +9,9 @@ import java.util.*
 
 
 open class IndependentSetDirectedGraph(n: Int,
-                                  m: Int,
-                                  val k: Int,
-                                  neighbourhoods: Set<Neighbourhood>) : DirectedGraph(n, m, neighbourhoods) {
+                                       m: Int,
+                                       val k: Int,
+                                       neighbourhoods: Set<Neighbourhood>) : DirectedGraph(n, m, neighbourhoods) {
     /**
      * Format:
      * <n> <m>

@@ -2,7 +2,6 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tryToFindSolutionForEachProblem
 import gnu.trove.list.array.TIntArrayList
 import org.junit.Assert.*
 import org.junit.Test
@@ -41,17 +40,18 @@ class CheckAllKtTest {
         assertEquals(hashSetOf(VertexRule("N"), VertexRule("E"), VertexRule("S")), problem.rules)
     }
 
-    @Test
-    fun checkAllSolvable() {
-        val solvable = parseInts(solvableFile)
-        val problems = ArrayList<Problem>()
-        for (s in solvable) {
-            problems.add(Problem(s))
-        }
-        println(solvable.size())
-        val newSolvable = tryToFindSolutionForEachProblem(problems)
-        assertEquals(solvable.size(), newSolvable.size)
-    }
+    /* this test takes too much time */
+//    @Test
+//    fun checkAllSolvable() {
+//        val solvable = parseInts(solvableFile)
+//        val problems = ArrayList<Problem>()
+//        for (s in solvable) {
+//            problems.add(Problem(s))
+//        }
+//        println(solvable.size())
+//        val newSolvable = tryToFindSolutionForEachProblem(problems)
+//        assertEquals(solvable.size(), newSolvable.size)
+//    }
 
     @Test
     fun checkSolvableWithUnsolvable() {
