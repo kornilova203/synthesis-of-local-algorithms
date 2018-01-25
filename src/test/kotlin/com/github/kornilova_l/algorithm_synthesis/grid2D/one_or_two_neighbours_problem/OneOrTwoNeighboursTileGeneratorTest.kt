@@ -41,7 +41,7 @@ class OneOrTwoNeighboursTileGeneratorTest {
     @Test
     fun twoSquares() {
         val tileGenerator = OneOrTwoNeighboursTileGenerator(2, 3)
-        assertEquals(26, tileGenerator.tiles.size)
+        assertEquals(28, tileGenerator.tiles.size)
     }
 
     @Test

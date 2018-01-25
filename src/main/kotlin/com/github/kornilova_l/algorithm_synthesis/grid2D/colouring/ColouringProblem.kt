@@ -11,17 +11,19 @@ import java.nio.file.Paths
  * Solves colouring problem
  * Converts graph to dimacs format to solve n-colouring problem
  * Starts python script which starts SAT solver
- * @param dir directory where tiles are stored.
- * If dir is null then [ColouringProblem.colouringFunction] will be null
  */
-class ColouringProblem(graph: SimpleGraph, coloursCount: Int, dir: File? = null) {
+class ColouringProblem {
     /**
      * Value is null if there is no proper colouring
      */
     val colouringFunction: ColouringFunction? // it is public because it is value
     val solutionExists: Boolean
 
-    init {
+    /**
+     * @param dir directory where tiles are stored.
+     * If dir is null then [ColouringProblem.colouringFunction] will be null
+     */
+    constructor(graph: SimpleGraph, coloursCount: Int, dir: File? = null) {
         val satSolver = SatSolver()
         addClausesToSatSolver(graph, coloursCount, satSolver)
         val solution = satSolver.solve(graph.size * coloursCount)
@@ -35,18 +37,35 @@ class ColouringProblem(graph: SimpleGraph, coloursCount: Int, dir: File? = null)
         }
     }
 
+    constructor(graph: SimpleGraphWithTiles, coloursCount: Int) {
+        val satSolver = SatSolver()
+        addClausesToSatSolver(graph, coloursCount, satSolver)
+        val solution = satSolver.solve(graph.size * coloursCount)
+        if (solution == null) {
+            colouringFunction = null
+            solutionExists = false
+        } else {
+            solutionExists = true
+            colouringFunction = createColouringFunction(solution, coloursCount, graph)
+        }
+    }
+
     private fun createColouringFunction(solution: List<Int>, coloursCount: Int, dir: File, graph: SimpleGraph): ColouringFunction? {
-        val tileColours = HashMap<BinaryTile, Int>()
         val tilesFile = Paths.get(dir.toString(), "${graph.n}-${graph.m}.txt").toFile()
         if (!tilesFile.exists()) {
             return null
         }
         val graphWithTiles = SimpleGraphWithTiles.createInstance(tilesFile, graph)
+        return createColouringFunction(solution, coloursCount, graphWithTiles)
+    }
+
+    private fun createColouringFunction(solution: List<Int>, coloursCount: Int, graph: SimpleGraphWithTiles): ColouringFunction {
+        val tileColours = HashMap<BinaryTile, Int>()
         for (index in solution) {
             if (index > 0) { // if colour was assigned
                 val tileColourId = Math.abs(index)
                 val tileId = getTileId(tileColourId, coloursCount)
-                tileColours[graphWithTiles.getTile(tileId) as BinaryTile] = getColourId(tileColourId, coloursCount)
+                tileColours[graph.getTile(tileId) as BinaryTile] = getColourId(tileColourId, coloursCount)
             }
         }
         return ColouringFunction(tileColours)

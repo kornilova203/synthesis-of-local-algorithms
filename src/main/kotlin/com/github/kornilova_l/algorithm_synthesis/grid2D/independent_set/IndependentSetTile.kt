@@ -14,8 +14,14 @@ import java.io.FileReader
 fun parseSet(reader: BufferedReader, n: Int, m: Int): OpenBitSet {
     val grid = OpenBitSet(n * m.toLong())
     var i = 0L
+    var line = reader.readLine() // readLine() is faster that read()
+    var lineIndex = 0
     while (i < n * m) {
-        val c = reader.read().toChar()
+        val c = line[lineIndex++]
+        if (line.length == lineIndex) {
+            line = reader.readLine()
+            lineIndex = 0
+        }
         if (c == '1' || c == '0') {
             if (c == '1') {
                 grid.set(i)
