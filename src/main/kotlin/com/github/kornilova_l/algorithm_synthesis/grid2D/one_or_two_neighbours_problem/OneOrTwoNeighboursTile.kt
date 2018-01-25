@@ -104,17 +104,17 @@ class OneOrTwoNeighboursTile(n: Int, m: Int, grid: OpenBitSet) : BinaryTile(n, m
                 calcIncluded++
             }
         }
-        if (j >= 0 && i < n) {
+        if (j >= 0 && i + 1 < n) {
             if (grid.get(getIndex(i + 1, j))) {
                 calcIncluded++
             }
         }
-        if (i >= 0 && j < m) {
+        if (i >= 0 && j + 1 < m) {
             if (grid.get(getIndex(i, j + 1))) {
                 calcIncluded++
             }
         }
-        if (i < n && j < m) {
+        if (i + 1 < n && j + 1 < m) {
             if (grid.get(getIndex(i + 1, j + 1))) {
                 calcIncluded++
             }

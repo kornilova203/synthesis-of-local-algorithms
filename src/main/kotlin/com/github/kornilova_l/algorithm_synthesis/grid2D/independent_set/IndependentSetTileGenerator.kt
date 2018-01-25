@@ -77,13 +77,15 @@ class IndependentSetTileGenerator(finalN: Int,
          * Remove all tileSet which does not have maximal IS
          */
         fun removeInvalid(tiles: Set<BinaryTile>): Set<BinaryTile> {
-            val maximalTiles = HashSet<BinaryTile>()
+            val validTiles = HashSet<BinaryTile>()
             for (tile in tiles) {
                 if (tile.isValid()) {
-                    maximalTiles.add(tile)
+                    validTiles.add(tile)
+                } else {
+                    println(tile)
                 }
             }
-            return maximalTiles
+            return validTiles
         }
 
         /**
@@ -100,14 +102,14 @@ class IndependentSetTileGenerator(finalN: Int,
 
             for (i in 0 until n) {
                 for (j in 0 until m) {
-                    val newTileIS = HashSet<BinaryTile>()
+                    val newTiles = HashSet<BinaryTile>()
                     for (possiblyValidTile in possiblyValidTiles) {
                         if (possiblyValidTile.canBeIncluded(i, j)) {
-                            newTileIS.add(possiblyValidTile.cloneAndChange(i, j))
+                            newTiles.add(possiblyValidTile.cloneAndChange(i, j))
                         }
                     }
-                    possiblyValidTiles.addAll(newTileIS)
-                    newTileIS.clear()
+                    possiblyValidTiles.addAll(newTiles)
+                    newTiles.clear()
                 }
             }
             return possiblyValidTiles

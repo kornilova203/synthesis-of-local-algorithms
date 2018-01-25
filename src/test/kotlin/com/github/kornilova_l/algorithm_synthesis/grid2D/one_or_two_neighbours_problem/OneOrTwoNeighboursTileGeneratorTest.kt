@@ -3,6 +3,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import org.junit.Assert
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 
@@ -55,5 +56,12 @@ class OneOrTwoNeighboursTileGeneratorTest {
         assertEquals(tileGenerator.tiles, parsedTiles)
 
         file.delete()
+    }
+
+    @Test
+    fun threeByFourTest() {
+        val tileGenerator = OneOrTwoNeighboursTileGenerator(3, 4)
+        val expectedTile = OneOrTwoNeighboursTile.createInstance("0111\n1000\n1010")
+        assertTrue(tileGenerator.tiles.contains(expectedTile))
     }
 }
