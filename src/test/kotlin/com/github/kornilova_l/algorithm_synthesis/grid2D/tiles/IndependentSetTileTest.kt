@@ -3,7 +3,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.Grid2D
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Companion.Part.*
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Part.*
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import org.junit.Assert.*
 import org.junit.Test
@@ -12,7 +12,7 @@ import java.io.File
 internal class IndependentSetTileTest {
     @Test
     fun canBeI() {
-        var tile: Tile = IndependentSetTile(5, 6, 2)
+        var tile: BinaryTile = IndependentSetTile(5, 6, 2)
 
         assertTrue(tile.canBeIncluded(4, 4))
         tile = tile.cloneAndChange(4, 3)
@@ -42,9 +42,9 @@ internal class IndependentSetTileTest {
 
     @Test
     fun expandingConstructor() {
-        var tile: Tile = IndependentSetTile(3, 4, 3)
+        var tile: BinaryTile = IndependentSetTile(3, 4, 3)
         tile = tile.cloneAndChange(0, 1)
-        var expected: Tile = IndependentSetTile(9, 10, 3)
+        var expected: BinaryTile = IndependentSetTile(9, 10, 3)
 
         expected = expected.cloneAndChange(3, 4)
         assertEquals(expected, tile.cloneAndExpand(9, 10))
@@ -55,13 +55,13 @@ internal class IndependentSetTileTest {
         val grid2D = Grid2D(File("src/test/resources/grids/01_grid_5-6.txt"))
         val independentSet = IndependentSetAlgorithm(grid2D, 2).independentSet
 
-        var tile = Tile(independentSet, 1, 3, 3, 5)
+        var tile = BinaryTile(independentSet, 1, 3, 3, 5)
 
-        assertEquals(Tile.createInstance("0 0 0 0 0\n0 0 0 1 0\n0 1 0 0 0\n"), tile)
+        assertEquals(BinaryTile.createInstance("0 0 0 0 0\n0 0 0 1 0\n0 1 0 0 0\n"), tile)
 
-        tile = Tile(independentSet, 0, 0, 3, 5)
+        tile = BinaryTile(independentSet, 0, 0, 3, 5)
 
-        assertEquals(Tile.createInstance("0 0 0 0 0\n0 0 1 0 0\n1 0 0 0 0\n"), tile)
+        assertEquals(BinaryTile.createInstance("0 0 0 0 0\n0 0 1 0 0\n1 0 0 0 0\n"), tile)
     }
 
     @Test

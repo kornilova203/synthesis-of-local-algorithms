@@ -1,6 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator
 import java.io.File
 import java.io.FileOutputStream
@@ -27,7 +27,7 @@ class IndependentSetTileGenerator(finalN: Int,
     }
 
     /**
-     * If it does not matter if tiles have class [Tile] or [IndependentSetTile] then
+     * If it does not matter if tiles have class [BinaryTile] or [IndependentSetTile] then
      * use [TileGenerator.tiles]. Because this method copies all tiles to new set
      */
     fun getIndependentSetTiles(): Set<IndependentSetTile> {
@@ -44,7 +44,7 @@ class IndependentSetTileGenerator(finalN: Int,
 
     companion object {
 
-        private fun getInitialTiles(finalN: Int, finalM: Int, k: Int, dir: File?): Set<Tile> {
+        private fun getInitialTiles(finalN: Int, finalM: Int, k: Int, dir: File?): Set<BinaryTile> {
             if (dir == null) {
                 return generateNew(finalN, finalM, k)
             }
@@ -66,7 +66,7 @@ class IndependentSetTileGenerator(finalN: Int,
             return generateNew(finalN, finalM, k)
         }
 
-        private fun generateNew(finalN: Int, finalM: Int, k: Int): Set<Tile> {
+        private fun generateNew(finalN: Int, finalM: Int, k: Int): Set<BinaryTile> {
             val currentN = if (finalN < 3) finalN else 3
             val currentM = if (finalM < 3) finalM else 3
             val tiles = generatePossiblyValidTiles(IndependentSetTile(currentN, currentM, k), currentN, currentM)
@@ -76,8 +76,8 @@ class IndependentSetTileGenerator(finalN: Int,
         /**
          * Remove all tileSet which does not have maximal IS
          */
-        fun removeInvalid(tiles: Set<Tile>): Set<Tile> {
-            val maximalTiles = HashSet<Tile>()
+        fun removeInvalid(tiles: Set<BinaryTile>): Set<BinaryTile> {
+            val maximalTiles = HashSet<BinaryTile>()
             for (tile in tiles) {
                 if (tile.isValid()) {
                     maximalTiles.add(tile)
@@ -89,18 +89,18 @@ class IndependentSetTileGenerator(finalN: Int,
         /**
          * Generates set of possibly-valid tiles
          */
-        fun generatePossiblyValidTiles(emptyTile: Tile, n: Int, m: Int): Set<Tile> {
+        fun generatePossiblyValidTiles(emptyTile: BinaryTile, n: Int, m: Int): Set<BinaryTile> {
 
             /* It is meaningless to make following piece of code recursive
              * because all candidate tiles must be placed in possiblyValidTiles set
              * and it is not possible to reduce memory consumption using recursive method
              */
-            val possiblyValidTiles = HashSet<Tile>()
+            val possiblyValidTiles = HashSet<BinaryTile>()
             possiblyValidTiles.add(emptyTile)
 
             for (i in 0 until n) {
                 for (j in 0 until m) {
-                    val newTileIS = HashSet<Tile>()
+                    val newTileIS = HashSet<BinaryTile>()
                     for (possiblyValidTile in possiblyValidTiles) {
                         if (possiblyValidTile.canBeIncluded(i, j)) {
                             newTileIS.add(possiblyValidTile.cloneAndChange(i, j))

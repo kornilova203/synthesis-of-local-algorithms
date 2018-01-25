@@ -1,6 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.colouring
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleTileGraph
 import java.io.File
 import java.io.FileOutputStream
@@ -21,7 +21,7 @@ class ColouringProblem(graph: SimpleTileGraph, coloursCount: Int, k: Int) {
     val colouringFunction: ColouringFunction? // it is public because it is value
 
     init {
-        var tileColours: Map<Tile, Int>? = null
+        var tileColours: Map<BinaryTile, Int>? = null
         val dimacsFile = exportDimacs(graph, coloursCount, File("dimacs/"))
         val builder = ProcessBuilder("python",
                 File("python_sat/sat/start_sat.py").toString(),
@@ -46,9 +46,9 @@ class ColouringProblem(graph: SimpleTileGraph, coloursCount: Int, k: Int) {
         colouringFunction = if (tileColours == null) null else ColouringFunction(tileColours, k)
     }
 
-    private fun getResult(scanner: Scanner, graph: SimpleTileGraph, coloursCount: Int): Map<Tile, Int>? {
-        val resultColours = HashMap<Tile, Int>()
-        val possibleColours = HashMap<Tile, BooleanArray>()
+    private fun getResult(scanner: Scanner, graph: SimpleTileGraph, coloursCount: Int): Map<BinaryTile, Int>? {
+        val resultColours = HashMap<BinaryTile, Int>()
+        val possibleColours = HashMap<BinaryTile, BooleanArray>()
         for (tile in graph.graph.keys) {
             possibleColours[tile] = BooleanArray(4)
         }
@@ -90,7 +90,7 @@ class ColouringProblem(graph: SimpleTileGraph, coloursCount: Int, k: Int) {
             val clausesCount = graph.size + graph.edgeCount * coloursCount
             stringBuilder.append("p cnf ").append(graph.size * coloursCount).append(" ").append(clausesCount).append("\n")
 
-            val visitedEdges = HashMap<Tile, HashSet<Tile>>() // to count each edge only ones
+            val visitedEdges = HashMap<BinaryTile, HashSet<BinaryTile>>() // to count each edge only ones
 
             for (tile in graph.graph.keys) {
                 addTileClause(stringBuilder, graph.getId(tile), coloursCount)

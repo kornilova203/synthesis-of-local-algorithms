@@ -1,6 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileIntersection
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolver
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
@@ -26,9 +26,9 @@ fun parseSet(reader: BufferedReader, n: Int, m: Int): OpenBitSet {
     return grid
 }
 
-open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Tile(n, m, grid) {
+open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : BinaryTile(n, m, grid) {
 
-    override fun createInstanceOfClass(newN: Int, newM: Int, grid: OpenBitSet): Tile = IndependentSetTile(newN, newM, k, grid)
+    override fun createInstanceOfClass(newN: Int, newM: Int, grid: OpenBitSet): BinaryTile = IndependentSetTile(newN, newM, k, grid)
 
     /**
      * Check if this tile is valid
@@ -88,7 +88,7 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
             return true
         }
 
-        private fun cellMustStayTheSame(x: Int, y: Int, biggerTile: Tile, satSolver: SatSolver) {
+        private fun cellMustStayTheSame(x: Int, y: Int, biggerTile: BinaryTile, satSolver: SatSolver) {
             val value = if (biggerTile.isI(x, y)) {
                 biggerTile.getId(x, y)
             } else {
@@ -97,7 +97,7 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
             satSolver.addClause(value)
         }
 
-        private fun allNeighboursMustBeZero(x: Int, y: Int, biggerTile: Tile, newN: Int, newM: Int, k: Int,
+        private fun allNeighboursMustBeZero(x: Int, y: Int, biggerTile: BinaryTile, newN: Int, newM: Int, k: Int,
                                             intersection: TileIntersection, satSolver: SatSolver) {
             for (i in x - k..x + k) {
                 for (j in y - k..y + k) {
@@ -114,7 +114,7 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
         /**
          * If (x, y) is 1 then non of it's neighbours is 1
          */
-        private fun ifCenterIsOneAllOtherAreNot(x: Int, y: Int, biggerTile: Tile, satSolver: SatSolver,
+        private fun ifCenterIsOneAllOtherAreNot(x: Int, y: Int, biggerTile: BinaryTile, satSolver: SatSolver,
                                                 newN: Int, newM: Int, k: Int, intersection: TileIntersection) {
             for (i in x - k..x + k) {
                 for (j in y - k..y + k) {
@@ -127,7 +127,7 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
             }
         }
 
-        private fun atLeastOneNeighbourMustBeOne(x: Int, y: Int, biggerTile: Tile, newN: Int,
+        private fun atLeastOneNeighbourMustBeOne(x: Int, y: Int, biggerTile: BinaryTile, newN: Int,
                                                  newM: Int, k: Int, intersection: TileIntersection): TIntHashSet {
             val clause = TIntHashSet()
             for (i in x - k..x + k) {
@@ -222,7 +222,7 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
 
     private fun processCellOutsideIntersection(x: Int, y: Int, newN: Int,
                                                newM: Int, intersection: TileIntersection,
-                                               biggerTile: Tile, satSolver: SatSolver) {
+                                               biggerTile: BinaryTile, satSolver: SatSolver) {
         if (biggerTile.canBeIncluded(x, y)) {
             ifCenterIsOneAllOtherAreNot(x, y, biggerTile, satSolver, newN, newM, k, intersection)
             if (neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
@@ -239,7 +239,7 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
     private fun processCellInsideIntersection(x: Int, y: Int,
                                               newN: Int, newM: Int,
                                               intersection: TileIntersection,
-                                              biggerTile: Tile, satSolver: SatSolver): Boolean {
+                                              biggerTile: BinaryTile, satSolver: SatSolver): Boolean {
         cellMustStayTheSame(x, y, biggerTile, satSolver)
         if (biggerTile.isI(x, y)) {
             allNeighboursMustBeZero(x, y, biggerTile, newN, newM, k, intersection, satSolver)

@@ -1,15 +1,15 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraphWithTiles
 
 
 class LabelingFunction {
-    private val tileLabels: Map<Tile, Boolean>
+    private val tileLabels: Map<BinaryTile, Boolean>
     private val n: Int
     private val m: Int
 
-    constructor(tileLabels: Map<Tile, Boolean>) {
+    constructor(tileLabels: Map<BinaryTile, Boolean>) {
         this.tileLabels = tileLabels
         this.n = tileLabels.entries.first().key.n
         this.m = tileLabels.entries.first().key.m
@@ -29,7 +29,7 @@ class LabelingFunction {
         val colouredGraph = Array(independentSet.size) { BooleanArray(independentSet[0].size) }
         for (i in independentSet.indices) {
             for (j in independentSet[i].indices) {
-                val tile = Tile(independentSet, i, j, n, m)
+                val tile = BinaryTile(independentSet, i, j, n, m)
                 val colour = tileLabels[tile]!!
                 colouredGraph[i][j] = colour
             }
@@ -38,7 +38,7 @@ class LabelingFunction {
     }
 
     fun rotate(): LabelingFunction {
-        val rotatedTileMap = HashMap<Tile, Boolean>()
+        val rotatedTileMap = HashMap<BinaryTile, Boolean>()
         for (tileLabel in tileLabels) {
             rotatedTileMap[tileLabel.key.rotate()] = tileLabel.value
         }

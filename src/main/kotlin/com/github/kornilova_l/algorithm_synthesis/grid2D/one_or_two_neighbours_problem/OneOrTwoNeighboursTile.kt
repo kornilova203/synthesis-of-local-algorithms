@@ -1,7 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_problem
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.parseSet
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import org.apache.lucene.util.OpenBitSet
 import java.io.BufferedReader
 import java.io.File
@@ -22,7 +22,7 @@ import java.io.FileReader
  * 0 1
  * 1 1
  */
-class OneOrTwoNeighboursTile(n: Int, m: Int, grid: OpenBitSet) : Tile(n, m, grid) {
+class OneOrTwoNeighboursTile(n: Int, m: Int, grid: OpenBitSet) : BinaryTile(n, m, grid) {
 
     /**
      * Create an empty tile
@@ -32,7 +32,7 @@ class OneOrTwoNeighboursTile(n: Int, m: Int, grid: OpenBitSet) : Tile(n, m, grid
      */
     constructor(n: Int, m: Int) : this(n, m, OpenBitSet((n * m).toLong()))
 
-    override fun createInstanceOfClass(newN: Int, newM: Int, grid: OpenBitSet): Tile = OneOrTwoNeighboursTile(newN, newM, grid)
+    override fun createInstanceOfClass(newN: Int, newM: Int, grid: OpenBitSet): BinaryTile = OneOrTwoNeighboursTile(newN, newM, grid)
 
     override fun rotate(): OneOrTwoNeighboursTile = OneOrTwoNeighboursTile(m, n, rotateGrid(grid))
 

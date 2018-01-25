@@ -1,7 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Companion.Part.*
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Part.*
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
 import java.util.*
 
@@ -9,13 +9,13 @@ import java.util.*
  * Constructs graph of tiles.
  * This implementation does not save orientation of edges
  */
-class SimpleTileGraph(tileSet1: Set<Tile>, tileSet2: Set<Tile>) : TileGraph() {
+class SimpleTileGraph(tileSet1: Set<BinaryTile>, tileSet2: Set<BinaryTile>) : TileGraph() {
     override val n: Int
     override val m: Int
-    val graph = HashMap<Tile, HashSet<Tile>>()
-    private val ids = DualHashBidiMap<Tile, Int>()
-    private val tileSet1: Set<Tile>
-    private val tileSet2: Set<Tile>
+    val graph = HashMap<BinaryTile, HashSet<BinaryTile>>()
+    private val ids = DualHashBidiMap<BinaryTile, Int>()
+    private val tileSet1: Set<BinaryTile>
+    private val tileSet2: Set<BinaryTile>
 
 
     val edgeCount: Int
@@ -75,11 +75,11 @@ class SimpleTileGraph(tileSet1: Set<Tile>, tileSet2: Set<Tile>) : TileGraph() {
         }
     }
 
-    fun getId(tile: Tile): Int = ids[tile]!!
+    fun getId(tile: BinaryTile): Int = ids[tile]!!
 
-    fun getKey(tileId: Int): Tile = ids.getKey(tileId)
+    fun getKey(tileId: Int): BinaryTile = ids.getKey(tileId)
 
-    private fun validateTileSets(tileSet1: Set<Tile>, tileSet2: Set<Tile>) {
+    private fun validateTileSets(tileSet1: Set<BinaryTile>, tileSet2: Set<BinaryTile>) {
         if (tileSet1.isEmpty() || tileSet2.isEmpty()) {
             throw IllegalArgumentException("At least one set is empty")
         }

@@ -2,7 +2,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTileGenerator.Companion.generatePossiblyValidTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTileGenerator.Companion.removeInvalid
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator
 import java.io.File
 import java.io.FileOutputStream
@@ -23,7 +23,7 @@ class OneOrTwoNeighboursTileGenerator(finalN: Int,
     }
 
     /**
-     * If it does not matter if tiles have class [Tile] or [OneOrTwoNeighboursTileGenerator] then
+     * If it does not matter if tiles have class [BinaryTile] or [OneOrTwoNeighboursTileGenerator] then
      * use [OneOrTwoNeighboursTileGenerator.tiles]. Because this method copies all tiles to new set
      */
     fun getIndependentSetTiles(): Set<OneOrTwoNeighboursTile> {
@@ -40,7 +40,7 @@ class OneOrTwoNeighboursTileGenerator(finalN: Int,
 
     companion object {
 
-        private fun getInitialTiles(finalN: Int, finalM: Int, dir: File?): Set<Tile> {
+        private fun getInitialTiles(finalN: Int, finalM: Int, dir: File?): Set<BinaryTile> {
             if (dir == null) {
                 return generateNew(finalN, finalM)
             }
@@ -62,7 +62,7 @@ class OneOrTwoNeighboursTileGenerator(finalN: Int,
             return generateNew(finalN, finalM)
         }
 
-        private fun generateNew(finalN: Int, finalM: Int): Set<Tile> {
+        private fun generateNew(finalN: Int, finalM: Int): Set<BinaryTile> {
             val currentN = if (finalN < 3) finalN else 3
             val currentM = if (finalM < 3) finalM else 3
             val tiles = generatePossiblyValidTiles(OneOrTwoNeighboursTile(currentN, currentM), currentN, currentM)
