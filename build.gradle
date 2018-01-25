@@ -1,7 +1,7 @@
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.2.20'
+    ext.kotlin_version = '1.2.21'
 
     repositories {
         mavenCentral()
@@ -31,7 +31,7 @@ mainClassName = "com.github.kornilova_l.algorithm_synthesis.grid2D.CheckAllKt"
 //]
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1' // BidiMap
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
     compile group: 'org.apache.lucene', name: 'lucene-core', version: '3.6.0' // OpenBitSet
