@@ -1,11 +1,14 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.parseSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_problem.OneOrTwoNeighboursTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Part.*
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
+import java.io.BufferedReader
 import java.io.File
+import java.io.FileReader
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.collections.HashMap
@@ -162,6 +165,32 @@ class SimpleGraphWithTiles(n: Int, m: Int, graph: Map<Int, Set<Int>>, private va
                 id
             }
         }
+
+        fun createInstance(tilesFile: File, simpleGraph: SimpleGraph): SimpleGraphWithTiles {
+            val ids = DualHashBidiMap<Tile, Int>()
+            BufferedReader(FileReader(tilesFile)).use { reader ->
+                val firstLine = reader.readLine()
+                val parts = firstLine.split(" ")
+                val n = Integer.parseInt(parts[0])
+                val m = Integer.parseInt(parts[1])
+                if (n != simpleGraph.n || m != simpleGraph.m) {
+                    throw IllegalArgumentException("Parameters of graph do not match size of tiles. Graph: n = ${simpleGraph.n} " +
+                            "m = ${simpleGraph.m}. IndependentSetTile: n = $n m = $m.")
+                }
+                val tilesCount = Integer.parseInt(reader.readLine())
+                for (i in 0 until tilesCount) {
+                    var line = reader.readLine()
+                    while (line.isEmpty()) {
+                        line = reader.readLine()
+                    }
+                    val id = Integer.parseInt(line)
+                    val grid = parseSet(reader, n, m)
+                    ids[BinaryTile(n, m, grid)] = id
+                }
+                return SimpleGraphWithTiles(simpleGraph.n, simpleGraph.m, simpleGraph.graph, ids)
+            }
+        }
+
     }
 
     fun getTile(tileId: Int): Tile {

@@ -23,4 +23,15 @@ internal class SimpleGraphWithTilesTest {
         assertEquals(2079, tileGraph.size)
     }
 
+    @Test
+    fun exportAndImport() {
+        val graph = SimpleGraphWithTiles.createInstance(tiles32, tiles23)
+        val file = File("temp.txt")
+        graph.export(file)
+
+        val parsedGraph = SimpleGraph(file)
+        assertEquals(graph.graph, parsedGraph.graph)
+
+        file.delete()
+    }
 }

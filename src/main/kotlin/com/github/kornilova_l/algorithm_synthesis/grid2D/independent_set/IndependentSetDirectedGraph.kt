@@ -62,7 +62,7 @@ open class IndependentSetDirectedGraph(n: Int,
             }
         }
 
-        private fun parseNumber(graphFile: File, index: Int): Int {
+        fun parseNumber(graphFile: File, index: Int): Int {
             BufferedReader(FileReader(graphFile)).use { reader ->
                 val firstLine = reader.readLine()
                 val parts = firstLine.split(" ")

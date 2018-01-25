@@ -4,17 +4,22 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleGraphWithTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolver
+import java.io.File
+import java.nio.file.Paths
 
 /**
  * Solves colouring problem
  * Converts graph to dimacs format to solve n-colouring problem
  * Starts python script which starts SAT solver
+ * @param dir directory where tiles are stored.
+ * If dir is null then [ColouringProblem.colouringFunction] will be null
  */
-class ColouringProblem(graph: SimpleGraphWithTiles, coloursCount: Int) {
+class ColouringProblem(graph: SimpleGraph, coloursCount: Int, dir: File? = null) {
     /**
      * Value is null if there is no proper colouring
      */
     val colouringFunction: ColouringFunction? // it is public because it is value
+    val solutionExists: Boolean
 
     init {
         val satSolver = SatSolver()
@@ -22,17 +27,29 @@ class ColouringProblem(graph: SimpleGraphWithTiles, coloursCount: Int) {
         val solution = satSolver.solve(graph.size * coloursCount)
         if (solution == null) {
             colouringFunction = null
+            solutionExists = false
         } else {
-            val tileColours = HashMap<BinaryTile, Int>()
-            for (index in solution) {
-                if (index > 0) { // if colour was assigned
-                    val tileColourId = Math.abs(index)
-                    val tileId = getTileId(tileColourId, coloursCount)
-                    tileColours[graph.getTile(tileId) as BinaryTile] = getColourId(tileColourId, coloursCount)
-                }
-            }
-            colouringFunction = ColouringFunction(tileColours)
+            solutionExists = true
+            colouringFunction = if (dir != null)
+                createColouringFunction(solution, coloursCount, dir, graph) else null
         }
+    }
+
+    private fun createColouringFunction(solution: List<Int>, coloursCount: Int, dir: File, graph: SimpleGraph): ColouringFunction? {
+        val tileColours = HashMap<BinaryTile, Int>()
+        val tilesFile = Paths.get(dir.toString(), "${graph.n}-${graph.m}.txt").toFile()
+        if (!tilesFile.exists()) {
+            return null
+        }
+        val graphWithTiles = SimpleGraphWithTiles.createInstance(tilesFile, graph)
+        for (index in solution) {
+            if (index > 0) { // if colour was assigned
+                val tileColourId = Math.abs(index)
+                val tileId = getTileId(tileColourId, coloursCount)
+                tileColours[graphWithTiles.getTile(tileId) as BinaryTile] = getColourId(tileColourId, coloursCount)
+            }
+        }
+        return ColouringFunction(tileColours)
     }
 
     /**
