@@ -8,9 +8,6 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.Direc
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.positions
 import java.io.File
-import java.util.regex.Pattern
-
-val tilesFilePattern = Pattern.compile("\\d+-\\d+-\\d+\\.txt")!!
 
 /**
  * Try to find tile size such that it is possible to get labels so

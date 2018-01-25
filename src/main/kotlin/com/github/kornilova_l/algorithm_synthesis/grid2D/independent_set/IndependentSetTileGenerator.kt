@@ -81,8 +81,6 @@ class IndependentSetTileGenerator(finalN: Int,
             for (tile in tiles) {
                 if (tile.isValid()) {
                     validTiles.add(tile)
-                } else {
-                    println(tile)
                 }
             }
             return validTiles

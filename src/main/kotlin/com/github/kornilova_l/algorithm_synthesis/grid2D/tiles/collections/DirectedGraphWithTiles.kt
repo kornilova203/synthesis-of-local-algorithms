@@ -4,13 +4,15 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.Indepen
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.parseSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tilesFilePattern
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.util.*
+import java.util.regex.Pattern
 
+
+private val tilesFilePattern = Pattern.compile("\\d+-\\d+-\\d+\\.txt")!!
 
 /**
  * Precalculate graphs and export them to files.

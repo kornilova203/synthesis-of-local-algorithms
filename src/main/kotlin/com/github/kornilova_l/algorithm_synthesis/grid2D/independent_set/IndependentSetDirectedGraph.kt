@@ -14,7 +14,7 @@ open class IndependentSetDirectedGraph(n: Int,
                                        neighbourhoods: Set<Neighbourhood>) : DirectedGraph(n, m, neighbourhoods) {
     /**
      * Format:
-     * <n> <m>
+     * <n> <m> <k>
      * <number of neighbourhoods>
      * for each neighbourhood:
      * <id of center>

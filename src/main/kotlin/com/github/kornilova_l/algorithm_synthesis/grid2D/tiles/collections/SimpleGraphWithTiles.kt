@@ -1,11 +1,49 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_problem.OneOrTwoNeighboursTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Part.*
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
+import java.io.File
 import java.util.*
+import java.util.regex.Pattern
 import kotlin.collections.HashMap
+
+
+private val tilesFilePattern = Pattern.compile("\\d+-\\d+\\.txt")!!
+
+/**
+ * Precalculate graphs and export them to files.
+ * So [SimpleGraph] instances can be created and used.
+ */
+fun main(args: Array<String>) {
+    val dirName = "one_or_two_neighbours_tiles/simple_graphs"
+    val files = File("one_or_two_neighbours_tiles").listFiles()
+    for (i in 0 until files.size) {
+        val file = files[i]
+        if (file.isFile && tilesFilePattern.matcher(file.name).matches()) {
+            val parts = file.name.split("-")
+            val n = Integer.parseInt(parts[0])
+            val m = Integer.parseInt(parts[1].split(".")[0])
+            if (n > m) {
+                continue
+            }
+            println("n $n  m $m")
+            val file2 = File("one_or_two_neighbours_tiles/${n - 1}-${m + 1}.txt")
+            if (!file2.exists()) {
+                continue
+            }
+            val tileSet1 = OneOrTwoNeighboursTile.parseTiles(file)
+            val tileSet2 = OneOrTwoNeighboursTile.parseTiles(file2)
+            val graph = SimpleGraphWithTiles.createInstance(tileSet1, tileSet2)
+            println("Start export")
+            graph.exportTiles(File("$dirName/${graph.n}-${graph.m}.tiles"))
+            println("Export graph")
+            graph.export(File("$dirName/${graph.n}-${graph.m}.graph"))
+        }
+    }
+}
 
 /**
  * Constructs graph of tiles.
@@ -14,6 +52,25 @@ import kotlin.collections.HashMap
  */
 class SimpleGraphWithTiles(n: Int, m: Int, graph: Map<Int, Set<Int>>, private val ids: DualHashBidiMap<Tile, Int>) :
         SimpleGraph(n, m, graph) {
+
+    /**
+     * Format:
+     * <n> <m>
+     * <number of tiles>
+     * for each tile:
+     * <id>
+     * <tile>
+     */
+    fun exportTiles(file: File) {
+        file.outputStream().use { outputStream ->
+            outputStream.write("$n $m\n".toByteArray())
+            outputStream.write("${ids.size}\n".toByteArray())
+            for (tileAndId in ids) {
+                outputStream.write("${tileAndId.value}\n".toByteArray())
+                outputStream.write("${tileAndId.key}\n".toByteArray())
+            }
+        }
+    }
 
     companion object {
 
