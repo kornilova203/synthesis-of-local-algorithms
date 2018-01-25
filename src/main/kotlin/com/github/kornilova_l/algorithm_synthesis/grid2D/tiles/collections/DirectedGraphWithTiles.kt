@@ -3,7 +3,6 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetDirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.parseSet
-import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.parseTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tilesFilePattern
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
@@ -33,7 +32,7 @@ fun main(args: Array<String>) {
                 continue
             }
             print("n $n  m $m  k $k\n")
-            val tileSet = parseTiles(file)
+            val tileSet = IndependentSetTile.parseTiles(file)
             val graph = DirectedGraphWithTiles.createInstance(tileSet)
             println("Start export")
             graph.exportTiles(File("$dirName/${graph.n}-${graph.m}-${graph.k}.tiles"))

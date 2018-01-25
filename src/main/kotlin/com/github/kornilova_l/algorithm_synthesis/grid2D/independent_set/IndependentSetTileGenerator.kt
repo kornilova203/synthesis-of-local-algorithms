@@ -15,6 +15,17 @@ class IndependentSetTileGenerator(finalN: Int,
                                   private val k: Int,
                                   dir: File? = null) : TileGenerator(finalN, finalM, getInitialTiles(finalN, finalM, k, dir)) {
 
+    override fun getFileNameWithoutExtension(): String = "$finalN-$finalM-$k"
+
+    override fun export(file: File) {
+        FileOutputStream(file).use { outputStream ->
+            outputStream.write("$finalN $finalM $k\n${tiles.size}\n".toByteArray())
+            tiles.forEach { tile ->
+                outputStream.write("$tile\n".toByteArray())
+            }
+        }
+    }
+
     /**
      * If it does not matter if tiles have class [Tile] or [IndependentSetTile] then
      * use [TileGenerator.tiles]. Because this method copies all tiles to new set
@@ -31,29 +42,6 @@ class IndependentSetTileGenerator(finalN: Int,
         return set
     }
 
-    fun export(dir: File, addTimestampToFileName: Boolean = false): File? {
-        if (!dir.exists() || !dir.isDirectory) {
-            throw IllegalArgumentException("Argument is not a directory or does not exist")
-        }
-        val n = tiles.first().n
-        val m = tiles.first().m
-        val filePath = Paths.get(dir.toString(), getFileName(n, m, k, addTimestampToFileName))
-        val file = filePath.toFile()
-        FileOutputStream(file).use { outputStream ->
-            outputStream.write("$n $m $k\n${tiles.size}\n".toByteArray())
-            tiles.forEach { tile ->
-                outputStream.write("$tile\n".toByteArray())
-            }
-            return file
-        }
-    }
-
-    private fun getFileName(n: Int, m: Int, k: Int, addTimestampToFileName: Boolean): String {
-        return if (addTimestampToFileName) {
-            String.format("%d-%d-%d-%d.txt", n, m, k, System.currentTimeMillis())
-        } else String.format("%d-%d-%d.txt", n, m, k)
-    }
-
     companion object {
 
         private fun getInitialTiles(finalN: Int, finalM: Int, k: Int, dir: File?): Set<Tile> {
@@ -66,7 +54,7 @@ class IndependentSetTileGenerator(finalN: Int,
                 val file = Paths.get(dir.toString(), "$currentN-$currentM-$k.txt").toFile()
                 if (file.exists()) {
                     println("Found file: $file")
-                    return parseTiles(file)
+                    return IndependentSetTile.parseTiles(file)
                 }
                 if (currentM > currentN) {
                     currentM--
@@ -112,10 +100,10 @@ class IndependentSetTileGenerator(finalN: Int,
 
             for (i in 0 until n) {
                 for (j in 0 until m) {
-                    val newTileIS = HashSet<IndependentSetTile>()
+                    val newTileIS = HashSet<Tile>()
                     for (possiblyValidTile in possiblyValidTiles) {
                         if (possiblyValidTile.canBeIncluded(i, j)) {
-                            newTileIS.add(possiblyValidTile.cloneAndChange(i, j) as IndependentSetTile)
+                            newTileIS.add(possiblyValidTile.cloneAndChange(i, j))
                         }
                     }
                     possiblyValidTiles.addAll(newTileIS)

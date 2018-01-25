@@ -10,32 +10,6 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 
-fun parseTiles(file: File): Set<IndependentSetTile> {
-    if (!file.exists() || !file.isFile) {
-        throw IllegalArgumentException("File does not exist or it is not a file")
-    }
-    var validTiles: ArrayList<IndependentSetTile>? = null
-    BufferedReader(FileReader(file)).use { reader ->
-        val firstLine = reader.readLine()
-        val parts = firstLine.split(" ")
-        val n = Integer.parseInt(parts[0])
-        val m = Integer.parseInt(parts[1])
-        val k = Integer.parseInt(parts[2])
-        val size = Integer.parseInt(reader.readLine())
-        validTiles = ArrayList(size)
-        for (i in 0 until size) {
-            val grid = parseSet(reader, n, m)
-            validTiles!!.add(IndependentSetTile(n, m, k, grid))
-        }
-        if (size != validTiles!!.size) {
-            throw IllegalArgumentException("File contains less tiles that it states in the beginning of the file")
-        }
-    }
-    if (validTiles == null) {
-        throw IllegalArgumentException("Cannot read files from file")
-    }
-    return validTiles!!.toSet()
-}
 
 fun parseSet(reader: BufferedReader, n: Int, m: Int): OpenBitSet {
     val grid = OpenBitSet(n * m.toLong())
@@ -169,6 +143,28 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Ti
             return clause
         }
 
+        fun parseTiles(file: File): Set<IndependentSetTile> {
+            if (!file.exists() || !file.isFile) {
+                throw IllegalArgumentException("File does not exist or it is not a file")
+            }
+            BufferedReader(FileReader(file)).use { reader ->
+                val firstLine = reader.readLine()
+                val parts = firstLine.split(" ")
+                val n = Integer.parseInt(parts[0])
+                val m = Integer.parseInt(parts[1])
+                val k = Integer.parseInt(parts[2])
+                val size = Integer.parseInt(reader.readLine())
+                val validTiles = HashSet<IndependentSetTile>(size)
+                for (i in 0 until size) {
+                    val grid = parseSet(reader, n, m)
+                    validTiles.add(IndependentSetTile(n, m, k, grid))
+                }
+                if (size != validTiles.size) {
+                    throw IllegalArgumentException("File contains less tiles that it states in the beginning of the file")
+                }
+                return validTiles
+            }
+        }
     }
 
     /**

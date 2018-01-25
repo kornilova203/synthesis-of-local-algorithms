@@ -1,14 +1,12 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
+package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTileGenerator
-import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.parseTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters.getParametersSet
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
 import java.io.File
 
-internal class TileGeneratorTest {
+class IndependentSetTileGeneratorTest {
     @Test
     fun test() {
         val startTime = System.currentTimeMillis()
@@ -31,7 +29,7 @@ internal class TileGeneratorTest {
             val file = File("src/test/resources/tiles/$n-$m-$k.txt")
             if (file.exists()) {
                 val tiles = IndependentSetTileGenerator(n, m, k).tiles
-                val expectedTiles = parseTiles(file)
+                val expectedTiles = IndependentSetTile.parseTiles(file)
 
                 assertEquals(expectedTiles, tiles)
             }
@@ -46,7 +44,7 @@ internal class TileGeneratorTest {
         val file = tileGenerator.export(File("."), true)
         assertNotNull(file)
 
-        val tileIS = parseTiles(file!!)
+        val tileIS = IndependentSetTile.parseTiles(file!!)
         assertNotNull(tileIS)
 
         assertEquals(tileGenerator.tiles, tileIS)

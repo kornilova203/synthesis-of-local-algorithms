@@ -1,7 +1,11 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_problem
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.parseSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import org.apache.lucene.util.OpenBitSet
+import java.io.BufferedReader
+import java.io.File
+import java.io.FileReader
 
 
 /**
@@ -38,6 +42,28 @@ class OneOrTwoNeighboursTile(n: Int, m: Int, grid: OpenBitSet) : Tile(n, m, grid
             val n = lines.size
             val m = calculateM(lines)
             return OneOrTwoNeighboursTile(n, m, parseGrid(n, m, lines))
+        }
+
+        fun parseTiles(file: File): Set<OneOrTwoNeighboursTile> {
+            if (!file.exists() || !file.isFile) {
+                throw IllegalArgumentException("File does not exist or it is not a file")
+            }
+            BufferedReader(FileReader(file)).use { reader ->
+                val firstLine = reader.readLine()
+                val parts = firstLine.split(" ")
+                val n = Integer.parseInt(parts[0])
+                val m = Integer.parseInt(parts[1])
+                val size = Integer.parseInt(reader.readLine())
+                val validTiles = HashSet<OneOrTwoNeighboursTile>(size)
+                for (i in 0 until size) {
+                    val grid = parseSet(reader, n, m)
+                    validTiles.add(OneOrTwoNeighboursTile(n, m, grid))
+                }
+                if (size != validTiles.size) {
+                    throw IllegalArgumentException("File contains less tiles that it states in the beginning of the file")
+                }
+                return validTiles
+            }
         }
     }
 

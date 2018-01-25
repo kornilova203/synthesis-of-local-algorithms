@@ -4,6 +4,8 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Companion.Ex
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Companion.Expand.HEIGHT
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile.Companion.Expand.WIDTH
 import com.github.kornilova_l.util.ProgressBar
+import java.io.File
+import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -12,8 +14,23 @@ import java.util.concurrent.ConcurrentHashMap
  * set of some particular tiles (for example [IndependentSetTile]).
  * There are wrappers for [TileGenerator] that convert Set<Tile> to Set<Whatever>
  */
-abstract class TileGenerator(private val finalN: Int, private val finalM: Int, initialTiles: Set<Tile>) {
+abstract class TileGenerator(protected val finalN: Int, protected val finalM: Int, initialTiles: Set<Tile>) {
     val tiles: Set<Tile>
+
+    fun export(dir: File, addTimestampToFileName: Boolean = false): File? {
+        if (!dir.exists() || !dir.isDirectory) {
+            throw IllegalArgumentException("Argument is not a directory or does not exist")
+        }
+        val filePath = Paths.get(dir.toString(),
+                "${getFileNameWithoutExtension()}${if (addTimestampToFileName) "-" + System.currentTimeMillis().toString() else ""}.txt")
+        val file = filePath.toFile()
+        export(file)
+        return file
+    }
+
+    open fun getFileNameWithoutExtension(): String = "$finalN-$finalM"
+
+    abstract fun export(file: File)
 
     /**
      * Expand each tile by 1 row/column

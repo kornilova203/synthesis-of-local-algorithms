@@ -1,12 +1,12 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.colouring
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
-import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.parseTiles
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleTileGraph
 import java.io.File
 
-private val tiles67 = parseTiles(File("generated_tiles/6-7-3.txt"))
-private val tiles58 = parseTiles(File("generated_tiles/5-8-3.txt"))
+private val tiles67 = IndependentSetTile.parseTiles(File("generated_tiles/6-7-3.txt"))
+private val tiles58 = IndependentSetTile.parseTiles(File("generated_tiles/5-8-3.txt"))
 
 fun getRandomFourColouring() {
     val grid2D = generateGrid(7, 10)
