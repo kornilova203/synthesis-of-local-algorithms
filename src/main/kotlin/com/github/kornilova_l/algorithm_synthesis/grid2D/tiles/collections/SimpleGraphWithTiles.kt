@@ -1,15 +1,17 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.parseSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_problem.OneOrTwoNeighboursTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_problem.OneOrTwoNeighboursTile.Companion.oneOrTwoNeighboursTilesFilePattern
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Part.*
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.parseBitSet
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.parseNumber
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
+import java.nio.file.Paths
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -19,29 +21,24 @@ import kotlin.collections.HashMap
  * So [SimpleGraph] instances can be created and used.
  */
 fun main(args: Array<String>) {
-    val dirName = "one_or_two_neighbours_tiles/simple_graphs"
-    val files = File("one_or_two_neighbours_tiles").listFiles()
+    val outputDirName = "one_or_two_neighbours_tiles/simple_graphs"
+    val outputDir = File(outputDirName)
+    val tilesDir = File("one_or_two_neighbours_tiles")
+    val files = tilesDir.listFiles()
     for (i in 0 until files.size) {
         val file = files[i]
         if (file.isFile && oneOrTwoNeighboursTilesFilePattern.matcher(file.name).matches()) {
-            val parts = file.name.split("-")
-            val n = Integer.parseInt(parts[0])
-            val m = Integer.parseInt(parts[1].split(".")[0])
-            if (n > m) {
-                continue
-            }
+            val n = parseNumber(file.name, 1)
+            val m = parseNumber(file.name, 2)
             println("n $n  m $m")
-            val file2 = File("one_or_two_neighbours_tiles/${n - 1}-${m + 1}.txt")
-            if (!file2.exists()) {
-                continue
-            }
+            val file2 = OneOrTwoNeighboursTile.getTilesFile(n - 1, m + 1, tilesDir) ?: continue
             val tileSet1 = OneOrTwoNeighboursTile.parseTiles(file)
             val tileSet2 = OneOrTwoNeighboursTile.parseTiles(file2)
             val graph = SimpleGraphWithTiles.createInstance(tileSet1, tileSet2)
             println("Start export")
-            graph.exportTiles(File("$dirName/${graph.n}-${graph.m}.tiles"))
+            graph.exportTiles(outputDir)
             println("Export graph")
-            graph.export(File("$dirName/${graph.n}-${graph.m}.graph"))
+            graph.export(File("$outputDirName/${graph.n}-${graph.m}.graph"))
         }
     }
 }
@@ -54,6 +51,8 @@ fun main(args: Array<String>) {
 class SimpleGraphWithTiles(n: Int, m: Int, graph: Map<Int, Set<Int>>, private val ids: DualHashBidiMap<Tile, Int>) :
         SimpleGraph(n, m, graph) {
 
+    private val tilesFileExtension = "graphtiles"
+
     /**
      * Format:
      * <n> <m>
@@ -62,13 +61,14 @@ class SimpleGraphWithTiles(n: Int, m: Int, graph: Map<Int, Set<Int>>, private va
      * <id>
      * <tile>
      */
-    fun exportTiles(file: File) {
+    fun exportTiles(dir: File) {
+        val file = Paths.get(dir.toString(), "${OneOrTwoNeighboursTile.name}-$n-$m-${ids.size}.$tilesFileExtension").toFile()
         file.outputStream().use { outputStream ->
-            outputStream.write("$n $m\n".toByteArray())
-            outputStream.write("${ids.size}\n".toByteArray())
             for (tileAndId in ids) {
-                outputStream.write("${tileAndId.value}\n".toByteArray())
-                outputStream.write("${tileAndId.key}\n".toByteArray())
+                outputStream.write(tileAndId.value.toString().toByteArray())
+                outputStream.write("\n".toByteArray())
+                outputStream.write((tileAndId.key as BinaryTile).longsToString().toByteArray())
+                outputStream.write("\n".toByteArray())
             }
         }
     }
@@ -88,6 +88,9 @@ class SimpleGraphWithTiles(n: Int, m: Int, graph: Map<Int, Set<Int>>, private va
                 set1 = set2
                 set2 = temp
             }
+
+            assert(set1.first().n == set2.first().n + 1)
+            assert(set1.first().m + 1 == set2.first().m)
 
             val graph = HashMap<Int, MutableSet<Int>>()
             val ids = DualHashBidiMap<Tile, Int>()
@@ -164,25 +167,26 @@ class SimpleGraphWithTiles(n: Int, m: Int, graph: Map<Int, Set<Int>>, private va
             }
         }
 
+        /**
+         * This is only for [OneOrTwoNeighboursTile] tiles
+         */
         fun createInstance(tilesFile: File, simpleGraph: SimpleGraph): SimpleGraphWithTiles {
             val ids = DualHashBidiMap<Tile, Int>()
+            val n = parseNumber(tilesFile.name, 1)
+            val m = parseNumber(tilesFile.name, 2)
+            val size = parseNumber(tilesFile.name, 3)
+            if (n != simpleGraph.n || m != simpleGraph.m) {
+                throw IllegalArgumentException("Parameters of graph do not match size of tiles. Graph: n = ${simpleGraph.n} " +
+                        "m = ${simpleGraph.m}. IndependentSetTile: n = $n m = $m.")
+            }
             BufferedReader(FileReader(tilesFile)).use { reader ->
-                val firstLine = reader.readLine()
-                val parts = firstLine.split(" ")
-                val n = Integer.parseInt(parts[0])
-                val m = Integer.parseInt(parts[1])
-                if (n != simpleGraph.n || m != simpleGraph.m) {
-                    throw IllegalArgumentException("Parameters of graph do not match size of tiles. Graph: n = ${simpleGraph.n} " +
-                            "m = ${simpleGraph.m}. IndependentSetTile: n = $n m = $m.")
-                }
-                val tilesCount = Integer.parseInt(reader.readLine())
-                for (i in 0 until tilesCount) {
+                for (i in 0 until size) {
                     var line = reader.readLine()
                     while (line.isEmpty()) {
                         line = reader.readLine()
                     }
                     val id = Integer.parseInt(line)
-                    val grid = parseSet(reader, n, m)
+                    val grid = parseBitSet(reader.readLine())
                     ids[BinaryTile(n, m, grid)] = id
                 }
                 return SimpleGraphWithTiles(simpleGraph.n, simpleGraph.m, simpleGraph.graph, ids)

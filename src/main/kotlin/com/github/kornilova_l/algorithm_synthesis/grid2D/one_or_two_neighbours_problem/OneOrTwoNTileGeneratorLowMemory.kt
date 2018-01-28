@@ -46,7 +46,7 @@ class OneOrTwoNTileGeneratorLowMemory(tilesFile: File, side: Expand, outputDir: 
                 val validTiles = removeInvalid(expandedTiles)
                 tilesCount += validTiles.size
                 for (validTile in validTiles) {
-                    outputStream.write(validTile.toString().toByteArray())
+                    outputStream.write(validTile.longsToString().toByteArray())
                     outputStream.write("\n".toByteArray())
                 }
                 progressBar.updateProgress()

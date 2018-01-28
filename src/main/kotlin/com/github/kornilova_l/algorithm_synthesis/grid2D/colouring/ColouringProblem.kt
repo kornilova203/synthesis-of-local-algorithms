@@ -1,11 +1,11 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.colouring
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_problem.OneOrTwoNeighboursTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleGraphWithTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolver
 import java.io.File
-import java.nio.file.Paths
 
 /**
  * Solves colouring problem
@@ -51,10 +51,7 @@ class ColouringProblem {
     }
 
     private fun createColouringFunction(solution: List<Int>, coloursCount: Int, dir: File, graph: SimpleGraph): ColouringFunction? {
-        val tilesFile = Paths.get(dir.toString(), "${graph.n}-${graph.m}.txt").toFile()
-        if (!tilesFile.exists()) {
-            return null
-        }
+        val tilesFile = OneOrTwoNeighboursTile.getTilesFile(graph.n, graph.m, dir) ?: return null
         val graphWithTiles = SimpleGraphWithTiles.createInstance(tilesFile, graph)
         return createColouringFunction(solution, coloursCount, graphWithTiles)
     }
