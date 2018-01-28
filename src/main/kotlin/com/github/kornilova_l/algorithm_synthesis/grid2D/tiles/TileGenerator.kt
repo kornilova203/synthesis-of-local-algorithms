@@ -6,6 +6,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Compan
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Expand.WIDTH
 import com.github.kornilova_l.util.ProgressBar
 import java.io.File
+import java.io.FileOutputStream
 import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
 
@@ -23,15 +24,22 @@ abstract class TileGenerator(protected val finalN: Int, protected val finalM: In
             throw IllegalArgumentException("Argument is not a directory or does not exist")
         }
         val filePath = Paths.get(dir.toString(),
-                "${getFileNameWithoutExtension()}-${tiles.size}${if (addTimestampToFileName) "-" + System.currentTimeMillis().toString() else ""}.txt")
+                "${getFileNameWithoutExtension()}-${tiles.size}${if (addTimestampToFileName) "-" + System.currentTimeMillis().toString() else ""}.tiles")
         val file = filePath.toFile()
         export(file)
         return file
     }
 
-    open fun getFileNameWithoutExtension(): String = "$finalN-$finalM"
+    abstract fun getFileNameWithoutExtension(): String
 
-    protected abstract fun export(file: File)
+    private fun export(file: File) {
+        FileOutputStream(file).use { outputStream ->
+            tiles.forEach { tile ->
+                outputStream.write(tile.longsToString().toByteArray())
+                outputStream.write("\n".toByteArray())
+            }
+        }
+    }
 
     /**
      * Expand each tile by 1 row/column

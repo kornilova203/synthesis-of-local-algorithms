@@ -169,14 +169,13 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
             if (!file.exists() || !file.isFile) {
                 throw IllegalArgumentException("File does not exist or it is not a file")
             }
-            val nameParts = file.name.split("-", ".")
-            if (nameParts[0] != name) {
-                throw IllegalArgumentException("File name must contain name: $name")
+            if (!independentSetTilesFilePattern.matcher(file.name).matches()) {
+                throw IllegalArgumentException("File name does not match pattern: ${file.name}")
             }
-            val n = Integer.parseInt(nameParts[1])
-            val m = Integer.parseInt(nameParts[2])
-            val k = Integer.parseInt(nameParts[3])
-            val size = Integer.parseInt(nameParts[4])
+            val n = BinaryTile.parseNumber(file.name, 1)
+            val m = BinaryTile.parseNumber(file.name, 2)
+            val k = BinaryTile.parseNumber(file.name, 3)
+            val size = BinaryTile.parseNumber(file.name, 4)
             BufferedReader(FileReader(file)).use { reader ->
                 val tiles = HashSet<IndependentSetTile>(size)
                 for (i in 0 until size) {

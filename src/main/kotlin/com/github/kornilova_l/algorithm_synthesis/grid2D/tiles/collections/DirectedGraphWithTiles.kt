@@ -3,6 +3,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetDirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile.Companion.independentSetTilesFilePattern
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.parseBitSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
@@ -117,10 +118,9 @@ class DirectedGraphWithTiles(n: Int,
                 if (!tilesFilePattern.matcher(file.name).matches()) {
                     continue
                 }
-                val nameParts = file.name.split("-", ".")
-                if (Integer.parseInt(nameParts[1]) == n &&
-                        Integer.parseInt(nameParts[2]) == m &&
-                        Integer.parseInt(nameParts[3]) == k) {
+                if (BinaryTile.parseNumber(file.name, 1) == n &&
+                        BinaryTile.parseNumber(file.name, 2) == m &&
+                        BinaryTile.parseNumber(file.name, 3) == k) {
                     return file
                 }
             }
@@ -132,11 +132,10 @@ class DirectedGraphWithTiles(n: Int,
             if (!tilesFilePattern.matcher(tilesFile.name).matches()) {
                 throw IllegalArgumentException("File must contain independent set tiles. File: ${tilesFile.name}")
             }
-            val nameParts = tilesFile.name.split("-", ".")
-            val n = Integer.parseInt(nameParts[1])
-            val m = Integer.parseInt(nameParts[2])
-            val k = Integer.parseInt(nameParts[3])
-            val tilesCount = Integer.parseInt(nameParts[4])
+            val n = BinaryTile.parseNumber(tilesFile.name, 1)
+            val m = BinaryTile.parseNumber(tilesFile.name, 2)
+            val k = BinaryTile.parseNumber(tilesFile.name, 3)
+            val tilesCount = BinaryTile.parseNumber(tilesFile.name, 4)
             if (n != directedGraph.n || m != directedGraph.m || k != directedGraph.k) {
                 throw IllegalArgumentException("Parameters of graph do not match size of tiles. Graph: n = ${directedGraph.n} " +
                         "m = ${directedGraph.m} k = ${directedGraph.k}. IndependentSetTile: n = $n m = $m k = $k.")

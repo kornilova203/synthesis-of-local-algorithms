@@ -203,6 +203,11 @@ open class BinaryTile(n: Int,
             return OpenBitSet(longs, longs.size)
         }
 
+        fun parseNumber(line: String, numIndex: Int): Int {
+            val parts = line.split("-", ".")
+            return Integer.parseInt(parts[numIndex])
+        }
+
         fun createInstance(string: String): BinaryTile {
             val lines = string.split("\n").filter { it != "" }
             val n = lines.size

@@ -10,7 +10,7 @@ class OneOrTwoNeighboursTileParserTest {
     fun parseTest() {
         val tileGenerator = OneOrTwoNeighboursTileGenerator(3, 5)
         val expectedTiles = tileGenerator.tiles
-        val file = tileGenerator.export(File("."), true)!!
+        val file = tileGenerator.export(File("."))!!
 
         val actualTiles = HashSet<BinaryTile>()
         for (oneOrTwoNeighboursTile in OneOrTwoNeighboursTileParser(file)) {

@@ -2,25 +2,18 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTileGenerator.Companion.generatePossiblyValidTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTileGenerator.Companion.removeInvalid
+import com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_problem.OneOrTwoNeighboursTile.Companion.getTilesFile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator
 import java.io.File
-import java.io.FileOutputStream
-import java.nio.file.Paths
 
 
 class OneOrTwoNeighboursTileGenerator(finalN: Int,
                                       finalM: Int,
                                       dir: File? = null) : TileGenerator(finalN, finalM, getInitialTiles(finalN, finalM, dir)) {
 
-    override fun export(file: File) {
-        FileOutputStream(file).use { outputStream ->
-            outputStream.write("$finalN $finalM\n${tiles.size}\n".toByteArray())
-            tiles.forEach { tile ->
-                outputStream.write("$tile\n".toByteArray())
-            }
-        }
-    }
+    override fun getFileNameWithoutExtension(): String = "${OneOrTwoNeighboursTile.name}-$finalN-$finalM"
+
 
     /**
      * If it does not matter if tiles have class [BinaryTile] or [OneOrTwoNeighboursTileGenerator] then
@@ -47,8 +40,8 @@ class OneOrTwoNeighboursTileGenerator(finalN: Int,
             var currentN = finalN
             var currentM = finalM
             while (currentN >= 3 && currentM >= 3) {
-                val file = Paths.get(dir.toString(), "$currentN-$currentM.txt").toFile()
-                if (file.exists()) {
+                val file = getTilesFile(currentN, currentM, dir)
+                if (file != null) {
                     println("Found file: $file")
                     return OneOrTwoNeighboursTile.parseTiles(file)
                 }

@@ -35,7 +35,20 @@ class OneOrTwoNeighboursTile(n: Int, m: Int, grid: OpenBitSet) : BinaryTile(n, m
     override fun rotate(): OneOrTwoNeighboursTile = OneOrTwoNeighboursTile(m, n, rotateGrid(grid))
 
     companion object {
-        val oneOrTwoNeighboursTilesFilePattern = Pattern.compile("\\d+-\\d+\\.txt")!!
+        const val name = "one_or_two_neighbours_tile"
+        val oneOrTwoNeighboursTilesFilePattern = Pattern.compile("$name-\\d+-\\d+-\\d+\\.tiles")!!
+
+        fun getTilesFile(n: Int, m: Int, dir: File): File? {
+            for (file in dir.listFiles()) {
+                if (file.isDirectory) {
+                    continue
+                }
+                if (file.name.startsWith("${OneOrTwoNeighboursTile.name}-$n-$m")) {
+                    return file
+                }
+            }
+            return null
+        }
 
         fun createInstance(string: String): OneOrTwoNeighboursTile {
             val lines = string.split("\n").filter { it != "" }

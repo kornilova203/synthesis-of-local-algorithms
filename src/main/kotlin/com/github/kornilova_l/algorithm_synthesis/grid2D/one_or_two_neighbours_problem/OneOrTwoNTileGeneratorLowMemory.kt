@@ -3,19 +3,15 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTileGenerator.Companion.removeInvalid
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Expand
 import com.github.kornilova_l.util.ProgressBar
-import java.io.BufferedReader
 import java.io.File
 import java.io.FileOutputStream
-import java.io.FileReader
 import java.nio.file.Paths
 
 fun main(args: Array<String>) {
+    val tilesDir = File("one_or_two_neighbours_tiles")
     val outputDir = File("one_or_two_neighbours_tiles/expanded")
-    OneOrTwoNTileGeneratorLowMemory(File("one_or_two_neighbours_tiles/6-6.txt"),
-            Expand.WIDTH, outputDir)
-
-    OneOrTwoNTileGeneratorLowMemory(File("one_or_two_neighbours_tiles/5-7.txt"),
-            Expand.WIDTH, outputDir)
+    OneOrTwoNTileGeneratorLowMemory(OneOrTwoNeighboursTile.getTilesFile(5, 6, tilesDir)!!,
+            Expand.HEIGHT, outputDir)
 }
 
 
@@ -37,22 +33,8 @@ class OneOrTwoNTileGeneratorLowMemory(tilesFile: File, side: Expand, outputDir: 
         }
         val tempOutputFile = Paths.get(outputDir.toString(), "$n-$m-temp.txt").toFile()
         val tilesCount = expandTiles(tempOutputFile, parser, side)
-        val outputFile = Paths.get(outputDir.toString(), "$n-$m.txt").toFile()
-        FileOutputStream(outputFile).use { outputStream ->
-            outputStream.write("$n $m\n".toByteArray())
-            outputStream.write("$tilesCount\n".toByteArray())
-
-            BufferedReader(FileReader(tempOutputFile)).use { reader ->
-                var line = reader.readLine()
-                while (line != null) {
-                    outputStream.write(line.toString().toByteArray())
-                    outputStream.write("\n".toByteArray())
-                    line = reader.readLine()
-                }
-            }
-        }
-
-        tempOutputFile.delete()
+        val outputFile = Paths.get(outputDir.toString(), "${OneOrTwoNeighboursTile.name}-$n-$m-$tilesCount.tiles").toFile()
+        tempOutputFile.renameTo(outputFile)
     }
 
     private fun expandTiles(tempOutputFile: File, parser: OneOrTwoNeighboursTileParser, side: Expand): Int {

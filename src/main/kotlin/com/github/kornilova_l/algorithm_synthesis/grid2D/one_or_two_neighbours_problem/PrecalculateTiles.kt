@@ -13,7 +13,7 @@ fun main(args: Array<String>) {
 private fun precalculateSpecificTile() {
     val n = 3
     val m = 4
-    if (!File("$dirName/$n-$m.txt").exists()) { // if was precalculated
+    if (OneOrTwoNeighboursTile.getTilesFile(n, m, File(dirName)) == null) { // if was not precalculated
         println("Calculate $n x $m")
         OneOrTwoNeighboursTileGenerator(n, m, File(dirName))
                 .export(File(dirName))
@@ -25,7 +25,7 @@ private fun precalculateAll() {
     for (parameters in parametersSet) {
         val n = parameters.n
         val m = parameters.m
-        if (!File("$dirName/$n-$m.txt").exists()) { // if was precalculated
+        if (OneOrTwoNeighboursTile.getTilesFile(n, m, File(dirName)) == null) { // if was not precalculated
             println("Calculate $n x $m")
             OneOrTwoNeighboursTileGenerator(n, m, File(dirName)).export(File(dirName))
         }

@@ -1,11 +1,10 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile.Companion.getTilesFile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile.Companion.name
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator
 import java.io.File
-import java.io.FileOutputStream
-import java.nio.file.Paths
 
 
 /**
@@ -17,15 +16,6 @@ class IndependentSetTileGenerator(finalN: Int,
                                   dir: File? = null) : TileGenerator(finalN, finalM, getInitialTiles(finalN, finalM, k, dir)) {
 
     override fun getFileNameWithoutExtension(): String = "$name-$finalN-$finalM-$k"
-
-    override fun export(file: File) {
-        FileOutputStream(file).use { outputStream ->
-            tiles.forEach { tile ->
-                outputStream.write(tile.longsToString().toByteArray())
-                outputStream.write("\n".toByteArray())
-            }
-        }
-    }
 
     /**
      * If it does not matter if tiles have class [BinaryTile] or [IndependentSetTile] then
@@ -52,8 +42,8 @@ class IndependentSetTileGenerator(finalN: Int,
             var currentN = finalN
             var currentM = finalM
             while (currentN >= 3 && currentM >= 3) {
-                val file = Paths.get(dir.toString(), "$currentN-$currentM-$k.txt").toFile()
-                if (file.exists()) {
+                val file = getTilesFile(currentN, currentM, k, dir)
+                if (file != null) {
                     println("Found file: $file")
                     return IndependentSetTile.parseTiles(file)
                 }

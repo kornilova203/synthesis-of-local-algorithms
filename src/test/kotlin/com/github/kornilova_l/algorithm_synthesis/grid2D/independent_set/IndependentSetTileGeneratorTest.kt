@@ -40,7 +40,7 @@ class IndependentSetTileGeneratorTest {
     @Test
     fun exportAndImportTest() {
         val tileGenerator = IndependentSetTileGenerator(3, 5, 3)
-        val file = tileGenerator.export(File("."), true)
+        val file = tileGenerator.export(File("."))
         assertNotNull(file)
 
         val tileIS = IndependentSetTile.parseTiles(file!!)

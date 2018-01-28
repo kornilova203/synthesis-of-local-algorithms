@@ -47,7 +47,7 @@ class OneOrTwoNeighboursTileGeneratorTest {
     @Test
     fun exportAndImportTest() {
         val tileGenerator = OneOrTwoNeighboursTileGenerator(3, 5)
-        val file = tileGenerator.export(File("."), true)
+        val file = tileGenerator.export(File("."))
         Assert.assertNotNull(file)
 
         val parsedTiles = OneOrTwoNeighboursTile.parseTiles(file!!)

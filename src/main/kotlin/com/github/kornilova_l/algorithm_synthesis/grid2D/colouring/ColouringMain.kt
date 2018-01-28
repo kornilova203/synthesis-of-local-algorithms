@@ -7,8 +7,8 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.Simpl
 import java.io.File
 
 private const val k = 3
-private val tiles67 = IndependentSetTile.parseTiles(File("independent_set_tiles/6-7-$k.txt"))
-private val tiles58 = IndependentSetTile.parseTiles(File("independent_set_tiles/5-8-$k.txt"))
+private val tiles67 = IndependentSetTile.parseTiles(IndependentSetTile.getTilesFile(6, 5, k, File("independent_set_tiles"))!!)
+private val tiles58 = IndependentSetTile.parseTiles(IndependentSetTile.getTilesFile(5, 8, k, File("independent_set_tiles"))!!)
 
 fun getRandomFourColouring() {
     val grid2D = generateGrid(7, 10)
