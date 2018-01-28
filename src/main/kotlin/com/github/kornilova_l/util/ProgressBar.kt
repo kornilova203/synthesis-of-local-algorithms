@@ -63,7 +63,7 @@ class ProgressBar(private val total: Int, private val title: String = "") {
     }
 
     @Synchronized
-    fun updateProgress(addToProgress: Int) {
+    fun updateProgress(addToProgress: Int = 1) {
         if (addToProgress == 0 && (System.currentTimeMillis() - lastUpdateTime.get()) / 1000 == 0L) {
             return
         }
