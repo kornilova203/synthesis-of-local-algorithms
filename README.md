@@ -52,3 +52,9 @@ Column minimal dominating set (3 x 2 tiles, 1 power)
 XN XE NE XNE XS NS XNS ES XES NES XNES XW NW XNW EW XEW NEW XNEW SW XSW NSW XNSW ESW XESW  
 (5 x 7 tiles, 3 power)  
 ![](images/01_grid.png)
+
+## Build instructions:
+
+```
+protoc -I=src/main/kotlin --java_out=src/main/gen src/main/kotlin/com/github/kornilova_l/algorithm_synthesis/grid2D/tiles/tile.proto
+```
