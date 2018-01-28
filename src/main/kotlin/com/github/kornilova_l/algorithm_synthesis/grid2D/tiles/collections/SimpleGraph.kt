@@ -36,9 +36,11 @@ open class SimpleGraph(override val n: Int,
             outputStream.write("$n $m\n".toByteArray())
             outputStream.write("${graph.size}\n".toByteArray())
             for (centerId in graph.keys) {
-                outputStream.write("$centerId\n".toByteArray())
+                outputStream.write(centerId.toString().toByteArray())
+                outputStream.write("\n".toByteArray())
                 for (neighbourId in graph[centerId]!!) {
-                    outputStream.write("$neighbourId\n".toByteArray())
+                    outputStream.write(neighbourId.toString().toByteArray())
+                    outputStream.write("\n".toByteArray())
                 }
                 outputStream.write("\n".toByteArray())
             }

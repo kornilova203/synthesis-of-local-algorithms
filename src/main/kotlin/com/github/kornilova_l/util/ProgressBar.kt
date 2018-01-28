@@ -69,5 +69,8 @@ class ProgressBar(private val total: Int, private val title: String = "") {
         }
         current.addAndGet(addToProgress)
         lastUpdateTime.set(System.currentTimeMillis())
+        if (current.get() == total) {
+            finish()
+        }
     }
 }
