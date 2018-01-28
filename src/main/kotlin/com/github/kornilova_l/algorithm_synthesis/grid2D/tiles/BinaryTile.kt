@@ -194,6 +194,15 @@ open class BinaryTile(n: Int,
 
     companion object {
 
+        fun parseBitSet(line: String): OpenBitSet {
+            val longsStrings = line.split(" ")
+            val longs = LongArray(longsStrings.size)
+            for (j in 0 until longs.size) {
+                longs[j] = java.lang.Long.parseLong(longsStrings[j])
+            }
+            return OpenBitSet(longs, longs.size)
+        }
+
         fun createInstance(string: String): BinaryTile {
             val lines = string.split("\n").filter { it != "" }
             val n = lines.size

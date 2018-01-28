@@ -12,7 +12,7 @@ import java.util.*
  * This implementation contains only ids of tiles.
  * It should be used if you need to know only if solution of problem exists.
  */
-open class DirectedGraph(override val n: Int,
+abstract class DirectedGraph(override val n: Int,
                          override val m: Int,
                          val neighbourhoods: Set<Neighbourhood>) : TileGraph() {
     private var cachedSize = -1
@@ -50,16 +50,7 @@ open class DirectedGraph(override val n: Int,
      * <id of west>
      * blank line
      */
-    open fun export(file: File) {
-        file.outputStream().use { outputStream ->
-            outputStream.write("$n $m\n".toByteArray())
-            outputStream.write("${neighbourhoods.size}\n".toByteArray())
-            for (neighbourhood in neighbourhoods) {
-                outputStream.write(("${neighbourhood.get(POSITION.X)}\n${neighbourhood.get(POSITION.N)}\n" +
-                        "${neighbourhood.get(POSITION.E)}\n${neighbourhood.get(POSITION.S)}\n${neighbourhood.get(POSITION.W)}\n\n").toByteArray())
-            }
-        }
-    }
+    abstract fun export(dir: File)
 
     class Neighbourhood(private val centerId: Int,
                         private val northId: Int,

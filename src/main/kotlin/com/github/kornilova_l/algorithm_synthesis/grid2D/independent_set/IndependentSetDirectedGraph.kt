@@ -5,6 +5,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.ru
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
+import java.nio.file.Paths
 import java.util.*
 
 
@@ -24,7 +25,8 @@ open class IndependentSetDirectedGraph(n: Int,
      * <id of west>
      * blank line
      */
-    override fun export(file: File) {
+    override fun export(dir: File) {
+        val file = Paths.get(dir.toString(), "$n-$m-$k.graph").toFile()
         file.outputStream().use { outputStream ->
             outputStream.write("$n $m $k\n".toByteArray())
             outputStream.write("${neighbourhoods.size}\n".toByteArray())

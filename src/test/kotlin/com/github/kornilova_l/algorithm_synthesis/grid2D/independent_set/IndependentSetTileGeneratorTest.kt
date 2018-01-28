@@ -22,7 +22,7 @@ class IndependentSetTileGeneratorTest {
     fun testEasyTiles() {
         val startTime = System.currentTimeMillis()
         val parametersSet = getParametersSet(1)
-        parametersSet.forEachIndexed { i, parameters ->
+        parametersSet.forEach { parameters ->
             val n = parameters.n
             val m = parameters.m
             val k = parameters.k
@@ -33,7 +33,6 @@ class IndependentSetTileGeneratorTest {
 
                 assertEquals(expectedTiles, tiles)
             }
-            println("$i / ${parametersSet.size}")
         }
         println("Time: ${System.currentTimeMillis() - startTime}")
     }

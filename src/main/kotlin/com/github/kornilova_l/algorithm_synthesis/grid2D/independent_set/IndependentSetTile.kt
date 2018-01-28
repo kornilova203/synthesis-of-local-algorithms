@@ -9,6 +9,7 @@ import org.apache.lucene.util.OpenBitSet
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
+import java.util.regex.Pattern
 
 
 fun parseSet(reader: BufferedReader, n: Int, m: Int): OpenBitSet {
@@ -49,6 +50,9 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
 
     companion object {
 
+        const val name = "independent_set"
+        val independentSetTilesFilePattern = Pattern.compile("$name-\\d+-\\d+-\\d+-\\d+\\.tiles")!!
+
         fun getTilesFile(n: Int, m: Int, k: Int, dir: File): File? {
             for (file in dir.listFiles()) {
                 if (file.isDirectory) {
@@ -60,8 +64,6 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
             }
             return null
         }
-
-        const val name = "independent_set"
 
         /**
          * Created a subtile of size tile.n - 2 x tile.m - 2
@@ -178,13 +180,7 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
             BufferedReader(FileReader(file)).use { reader ->
                 val tiles = HashSet<IndependentSetTile>(size)
                 for (i in 0 until size) {
-                    val line = reader.readLine()
-                    val longsStrings = line.split(" ")
-                    val longs = LongArray(longsStrings.size)
-                    for (j in 0 until longs.size) {
-                        longs[j] = java.lang.Long.parseLong(longsStrings[j])
-                    }
-                    val grid = OpenBitSet(longs, longs.size)
+                    val grid = parseBitSet(reader.readLine())
                     tiles.add(IndependentSetTile(n, m, k, grid))
                 }
                 if (size != tiles.size) {

@@ -3,6 +3,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import org.apache.lucene.util.OpenBitSet
 import java.io.File
+import java.util.regex.Pattern
 
 
 /**
@@ -34,6 +35,8 @@ class OneOrTwoNeighboursTile(n: Int, m: Int, grid: OpenBitSet) : BinaryTile(n, m
     override fun rotate(): OneOrTwoNeighboursTile = OneOrTwoNeighboursTile(m, n, rotateGrid(grid))
 
     companion object {
+        val oneOrTwoNeighboursTilesFilePattern = Pattern.compile("\\d+-\\d+\\.txt")!!
+
         fun createInstance(string: String): OneOrTwoNeighboursTile {
             val lines = string.split("\n").filter { it != "" }
             val n = lines.size

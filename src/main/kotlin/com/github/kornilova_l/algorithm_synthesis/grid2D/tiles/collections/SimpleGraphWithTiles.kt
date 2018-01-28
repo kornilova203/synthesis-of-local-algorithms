@@ -2,6 +2,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.parseSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_problem.OneOrTwoNeighboursTile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_problem.OneOrTwoNeighboursTile.Companion.oneOrTwoNeighboursTilesFilePattern
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Part.*
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
@@ -10,11 +11,8 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.util.*
-import java.util.regex.Pattern
 import kotlin.collections.HashMap
 
-
-private val tilesFilePattern = Pattern.compile("\\d+-\\d+\\.txt")!!
 
 /**
  * Precalculate graphs and export them to files.
@@ -25,7 +23,7 @@ fun main(args: Array<String>) {
     val files = File("one_or_two_neighbours_tiles").listFiles()
     for (i in 0 until files.size) {
         val file = files[i]
-        if (file.isFile && tilesFilePattern.matcher(file.name).matches()) {
+        if (file.isFile && oneOrTwoNeighboursTilesFilePattern.matcher(file.name).matches()) {
             val parts = file.name.split("-")
             val n = Integer.parseInt(parts[0])
             val m = Integer.parseInt(parts[1].split(".")[0])

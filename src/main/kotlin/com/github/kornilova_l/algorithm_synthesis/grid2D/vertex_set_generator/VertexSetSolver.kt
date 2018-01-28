@@ -51,13 +51,17 @@ private fun getLabelingFunction(problem: Problem, graph: IndependentSetDirectedG
     var solution = tryToFindSolution(problem, graph)
     if (solution != null) { // solution found
         return LabelingFunction(solution,
-                DirectedGraphWithTiles.createInstance(File("independent_set_tiles/directed_graphs/${graph.n}-${graph.m}-${graph.k}.tiles"), graph))
+                DirectedGraphWithTiles.createInstance(
+                        DirectedGraphWithTiles.getTilesFile(graph.n, graph.m, graph.k, File("independent_set_tiles/directed_graphs/"))!!,
+                        graph))
     }
 
     solution = tryToFindSolution(problem.rotate(), graph)
     if (solution != null) { // solution found
         return LabelingFunction(solution,
-                DirectedGraphWithTiles.createInstance(File("independent_set_tiles/directed_graphs/${graph.n}-${graph.m}-${graph.k}.tiles"), graph))
+                DirectedGraphWithTiles.createInstance(
+                        DirectedGraphWithTiles.getTilesFile(graph.n, graph.m, graph.k, File("independent_set_tiles/directed_graphs/"))!!,
+                        graph))
                 .rotate()
     }
     return null
