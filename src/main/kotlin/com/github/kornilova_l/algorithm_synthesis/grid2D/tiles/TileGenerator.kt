@@ -23,7 +23,7 @@ abstract class TileGenerator(protected val finalN: Int, protected val finalM: In
             throw IllegalArgumentException("Argument is not a directory or does not exist")
         }
         val filePath = Paths.get(dir.toString(),
-                "${getFileNameWithoutExtension()}${if (addTimestampToFileName) "-" + System.currentTimeMillis().toString() else ""}.txt")
+                "${getFileNameWithoutExtension()}-${tiles.size}${if (addTimestampToFileName) "-" + System.currentTimeMillis().toString() else ""}.txt")
         val file = filePath.toFile()
         export(file)
         return file

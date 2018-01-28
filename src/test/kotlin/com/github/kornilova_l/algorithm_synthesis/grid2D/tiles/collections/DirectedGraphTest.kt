@@ -1,6 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile.Companion.getTilesFile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Neighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import org.junit.Assert.assertEquals
@@ -11,12 +12,12 @@ import java.io.File
 class DirectedGraphTest {
     @Test
     fun graphSize() {
-        var tileSet = IndependentSetTile.parseTiles(File("independent_set_tiles/4-4-1.txt"))
+        var tileSet = IndependentSetTile.parseTiles(getTilesFile(4, 4, 1, File("independent_set_tiles"))!!)
         var graph = DirectedGraphWithTiles.createInstance(tileSet)
         assertEquals(7, graph.size)
         assertEquals(392, graph.edgeCount)
 
-        tileSet = IndependentSetTile.parseTiles(File("independent_set_tiles/3-3-1.txt"))
+        tileSet = IndependentSetTile.parseTiles(getTilesFile(3, 3, 1, File("independent_set_tiles"))!!)
         graph = DirectedGraphWithTiles.createInstance(tileSet)
         assertEquals(2, graph.size)
         assertEquals((15 + 1) * 4, graph.edgeCount)
@@ -24,7 +25,7 @@ class DirectedGraphTest {
 
     @Test
     fun twoByThreeTiles() {
-        val tileSet = IndependentSetTile.parseTiles(File("independent_set_tiles/4-5-4.txt"))
+        val tileSet = IndependentSetTile.parseTiles(getTilesFile(4, 5, 4, File("independent_set_tiles"))!!)
         val graph = DirectedGraphWithTiles.createInstance(tileSet)
 
         val id1 = graph.getId(IndependentSetTile.createInstance("0 0 0\n0 0 0", 4))

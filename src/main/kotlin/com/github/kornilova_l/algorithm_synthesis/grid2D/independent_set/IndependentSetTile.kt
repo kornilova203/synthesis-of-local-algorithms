@@ -49,6 +49,20 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
 
     companion object {
 
+        fun getTilesFile(n: Int, m: Int, k: Int, dir: File): File? {
+            for (file in dir.listFiles()) {
+                if (file.isDirectory) {
+                    continue
+                }
+                if (file.name.startsWith("$name-$n-$m-$k")) {
+                    return file
+                }
+            }
+            return null
+        }
+
+        const val name = "independent_set"
+
         /**
          * Created a subtile of size tile.n - 2 x tile.m - 2
          */
@@ -153,22 +167,30 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
             if (!file.exists() || !file.isFile) {
                 throw IllegalArgumentException("File does not exist or it is not a file")
             }
+            val nameParts = file.name.split("-", ".")
+            if (nameParts[0] != name) {
+                throw IllegalArgumentException("File name must contain name: $name")
+            }
+            val n = Integer.parseInt(nameParts[1])
+            val m = Integer.parseInt(nameParts[2])
+            val k = Integer.parseInt(nameParts[3])
+            val size = Integer.parseInt(nameParts[4])
             BufferedReader(FileReader(file)).use { reader ->
-                val firstLine = reader.readLine()
-                val parts = firstLine.split(" ")
-                val n = Integer.parseInt(parts[0])
-                val m = Integer.parseInt(parts[1])
-                val k = Integer.parseInt(parts[2])
-                val size = Integer.parseInt(reader.readLine())
-                val validTiles = HashSet<IndependentSetTile>(size)
+                val tiles = HashSet<IndependentSetTile>(size)
                 for (i in 0 until size) {
-                    val grid = parseSet(reader, n, m)
-                    validTiles.add(IndependentSetTile(n, m, k, grid))
+                    val line = reader.readLine()
+                    val longsStrings = line.split(" ")
+                    val longs = LongArray(longsStrings.size)
+                    for (j in 0 until longs.size) {
+                        longs[j] = java.lang.Long.parseLong(longsStrings[j])
+                    }
+                    val grid = OpenBitSet(longs, longs.size)
+                    tiles.add(IndependentSetTile(n, m, k, grid))
                 }
-                if (size != validTiles.size) {
+                if (size != tiles.size) {
                     throw IllegalArgumentException("File contains less tiles that it states in the beginning of the file")
                 }
-                return validTiles
+                return tiles
             }
         }
     }

@@ -26,8 +26,8 @@ class IndependentSetTileGeneratorTest {
             val n = parameters.n
             val m = parameters.m
             val k = parameters.k
-            val file = File("src/test/resources/tiles/$n-$m-$k.txt")
-            if (file.exists()) {
+            val file = IndependentSetTile.getTilesFile(n, m, k, File("src/test/resources/tiles"))
+            if (file != null) {
                 val tiles = IndependentSetTileGenerator(n, m, k).tiles
                 val expectedTiles = IndependentSetTile.parseTiles(file)
 

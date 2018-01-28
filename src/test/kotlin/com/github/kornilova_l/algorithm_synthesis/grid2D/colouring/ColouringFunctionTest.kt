@@ -11,8 +11,8 @@ import java.io.File
 
 internal class ColouringFunctionTest {
     private val k = 3
-    private val tiles67 = IndependentSetTile.parseTiles(File("independent_set_tiles/6-7-$k.txt"))
-    private val tiles58 = IndependentSetTile.parseTiles(File("independent_set_tiles/5-8-$k.txt"))
+    private val tiles67 = IndependentSetTile.parseTiles(IndependentSetTile.getTilesFile(6, 7, 3, File("independent_set_tiles"))!!)
+    private val tiles58 = IndependentSetTile.parseTiles(IndependentSetTile.getTilesFile(5, 8, 3, File("independent_set_tiles"))!!)
     private val iterationsCount = 1000
 
     @Test

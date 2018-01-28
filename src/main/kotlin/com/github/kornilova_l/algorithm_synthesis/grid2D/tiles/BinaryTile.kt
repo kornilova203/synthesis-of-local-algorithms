@@ -35,6 +35,17 @@ open class BinaryTile(n: Int,
         return rotatedGrid
     }
 
+    fun longsToString(): String {
+        val stringBuilder = StringBuilder()
+        for (i in 0 until grid.bits.size) {
+            stringBuilder.append(grid.bits[i].toString())
+            if (i != grid.bits.size - 1) {
+                stringBuilder.append(" ")
+            }
+        }
+        return stringBuilder.toString()
+    }
+
     /**
      * Expand tile.
      * if side == HEIGHT then add extra row to the bottom of tile

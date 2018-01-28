@@ -1,5 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile.Companion.name
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator
 import java.io.File
@@ -15,13 +16,13 @@ class IndependentSetTileGenerator(finalN: Int,
                                   private val k: Int,
                                   dir: File? = null) : TileGenerator(finalN, finalM, getInitialTiles(finalN, finalM, k, dir)) {
 
-    override fun getFileNameWithoutExtension(): String = "$finalN-$finalM-$k"
+    override fun getFileNameWithoutExtension(): String = "$name-$finalN-$finalM-$k"
 
     override fun export(file: File) {
         FileOutputStream(file).use { outputStream ->
-            outputStream.write("$finalN $finalM $k\n${tiles.size}\n".toByteArray())
             tiles.forEach { tile ->
-                outputStream.write("$tile\n".toByteArray())
+                outputStream.write(tile.longsToString().toByteArray())
+                outputStream.write("\n".toByteArray())
             }
         }
     }
