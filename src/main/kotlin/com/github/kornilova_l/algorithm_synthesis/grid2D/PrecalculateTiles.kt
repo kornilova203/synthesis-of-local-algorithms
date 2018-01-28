@@ -13,10 +13,10 @@ private fun precalculateSpecificTile() {
     val n = 8
     val m = 9
     val k = 4
-    if (!File("generated_tiles/$n-$m-$k.txt").exists()) { // if was precalculated
+    if (!File("independent_set_tiles/$n-$m-$k.txt").exists()) { // if was precalculated
         println("Calculate $n x $m tile in power $k")
-        IndependentSetTileGenerator(n, m, k, File("generated_tiles"))
-                .export(File("generated_tiles"))
+        IndependentSetTileGenerator(n, m, k, File("independent_set_tiles"))
+                .export(File("independent_set_tiles"))
     }
 }
 
@@ -26,9 +26,9 @@ private fun precalculateAll() {
         val n = parameters.n
         val m = parameters.m
         val k = parameters.k
-        if (!File("generated_tiles/$n-$m-$k.txt").exists()) { // if was precalculated
+        if (!File("independent_set_tiles/$n-$m-$k.txt").exists()) { // if was precalculated
             println("Calculate $n x $m tile in power $k")
-            IndependentSetTileGenerator(n, m, k, File("generated_tiles")).export(File("generated_tiles"))
+            IndependentSetTileGenerator(n, m, k, File("independent_set_tiles")).export(File("independent_set_tiles"))
         }
     }
 }

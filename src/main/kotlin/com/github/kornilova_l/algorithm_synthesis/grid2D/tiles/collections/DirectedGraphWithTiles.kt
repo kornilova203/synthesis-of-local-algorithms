@@ -19,8 +19,8 @@ private val tilesFilePattern = Pattern.compile("\\d+-\\d+-\\d+\\.txt")!!
  * So [DirectedGraph] instances can be created and used.
  */
 fun main(args: Array<String>) {
-    val dirName = "directed_graphs"
-    val files = File("generated_tiles").listFiles()
+    val dirName = "independent_set_tiles/directed_graphs"
+    val files = File("independent_set_tiles").listFiles()
     for (i in 0 until files.size) {
         val file = files[i]
         if (tilesFilePattern.matcher(file.name).matches()) {

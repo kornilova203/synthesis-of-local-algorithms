@@ -9,8 +9,8 @@ import java.io.File
 internal class SimpleGraphWithTilesTest {
     private val tiles32 = IndependentSetTileGenerator(3, 2, 1).tiles
     private val tiles23 = IndependentSetTileGenerator(2, 3, 1).tiles
-    private val tiles67 = IndependentSetTile.parseTiles(File("generated_tiles/6-7-3.txt"))
-    private val tiles58 = IndependentSetTile.parseTiles(File("generated_tiles/5-8-3.txt"))
+    private val tiles67 = IndependentSetTile.parseTiles(File("independent_set_tiles/6-7-3.txt"))
+    private val tiles58 = IndependentSetTile.parseTiles(File("independent_set_tiles/5-8-3.txt"))
 
     @Test
     fun getGraph() {

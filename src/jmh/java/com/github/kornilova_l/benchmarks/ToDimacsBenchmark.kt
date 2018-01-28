@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 @Measurement(iterations = 8)
 open class ToDimacsBenchmark {
     private var problem: Problem = Problem("0?1?1")
-    private var graph = IndependentSetDirectedGraph(File("directed_graphs/5-7-1.graph"))
+    private var graph = IndependentSetDirectedGraph(File("independent_set_tiles/directed_graphs/5-7-1.graph"))
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)

@@ -13,10 +13,10 @@ import java.io.File
  * Try to find tile size such that it is possible to get labels so
  * each vertex has 1-neighbourhood in combinations Set.
  *
- * To use this function all tile sets must be precalculated and stored in generated_tiles directory
+ * To use this function all tile sets must be precalculated and stored in independent_set_tiles directory
  */
 fun getLabelingFunction(problem: Problem): Pair<LabelingFunction, Int>? {
-    val directedGraphsParser = IndependentSetDirectedGraphsIterator(File("directed_graphs"))
+    val directedGraphsParser = IndependentSetDirectedGraphsIterator(File("independent_set_tiles/directed_graphs"))
     for (graph in directedGraphsParser) {
         println("n = ${graph.n} m = ${graph.m} k = ${graph.k}")
         val function = getLabelingFunction(problem, graph)
@@ -30,7 +30,7 @@ fun getLabelingFunction(problem: Problem): Pair<LabelingFunction, Int>? {
 }
 
 fun doesSolutionExist(problem: Problem): Boolean {
-    val directedGraphsParser = IndependentSetDirectedGraphsIterator(File("directed_graphs"))
+    val directedGraphsParser = IndependentSetDirectedGraphsIterator(File("independent_set_tiles/directed_graphs"))
     for (graph in directedGraphsParser) {
         println("n = ${graph.n} m = ${graph.m} k = ${graph.k}")
         var solution = tryToFindSolution(problem, graph)
@@ -51,13 +51,13 @@ private fun getLabelingFunction(problem: Problem, graph: IndependentSetDirectedG
     var solution = tryToFindSolution(problem, graph)
     if (solution != null) { // solution found
         return LabelingFunction(solution,
-                DirectedGraphWithTiles.createInstance(File("directed_graphs/${graph.n}-${graph.m}-${graph.k}.tiles"), graph))
+                DirectedGraphWithTiles.createInstance(File("independent_set_tiles/directed_graphs/${graph.n}-${graph.m}-${graph.k}.tiles"), graph))
     }
 
     solution = tryToFindSolution(problem.rotate(), graph)
     if (solution != null) { // solution found
         return LabelingFunction(solution,
-                DirectedGraphWithTiles.createInstance(File("directed_graphs/${graph.n}-${graph.m}-${graph.k}.tiles"), graph))
+                DirectedGraphWithTiles.createInstance(File("independent_set_tiles/directed_graphs/${graph.n}-${graph.m}-${graph.k}.tiles"), graph))
                 .rotate()
     }
     return null
@@ -81,7 +81,7 @@ private fun isSolvable(problem: Problem, graph: DirectedGraph): Boolean {
  * @return solvable problems
  */
 fun tryToFindSolutionForEachProblem(problems: List<Problem>): Set<Problem> {
-    val directedGraphsParser = IndependentSetDirectedGraphsIterator(File("directed_graphs"))
+    val directedGraphsParser = IndependentSetDirectedGraphsIterator(File("independent_set_tiles/directed_graphs"))
     val solvable = HashSet<Problem>()
     for (graph in directedGraphsParser) {
         if (solvable.size == problems.size) { // if everything is solved

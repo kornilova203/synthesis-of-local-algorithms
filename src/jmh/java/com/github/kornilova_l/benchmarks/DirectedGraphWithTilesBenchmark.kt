@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
 @Measurement(iterations = 8)
 open class DirectedGraphWithTilesBenchmark {
 
-    private var tiles = IndependentSetTile.parseTiles(File("generated_tiles/6-7-1.txt"))
+    private var tiles = IndependentSetTile.parseTiles(File("independent_set_tiles/6-7-1.txt"))
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
