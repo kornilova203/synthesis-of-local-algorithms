@@ -8,8 +8,9 @@ import java.util.concurrent.atomic.AtomicLong
 class ProgressBar(private val total: Int, private val title: String = "") {
     private val startTime = AtomicLong(System.currentTimeMillis())
     private val timer: Timer = Timer()
-    private var lastUpdateTime = AtomicLong()
-    private var current = AtomicInteger()
+    private val lastUpdateTime = AtomicLong()
+    private val current = AtomicInteger()
+    @Volatile private var wasFinished = false
 
     init {
         timer.schedule(object : TimerTask() {
@@ -22,6 +23,10 @@ class ProgressBar(private val total: Int, private val title: String = "") {
 
     @Synchronized
     fun finish() {
+        if (wasFinished) {
+            return
+        }
+        wasFinished = true
         timer.cancel()
         updateProgress(total - current.get())
         redraw()

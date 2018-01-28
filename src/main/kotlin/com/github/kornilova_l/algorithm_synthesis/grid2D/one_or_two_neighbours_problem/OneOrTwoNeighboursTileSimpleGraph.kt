@@ -33,9 +33,6 @@ fun main(args: Array<String>) {
         if (file.isFile && OneOrTwoNeighboursTile.oneOrTwoNeighboursTilesFilePattern.matcher(file.name).matches()) {
             val n = parseNumber(file.name, 1)
             val m = parseNumber(file.name, 2)
-            if (n != 4 || m != 5) {
-                continue
-            }
             if (File("$outputDirName/$n-$m.graph").exists())
                 continue
             val tileSet = OneOrTwoNeighboursTile.parseTiles(file)
@@ -100,23 +97,30 @@ class OneOrTwoNeighboursTileSimpleGraph(n: Int, m: Int, graph: Map<Int, Set<Int>
             val m = tiles.first().m
             val ids = ConcurrentHashMap<Tile, Int>()
             val graph = ConcurrentHashMap<Int, MutableSet<Int>>()
+            val uniqueTiles = ConcurrentHashMap<Tile, Tile>()
+            for (tile in tiles) {
+                uniqueTiles[tile] = tile
+            }
             tiles.parallelStream().forEach { tile ->
-
                 val neighbours = HashSet<Int>()
                 var expandedTiles = removeInvalid(tile.getAllExpandedTiles(WIDTH))
                 for (expandedTile in expandedTiles) {
-                    val rightTile = expandedTile.clonePart(E)
+                    val rightTile = getUniqueTile(expandedTile.clonePart(E), uniqueTiles)
                     neighbours.add(getId(rightTile, ids))
                 }
                 expandedTiles = removeInvalid(tile.getAllExpandedTiles(HEIGHT))
                 for (expandedTile in expandedTiles) {
-                    val bottomTile = expandedTile.clonePart(S)
+                    val bottomTile = getUniqueTile(expandedTile.clonePart(S), uniqueTiles)
                     neighbours.add(getId(bottomTile, ids))
                 }
-                graph[getId(tile, ids)] = neighbours
+                graph[getId(getUniqueTile(tile, uniqueTiles), ids)] = neighbours
                 progressBar.updateProgress()
             }
             return OneOrTwoNeighboursTileSimpleGraph(n, m, graph, DualHashBidiMap(ids))
+        }
+
+        private fun getUniqueTile(tile: Tile, uniqueTiles: MutableMap<Tile, Tile>): Tile {
+            return uniqueTiles[tile]!!
         }
     }
 }

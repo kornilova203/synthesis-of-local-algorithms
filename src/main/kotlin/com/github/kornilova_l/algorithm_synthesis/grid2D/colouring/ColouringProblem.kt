@@ -111,8 +111,8 @@ class ColouringProblem {
         /**
          * Id of any variable must not be 0
          */
-        private fun getVarId(vertexId: Int, coloursCount: Int, currentVar: Int): Int =
-                vertexId * coloursCount + currentVar + 1
+        private fun getVarId(vertexId: Int, coloursCount: Int, colourId: Int): Int =
+                vertexId * coloursCount + colourId + 1
 
         private fun tileMustHaveAtLeastOneColour(id: Int, coloursCount: Int, satSolver: SatSolver) {
             val clause = IntArray(coloursCount)

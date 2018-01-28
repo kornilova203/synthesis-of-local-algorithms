@@ -102,13 +102,8 @@ open class SimpleGraphWithTiles(n: Int, m: Int, graph: Map<Int, Set<Int>>, prote
          * otherwise it adds tile to set and returns new id
          */
         fun getId(tile: Tile, ids: MutableMap<Tile, Int>): Int {
-            val maybeId = ids[tile]
-            return if (maybeId != null) {
-                maybeId
-            } else {
-                val id = ids.size // ids start with 0
-                ids[tile] = id
-                id
+            synchronized(this) {
+                return ids.computeIfAbsent(tile, { ids.size })
             }
         }
     }
