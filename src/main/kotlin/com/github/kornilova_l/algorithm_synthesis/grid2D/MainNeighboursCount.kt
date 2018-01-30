@@ -6,8 +6,10 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.ru
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.tryToFindSolutionForEachProblem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.visualization.GridDrawer
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.visualization.RowDrawer
+import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashSet
 
 
 /**
@@ -47,7 +49,23 @@ val neighboursCombinationsList = (1..31).map { i ->
 
 fun main(args: Array<String>) {
 //    calc1DScheme()
-    calc2DScheme()
+//    calc2DScheme()
+    val file = File("solvable_combinations")
+    val solvableCombinations = HashSet<Pair<List<Int>, List<Int>>>()
+    file.forEachLine { line ->
+        val firstSet = line.substring(line.indexOf("[") + 1, line.indexOf("]")).split(", ").map { Integer.parseInt(it) }
+        val secondSet = line.substring(line.lastIndexOf("[") + 1, line.lastIndexOf("]")).split(", ").map { Integer.parseInt(it) }
+        val combination = Pair(firstSet, secondSet)
+        solvableCombinations.add(combination)
+        println(combination)
+    }
+    val combinationsForIncludedCenter = neighboursCombinationsList.filter { !it.contains(4) }
+    val combinationsForExcludedCenter = neighboursCombinationsList.filter { !it.contains(0) }
+    val grid = createGrid(solvableCombinations, combinationsForIncludedCenter, combinationsForExcludedCenter)
+    GridDrawer(
+            combinationsForIncludedCenter.map { it.toString().removePrefix("[").removeSuffix("]") },
+            combinationsForExcludedCenter.reversed().map { it.toString().removePrefix("[").removeSuffix("]") },
+            grid).outputImage()
 }
 
 fun calc2DScheme() {
@@ -56,6 +74,9 @@ fun calc2DScheme() {
     val problems = ArrayList<Problem>()
     for (combinationForIncludedCenter in neighboursCombinationsList) {
         for (combinationForExcludedCenter in neighboursCombinationsList) {
+            if (combinationForIncludedCenter.contains(4) || combinationForExcludedCenter.contains(0)) { // if have trivial solution
+                continue
+            }
             val problem = createProblem(combinationForIncludedCenter, combinationForExcludedCenter)
             problemToCombinations[problem] = Pair(combinationForIncludedCenter, combinationForExcludedCenter)
             problems.add(problem)
@@ -66,25 +87,30 @@ fun calc2DScheme() {
     for (solvableCombination in solvableCombinations) {
         println(solvableCombination)
     }
-    val grid = createGrid(solvableCombinations)
-    val labels = neighboursCombinationsList.map { it.toString() }
+    val grid = createGrid(solvableCombinations, neighboursCombinationsList, neighboursCombinationsList)
+    val labels = neighboursCombinationsList.map { it.toString().removePrefix("[").removeSuffix("]") }
     GridDrawer(labels, labels.reversed(), grid).outputImage()
 }
 
-fun createGrid(solvableCombinations: Set<Pair<List<Int>, List<Int>>>): Array<BooleanArray> {
-    val size = neighboursCombinationsList.size
-    val grid = Array(size, { BooleanArray(size, { false }) })
+fun createGrid(solvableCombinations: Set<Pair<List<Int>, List<Int>>>,
+               combinationsForIncludedCenter: List<List<Int>>,
+               combinationsForExcludedCenter: List<List<Int>>): Array<BooleanArray> {
+    val n = combinationsForIncludedCenter.size
+    val m = combinationsForExcludedCenter.size
+    val grid = Array(n, { BooleanArray(m, { false }) })
     for (pair in solvableCombinations) {
         val combinationForIncludedCenter = pair.first
         val combinationForExcludedCenter = pair.second
-        grid[getId(combinationForIncludedCenter)][size - 1 - getId(combinationForExcludedCenter)] = true
+        val i = getId(combinationForIncludedCenter, combinationsForIncludedCenter)
+        val j = m - 1 - getId(combinationForExcludedCenter, combinationsForExcludedCenter)
+        grid[i][j] = true
     }
     return grid
 }
 
-fun getId(combinationForExcludedCenter: List<Int>): Int {
-    for (i in 0 until neighboursCombinationsList.size) {
-        if (combinationForExcludedCenter == neighboursCombinationsList[i]) {
+fun getId(combinationForExcludedCenter: List<Int>, allCombinations: List<List<Int>>): Int {
+    for (i in 0 until allCombinations.size) {
+        if (combinationForExcludedCenter == allCombinations[i]) {
             return i
         }
     }

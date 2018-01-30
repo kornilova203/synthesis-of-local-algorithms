@@ -17,7 +17,8 @@ fun main(args: Array<String>) {
 //    val problem = columnMinimalDominatingSet()
 //    val problem = atLeastOneIncludedAndOneExcluded()
 //    val problem = test()
-    val problem = gameOfLife()
+//    val problem = gameOfLife()
+    val problem = oneOrTwoNeighbours()
 //    val problem = invertedIndependentSet()
 
     tryToSolve(problem)
@@ -115,6 +116,15 @@ fun gameOfLife(): Problem {
     /* cell does not survive if it has 4 of 1 neighbour */
     rules.addAll(getRulePermutations(1, false))
 //    rules.addAll(getRulePermutations(3, false))
+    return Problem(rules)
+}
+
+fun oneOrTwoNeighbours(): Problem {
+    val rules = HashSet<VertexRule>()
+    rules.addAll(getRulePermutations(1, true))
+    rules.addAll(getRulePermutations(2, true))
+    rules.addAll(getRulePermutations(1, false))
+    rules.addAll(getRulePermutations(2, false))
     return Problem(rules)
 }
 
