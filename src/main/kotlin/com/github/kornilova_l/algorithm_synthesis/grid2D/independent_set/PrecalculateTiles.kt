@@ -14,7 +14,7 @@ private val logger = Logger(File("precalculate_is_tiles.log"))
  * This program outputs precalculated tiles to [dir] directory
  */
 fun main(args: Array<String>) {
-    createDir(dir)
+    createDir(dir, logger)
     if (args.isEmpty()) {
         precalculateAll()
     } else {
@@ -29,10 +29,10 @@ fun main(args: Array<String>) {
     }
 }
 
-fun createDir(dir: File) {
+fun createDir(dir: File, logger: Logger? = null) {
     if (!dir.exists()) {
         dir.mkdir()
-        logger.info("created directory ${dir.absolutePath}")
+        logger?.info("created directory ${dir.absolutePath}")
     }
 }
 

@@ -65,6 +65,11 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
             return null
         }
 
+        fun getK(file: File): Int {
+            val parts = file.name.split("-")
+            return Integer.parseInt(parts[3])
+        }
+
         /**
          * Created a subtile of size tile.n - 2 x tile.m - 2
          */

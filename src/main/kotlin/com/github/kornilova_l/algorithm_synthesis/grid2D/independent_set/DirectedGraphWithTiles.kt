@@ -1,10 +1,8 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
+package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetDirectedGraph
-import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
-import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile.Companion.independentSetTilesFilePattern
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.parseBitSet
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
 import java.io.BufferedReader
@@ -14,33 +12,6 @@ import java.nio.file.Paths
 import java.util.*
 import java.util.regex.Pattern
 
-
-/**
- * Precalculate graphs and export them to files.
- * So [DirectedGraph] instances can be created and used.
- */
-fun main(args: Array<String>) {
-    val dirName = "independent_set_tiles/directed_graphs"
-    val files = File("independent_set_tiles").listFiles()
-    for (i in 0 until files.size) {
-        val file = files[i]
-        if (independentSetTilesFilePattern.matcher(file.name).matches()) {
-            val parts = file.name.split("-")
-            val n = Integer.parseInt(parts[1])
-            val m = Integer.parseInt(parts[2])
-            if (n < 3 || m < 3) {
-                continue
-            }
-            println(file.name)
-            val tileSet = IndependentSetTile.parseTiles(file)
-            val graph = DirectedGraphWithTiles.createInstance(tileSet)
-            println("Start export")
-            graph.exportTiles(File(dirName))
-            println("Export graph")
-            graph.export(File(dirName))
-        }
-    }
-}
 
 /**
  * Constructs graph of tiles.
