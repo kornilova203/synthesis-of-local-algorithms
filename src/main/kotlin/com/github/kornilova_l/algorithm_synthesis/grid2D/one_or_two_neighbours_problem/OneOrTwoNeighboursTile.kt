@@ -70,8 +70,8 @@ class OneOrTwoNeighboursTile(n: Int, m: Int, grid: OpenBitSet) : BinaryTile(n, m
      * Simply check each square
      */
     override fun isValid(): Boolean {
-        for (i in 0 until n - 1) {
-            for (j in 0 until m - 1) {
+        for (i in 1 until n - 1) {
+            for (j in 1 until m - 1) {
                 val calcIncluded = calcIncluded(i, j)
                 if (calcIncluded != 1 && calcIncluded != 2) {
                     return false
@@ -85,11 +85,10 @@ class OneOrTwoNeighboursTile(n: Int, m: Int, grid: OpenBitSet) : BinaryTile(n, m
         if (grid.get(getIndex(x, y))) {
             throw IllegalArgumentException("Cell is already included")
         }
-        /* we need to check four squares */
-        return calcIncluded(x - 1, y - 1) < 2 &&
+        return calcIncluded(x - 1, y) < 2 &&
                 calcIncluded(x, y - 1) < 2 &&
-                calcIncluded(x - 1, y) < 2 &&
-                calcIncluded(x, y) < 2
+                calcIncluded(x + 1, y) < 2 &&
+                calcIncluded(x, y + 1) < 2
     }
 
     /**
@@ -98,23 +97,23 @@ class OneOrTwoNeighboursTile(n: Int, m: Int, grid: OpenBitSet) : BinaryTile(n, m
      */
     private fun calcIncluded(i: Int, j: Int): Int {
         var calcIncluded = 0
-        if (i >= 0 && j >= 0) {
-            if (grid.get(getIndex(i, j))) {
-                calcIncluded++
-            }
-        }
-        if (j >= 0 && i + 1 < n) {
+        if (i + 1 < n && j >= 0 && j < m) {
             if (grid.get(getIndex(i + 1, j))) {
                 calcIncluded++
             }
         }
-        if (i >= 0 && j + 1 < m) {
+        if (j + 1 < m && i >= 0 && i < n) {
             if (grid.get(getIndex(i, j + 1))) {
                 calcIncluded++
             }
         }
-        if (i + 1 < n && j + 1 < m) {
-            if (grid.get(getIndex(i + 1, j + 1))) {
+        if (i - 1 >= 0 && j >= 0 && j < m) {
+            if (grid.get(getIndex(i - 1, j))) {
+                calcIncluded++
+            }
+        }
+        if (j - 1 >= 0 && i >= 0 && i < n) {
+            if (grid.get(getIndex(i, j - 1))) {
                 calcIncluded++
             }
         }
