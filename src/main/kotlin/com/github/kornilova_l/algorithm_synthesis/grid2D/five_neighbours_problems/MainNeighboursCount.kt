@@ -1,8 +1,7 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D
+package com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.tryToFindSolutionForEachProblem
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FiveNeighboursRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.FiveNeighboursProblem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.visualization.GridDrawer
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.visualization.RowDrawer
@@ -70,8 +69,8 @@ fun main(args: Array<String>) {
 
 fun calc2DScheme() {
     /* maps problem to combination for included center and excluded center */
-    val problemToCombinations = HashMap<Problem, Pair<List<Int>, List<Int>>>()
-    val problems = ArrayList<Problem>()
+    val problemToCombinations = HashMap<FiveNeighboursProblem, Pair<List<Int>, List<Int>>>()
+    val problems = ArrayList<FiveNeighboursProblem>()
     for (combinationForIncludedCenter in neighboursCombinationsList) {
         for (combinationForExcludedCenter in neighboursCombinationsList) {
             if (combinationForIncludedCenter.contains(4) || combinationForExcludedCenter.contains(0)) { // if have trivial solution
@@ -130,8 +129,8 @@ fun getId(combinationForExcludedCenter: List<Int>, allCombinations: List<List<In
  * using [Drawer1D.draw(List<Point>)]
  */
 fun calc1DScheme() {
-    val problemToCombination = HashMap<Problem, List<Int>>()
-    val problems = ArrayList<Problem>()
+    val problemToCombination = HashMap<FiveNeighboursProblem, List<Int>>()
+    val problems = ArrayList<FiveNeighboursProblem>()
     for (neighboursCombination in neighboursCombinationsList) {
         val problem = createProblem(neighboursCombination)
         problemToCombination[problem] = neighboursCombination
@@ -156,11 +155,11 @@ private fun createDrawer(neighboursCombinationsList: List<List<Int>>, solvableCo
 }
 
 /**
- * Method [tryToFindSolutionForEachProblem] returns list of [Problem]
+ * Method [tryToFindSolutionForEachProblem] returns list of [FiveNeighboursProblem]
  * and we need to get combinations which were used to create these problems.
  */
-private fun <T> getSolvableCombinations(solvableProblems: Set<Problem>,
-                                        problemToCombination: HashMap<Problem, T>): Set<T> {
+private fun <T> getSolvableCombinations(solvableProblems: Set<FiveNeighboursProblem>,
+                                        problemToCombination: HashMap<FiveNeighboursProblem, T>): Set<T> {
     val solvableCombinations = HashSet<T>()
     for (solvableProblem in solvableProblems) {
         solvableCombinations.add(problemToCombination[solvableProblem]!!)
@@ -172,13 +171,13 @@ private fun <T> getSolvableCombinations(solvableProblems: Set<Problem>,
  * @param combination1 combination of neighbours for included cell
  * @param combination2 combination of neighbours for excluded cell (if not specified it is the same as combination1)
  */
-private fun createProblem(combination1: ArrayList<Int>, combination2: ArrayList<Int> = combination1): Problem {
-    val rules = HashSet<VertexRule>()
+private fun createProblem(combination1: ArrayList<Int>, combination2: ArrayList<Int> = combination1): FiveNeighboursProblem {
+    val rules = HashSet<FiveNeighboursRule>()
     for (includedNeighboursCount in combination1) {
         rules.addAll(getRulePermutations(includedNeighboursCount, true))
     }
     for (includedNeighboursCount in combination2) {
         rules.addAll(getRulePermutations(includedNeighboursCount, false))
     }
-    return Problem(rules)
+    return FiveNeighboursProblem(rules)
 }

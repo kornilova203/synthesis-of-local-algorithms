@@ -1,4 +1,4 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule
+package com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule
 
 import org.apache.commons.collections4.BidiMap
 import org.apache.commons.collections4.bidimap.DualHashBidiMap

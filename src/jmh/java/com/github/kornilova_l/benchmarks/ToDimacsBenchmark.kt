@@ -3,7 +3,7 @@ package com.github.kornilova_l.benchmarks
 import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.addClausesToSatSolver
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetDirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolver
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.FiveNeighboursProblem
 import org.openjdk.jmh.annotations.*
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 @Warmup(iterations = 2)
 @Measurement(iterations = 8)
 open class ToDimacsBenchmark {
-    private var problem: Problem = Problem("0?1?1")
+    private var problem = FiveNeighboursProblem("0?1?1")
     private var graph = IndependentSetDirectedGraph(File("independent_set_tiles/directed_graphs/5-7-1.graph"))
 
     @Benchmark

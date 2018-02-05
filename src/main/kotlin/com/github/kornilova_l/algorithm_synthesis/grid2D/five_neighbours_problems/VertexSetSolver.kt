@@ -1,5 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.positions
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.DirectedGraphWithTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetDirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetDirectedGraphsIterator
@@ -7,8 +8,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.Direc
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Neighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.LabelingFunction
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolver
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.positions
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.FiveNeighboursProblem
 import java.io.File
 
 /**
@@ -17,7 +17,7 @@ import java.io.File
  *
  * To use this function all tile sets must be precalculated and stored in independent_set_tiles directory
  */
-fun getLabelingFunction(problem: Problem): Pair<LabelingFunction, Int>? {
+fun getLabelingFunction(problem: FiveNeighboursProblem): Pair<LabelingFunction, Int>? {
     val directedGraphsParser = IndependentSetDirectedGraphsIterator(File("independent_set_tiles/directed_graphs"))
     for (graph in directedGraphsParser) {
         println("n = ${graph.n} m = ${graph.m} k = ${graph.k}")
@@ -31,7 +31,7 @@ fun getLabelingFunction(problem: Problem): Pair<LabelingFunction, Int>? {
     return null
 }
 
-fun doesSolutionExist(problem: Problem): Boolean {
+fun doesSolutionExist(problem: FiveNeighboursProblem): Boolean {
     val directedGraphsParser = IndependentSetDirectedGraphsIterator(File("independent_set_tiles/directed_graphs"))
     for (graph in directedGraphsParser) {
         println("n = ${graph.n} m = ${graph.m} k = ${graph.k}")
@@ -49,7 +49,7 @@ fun doesSolutionExist(problem: Problem): Boolean {
     return false
 }
 
-private fun getLabelingFunction(problem: Problem, graph: IndependentSetDirectedGraph): LabelingFunction? {
+private fun getLabelingFunction(problem: FiveNeighboursProblem, graph: IndependentSetDirectedGraph): LabelingFunction? {
     var solution = tryToFindSolution(problem, graph)
     if (solution != null) { // solution found
         return LabelingFunction(solution,
@@ -69,13 +69,13 @@ private fun getLabelingFunction(problem: Problem, graph: IndependentSetDirectedG
     return null
 }
 
-private fun tryToFindSolution(problem: Problem, graph: DirectedGraph): List<Int>? {
+private fun tryToFindSolution(problem: FiveNeighboursProblem, graph: DirectedGraph): List<Int>? {
     val satSolver = SatSolver()
     addClausesToSatSolver(graph, problem, satSolver)
     return satSolver.solve(graph.size)
 }
 
-private fun isSolvable(problem: Problem, graph: DirectedGraph): Boolean {
+private fun isSolvable(problem: FiveNeighboursProblem, graph: DirectedGraph): Boolean {
     val satSolver = SatSolver()
     addClausesToSatSolver(graph, problem, satSolver)
     return satSolver.isSolvable()
@@ -86,9 +86,9 @@ private fun isSolvable(problem: Problem, graph: DirectedGraph): Boolean {
  * because it constructs a graph only ones for all problems
  * @return solvable problems
  */
-fun tryToFindSolutionForEachProblem(problems: List<Problem>): Set<Problem> {
+fun tryToFindSolutionForEachProblem(problems: List<FiveNeighboursProblem>): Set<FiveNeighboursProblem> {
     val directedGraphsParser = IndependentSetDirectedGraphsIterator(File("independent_set_tiles/directed_graphs"))
-    val solvable = HashSet<Problem>()
+    val solvable = HashSet<FiveNeighboursProblem>()
     for (graph in directedGraphsParser) {
         if (solvable.size == problems.size) { // if everything is solved
             return solvable
@@ -99,8 +99,8 @@ fun tryToFindSolutionForEachProblem(problems: List<Problem>): Set<Problem> {
     return solvable
 }
 
-private fun useGraphToFindSolutions(problems: List<Problem>, graph: IndependentSetDirectedGraph,
-                                    solvedProblems: MutableSet<Problem>) {
+private fun useGraphToFindSolutions(problems: List<FiveNeighboursProblem>, graph: IndependentSetDirectedGraph,
+                                    solvedProblems: MutableSet<FiveNeighboursProblem>) {
     println("Try n=${graph.n} m=${graph.m} k=${graph.k}")
     try {
         for (problem in problems) {
@@ -121,14 +121,14 @@ private fun useGraphToFindSolutions(problems: List<Problem>, graph: IndependentS
     }
 }
 
-fun addClausesToSatSolver(graph: DirectedGraph, problem: Problem, satSolver: SatSolver) {
+fun addClausesToSatSolver(graph: DirectedGraph, problem: FiveNeighboursProblem, satSolver: SatSolver) {
     val reversedProblem = problem.reverse()
     for (neighbourhood in graph.neighbourhoods) {
         formClause(neighbourhood, reversedProblem, satSolver)
     }
 }
 
-private fun formClause(neighbourhood: Neighbourhood, reversedProblem: Problem, satSolver: SatSolver) {
+private fun formClause(neighbourhood: Neighbourhood, reversedProblem: FiveNeighboursProblem, satSolver: SatSolver) {
     for (reversedRule in reversedProblem.rules) {
         var i = 0
         val clause = IntArray(5)

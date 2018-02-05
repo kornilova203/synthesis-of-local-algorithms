@@ -1,7 +1,8 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.*
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FiveNeighboursRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.FiveNeighboursProblem
 import gnu.trove.list.array.TIntArrayList
 import org.junit.Assert.*
 import org.junit.Test
@@ -36,8 +37,8 @@ class CheckAllKtTest {
 
     @Test
     fun toSetOfVertexRulesTest() {
-        val problem = Problem(7)
-        assertEquals(hashSetOf(VertexRule("N"), VertexRule("E"), VertexRule("S")), problem.rules)
+        val problem = FiveNeighboursProblem(7)
+        assertEquals(hashSetOf(FiveNeighboursRule("N"), FiveNeighboursRule("E"), FiveNeighboursRule("S")), problem.rules)
     }
 
     /* this test takes too much time */

@@ -1,6 +1,6 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D
+package com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.FiveNeighboursProblem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getNextProblemId
 import com.github.kornilova_l.util.ProgressBar
 import gnu.trove.list.array.TIntArrayList
@@ -39,7 +39,7 @@ class ReportPrinter(private val solvable: TIntArrayList, private val unsolvable:
      * Checks all possible problems that can be constructed by removing
      * set of rules from original problem
      */
-    fun printReport(problem: Problem, printSolvable: Boolean = false) {
+    fun printReport(problem: FiveNeighboursProblem, printSolvable: Boolean = false) {
         val combinationsCount = Math.pow(2.toDouble(), problem.rules.size.toDouble()).toInt()
         val progressBar = ProgressBar(combinationsCount, "Count solvable and unsolvable")
         var solvableCount = 0
@@ -64,7 +64,7 @@ class ReportPrinter(private val solvable: TIntArrayList, private val unsolvable:
         printReport(solvableCount, unsolvableCount, combinationsCount)
         if (printSolvable) {
             for (s in foundSolvable) {
-                println(Problem(s))
+                println(FiveNeighboursProblem(s))
             }
         }
     }

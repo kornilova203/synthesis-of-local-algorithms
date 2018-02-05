@@ -1,41 +1,43 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FiveNeighboursRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.POSITION
 import kotlin.experimental.and
 
 
 fun getBit(num: Int, position: Int): Boolean = (num shr position).toByte() and 1 == 1.toByte()
 
-fun getRulePermutations(numberOfIncludedNeighbours: Int, isCenterIncluded: Boolean): Set<VertexRule> {
+fun getRulePermutations(numberOfIncludedNeighbours: Int, isCenterIncluded: Boolean): Set<FiveNeighboursRule> {
     if (numberOfIncludedNeighbours < 0 || numberOfIncludedNeighbours > 4) {
         throw IllegalArgumentException("Invalid number of neighbours. Must be in [0, 4]")
     }
-    val rulePermutations = HashSet<VertexRule>()
+    val rulePermutations = HashSet<FiveNeighboursRule>()
     when (numberOfIncludedNeighbours) {
-        0 -> rulePermutations.add(VertexRule("-"))
+        0 -> rulePermutations.add(FiveNeighboursRule("-"))
         1 -> rulePermutations.addAll(hashSetOf(
-                VertexRule("N"),
-                VertexRule("E"),
-                VertexRule("S"),
-                VertexRule("W")
+                FiveNeighboursRule("N"),
+                FiveNeighboursRule("E"),
+                FiveNeighboursRule("S"),
+                FiveNeighboursRule("W")
         ))
         2 -> rulePermutations.addAll(hashSetOf(
-                VertexRule("NE"),
-                VertexRule("NS"),
-                VertexRule("NW"),
-                VertexRule("ES"),
-                VertexRule("EW"),
-                VertexRule("SW")
+                FiveNeighboursRule("NE"),
+                FiveNeighboursRule("NS"),
+                FiveNeighboursRule("NW"),
+                FiveNeighboursRule("ES"),
+                FiveNeighboursRule("EW"),
+                FiveNeighboursRule("SW")
         ))
         3 -> rulePermutations.addAll(hashSetOf(
-                VertexRule("NES"),
-                VertexRule("NEW"),
-                VertexRule("NSW"),
-                VertexRule("ESW")
+                FiveNeighboursRule("NES"),
+                FiveNeighboursRule("NEW"),
+                FiveNeighboursRule("NSW"),
+                FiveNeighboursRule("ESW")
         ))
-        4 -> rulePermutations.add(VertexRule("NESW"))
+        4 -> rulePermutations.add(FiveNeighboursRule("NESW"))
     }
     if (!isCenterIncluded) {
         return rulePermutations
     }
-    return rulePermutations.map { rule -> VertexRule(rule, POSITION.X) }.toSet()
+    return rulePermutations.map { rule -> FiveNeighboursRule(rule, POSITION.X) }.toSet()
 }

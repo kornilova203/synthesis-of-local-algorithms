@@ -1,7 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.positions
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.POSITION
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.positions
 import gnu.trove.set.hash.TIntHashSet
 import java.io.File
 import java.util.*

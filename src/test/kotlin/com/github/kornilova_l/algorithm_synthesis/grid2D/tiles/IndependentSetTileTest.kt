@@ -1,10 +1,10 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.Grid2D
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Part.*
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.POSITION
 import org.junit.Assert.*
 import org.junit.Test
 import java.io.File

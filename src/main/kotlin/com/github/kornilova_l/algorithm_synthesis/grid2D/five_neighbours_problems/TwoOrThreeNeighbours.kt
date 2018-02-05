@@ -1,8 +1,7 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D
+package com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.tryToFindSolutionForEachProblem
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FiveNeighboursRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.FiveNeighboursProblem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getNextProblemId
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
 
@@ -13,7 +12,7 @@ fun main(args: Array<String>) {
     val problem = atLeastOneIncludedAndOneExcluded()
     var combinationNum: Int? = problem.getId()
 
-    val currentIteration = ArrayList<Problem>()
+    val currentIteration = ArrayList<FiveNeighboursProblem>()
     var i = 0
     while (combinationNum != null) {
         i++
@@ -22,7 +21,7 @@ fun main(args: Array<String>) {
         }
         if (!isUnsolvable(combinationNum, unsolvable) && !isSolvable(combinationNum, solvable)) {
             println("add $combinationNum")
-            currentIteration.add(Problem(combinationNum))
+            currentIteration.add(FiveNeighboursProblem(combinationNum))
         } else {
 //            println("Solution exist")
         }
@@ -43,14 +42,14 @@ fun main(args: Array<String>) {
  * @return all possible combinations of rules
  * where center has two or three neighbours
  */
-fun getTwoOrThreeNeighboursRules(): Problem {
-    val rules = HashSet<VertexRule>()
+fun getTwoOrThreeNeighboursRules(): FiveNeighboursProblem {
+    val rules = HashSet<FiveNeighboursRule>()
     rules.addAll(getRulePermutations(1, true))
     rules.addAll(getRulePermutations(2, true))
     rules.addAll(getRulePermutations(3, true))
     rules.addAll(getRulePermutations(2, false))
     rules.addAll(getRulePermutations(3, false))
 
-    return Problem(rules)
+    return FiveNeighboursProblem(rules)
 }
 

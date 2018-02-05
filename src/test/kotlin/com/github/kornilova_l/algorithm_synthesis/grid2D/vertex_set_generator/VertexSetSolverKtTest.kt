@@ -1,10 +1,10 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.getLabelingFunction
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FiveNeighboursRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.FiveNeighboursProblem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -12,7 +12,7 @@ import org.junit.Test
 
 class VertexSetSolverKtTest {
 
-    private fun testLabelingFunction(problem: Problem) {
+    private fun testLabelingFunction(problem: FiveNeighboursProblem) {
         val iterations = 10000
         val labelingFunction = getLabelingFunction(problem)
         assertNotNull(labelingFunction)
@@ -29,74 +29,74 @@ class VertexSetSolverKtTest {
     @Test
     fun labelingFunctionForIS() {
         val independentSetRules = hashSetOf(
-                VertexRule("X"),
-                VertexRule("N"),
-                VertexRule("E"),
-                VertexRule("S"),
-                VertexRule("W"),
-                VertexRule("NE"),
-                VertexRule("NS"),
-                VertexRule("NW"),
-                VertexRule("ES"),
-                VertexRule("EW"),
-                VertexRule("SW"),
-                VertexRule("NES"),
-                VertexRule("NEW"),
-                VertexRule("NSW"),
-                VertexRule("ESW"),
-                VertexRule("NESW")
+                FiveNeighboursRule("X"),
+                FiveNeighboursRule("N"),
+                FiveNeighboursRule("E"),
+                FiveNeighboursRule("S"),
+                FiveNeighboursRule("W"),
+                FiveNeighboursRule("NE"),
+                FiveNeighboursRule("NS"),
+                FiveNeighboursRule("NW"),
+                FiveNeighboursRule("ES"),
+                FiveNeighboursRule("EW"),
+                FiveNeighboursRule("SW"),
+                FiveNeighboursRule("NES"),
+                FiveNeighboursRule("NEW"),
+                FiveNeighboursRule("NSW"),
+                FiveNeighboursRule("ESW"),
+                FiveNeighboursRule("NESW")
         )
-        testLabelingFunction(Problem(independentSetRules))
+        testLabelingFunction(FiveNeighboursProblem(independentSetRules))
     }
 
     @Test
     fun labelingFunctionForInvertedIS() {
         val invertedISRules = hashSetOf(
-                VertexRule("X"),
-                VertexRule("XN"),
-                VertexRule("XE"),
-                VertexRule("XS"),
-                VertexRule("XW"),
-                VertexRule("XNE"),
-                VertexRule("XNS"),
-                VertexRule("XNW"),
-                VertexRule("XES"),
-                VertexRule("XEW"),
-                VertexRule("XSW"),
-                VertexRule("XNES"),
-                VertexRule("XNEW"),
-                VertexRule("XNSW"),
-                VertexRule("XESW"),
-                VertexRule("NESW")
+                FiveNeighboursRule("X"),
+                FiveNeighboursRule("XN"),
+                FiveNeighboursRule("XE"),
+                FiveNeighboursRule("XS"),
+                FiveNeighboursRule("XW"),
+                FiveNeighboursRule("XNE"),
+                FiveNeighboursRule("XNS"),
+                FiveNeighboursRule("XNW"),
+                FiveNeighboursRule("XES"),
+                FiveNeighboursRule("XEW"),
+                FiveNeighboursRule("XSW"),
+                FiveNeighboursRule("XNES"),
+                FiveNeighboursRule("XNEW"),
+                FiveNeighboursRule("XNSW"),
+                FiveNeighboursRule("XESW"),
+                FiveNeighboursRule("NESW")
         )
-        testLabelingFunction(Problem(invertedISRules))
+        testLabelingFunction(FiveNeighboursProblem(invertedISRules))
     }
 
     @Test
     fun someRulesTest() {
-        val rules = HashSet<VertexRule>()
+        val rules = HashSet<FiveNeighboursRule>()
         rules.addAll(getRulePermutations(2, true))
         rules.addAll(getRulePermutations(3, true))
         rules.addAll(getRulePermutations(2, false))
         rules.addAll(getRulePermutations(3, false))
         rules.addAll(getRulePermutations(1, false))
 
-        testLabelingFunction(Problem(rules))
+        testLabelingFunction(FiveNeighboursProblem(rules))
     }
 
     @Test
     fun columnMinimalDominatingSet() {
-        val rules = HashSet<VertexRule>()
-        rules.addAll(Problem("10?0?").rules)
-        rules.addAll(Problem("01?0?").rules)
-        rules.addAll(Problem("00?1?").rules)
-        rules.addAll(Problem("01?1?").rules)
-        rules.addAll(Problem("11?0?").rules)
-        rules.addAll(Problem("10?1?").rules)
-        testLabelingFunction(Problem(rules))
+        val rules = HashSet<FiveNeighboursRule>()
+        rules.addAll(FiveNeighboursProblem("10?0?").rules)
+        rules.addAll(FiveNeighboursProblem("01?0?").rules)
+        rules.addAll(FiveNeighboursProblem("00?1?").rules)
+        rules.addAll(FiveNeighboursProblem("01?1?").rules)
+        rules.addAll(FiveNeighboursProblem("11?0?").rules)
+        rules.addAll(FiveNeighboursProblem("10?1?").rules)
+        testLabelingFunction(FiveNeighboursProblem(rules))
     }
 
-    private fun isRight(labeledGrid: Array<BooleanArray>, problem: Problem): Boolean {
+    private fun isRight(labeledGrid: Array<BooleanArray>, problem: FiveNeighboursProblem): Boolean {
         val n = labeledGrid.size
         val m = labeledGrid[0].size
         for (i in 0 until n) {
@@ -117,7 +117,7 @@ class VertexSetSolverKtTest {
                 if (labeledGrid[i][(j - 1 + m) % m]) {
                     vertexSet.append("W")
                 }
-                if (!problem.rules.contains(VertexRule(vertexSet.toString()))) {
+                if (!problem.rules.contains(FiveNeighboursRule(vertexSet.toString()))) {
                     return false
                 }
             }
