@@ -1,7 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FIVE_POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FiveNeighboursRule
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.POSITION
 import kotlin.experimental.and
 
 
@@ -39,5 +39,5 @@ fun getRulePermutations(numberOfIncludedNeighbours: Int, isCenterIncluded: Boole
     if (!isCenterIncluded) {
         return rulePermutations
     }
-    return rulePermutations.map { rule -> FiveNeighboursRule(rule, POSITION.X) }.toSet()
+    return rulePermutations.map { rule -> FiveNeighboursRule(rule, FIVE_POSITION.X) }.toSet()
 }

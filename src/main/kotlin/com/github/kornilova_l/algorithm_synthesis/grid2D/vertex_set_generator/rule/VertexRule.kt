@@ -23,4 +23,12 @@ abstract class VertexRule {
 
         return true
     }
+
+    companion object {
+        fun setArrayValues(id: Int, array: BooleanArray): BooleanArray {
+            (0 until array.size).filter { getBit(id, it) }
+                    .forEach { array[it] = true }
+            return array
+        }
+    }
 }

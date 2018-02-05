@@ -1,6 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.POSITION
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FIVE_POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.parseBitSet
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
@@ -68,11 +68,11 @@ class DirectedGraphWithTiles(n: Int,
             for (tile in tiles) {
                 neighbourhoods.add(
                         Neighbourhood(
-                                getId(IndependentSetTile.createInstance(tile, POSITION.X), ids),
-                                getId(IndependentSetTile.createInstance(tile, POSITION.N), ids),
-                                getId(IndependentSetTile.createInstance(tile, POSITION.E), ids),
-                                getId(IndependentSetTile.createInstance(tile, POSITION.S), ids),
-                                getId(IndependentSetTile.createInstance(tile, POSITION.W), ids)
+                                getId(IndependentSetTile.createInstance(tile, FIVE_POSITION.X), ids),
+                                getId(IndependentSetTile.createInstance(tile, FIVE_POSITION.N), ids),
+                                getId(IndependentSetTile.createInstance(tile, FIVE_POSITION.E), ids),
+                                getId(IndependentSetTile.createInstance(tile, FIVE_POSITION.S), ids),
+                                getId(IndependentSetTile.createInstance(tile, FIVE_POSITION.W), ids)
                         ))
             }
             if (neighbourhoods.size == 0) {

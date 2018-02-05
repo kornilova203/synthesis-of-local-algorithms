@@ -1,6 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.positions
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FIVE_POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.DirectedGraphWithTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetDirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetDirectedGraphsIterator
@@ -133,7 +133,7 @@ private fun formClause(neighbourhood: Neighbourhood, reversedProblem: FiveNeighb
         var i = 0
         val clause = IntArray(5)
         var isAlwaysTrue = false
-        for (position in positions) {
+        for (position in FIVE_POSITION.values()) {
             val id = neighbourhood.get(position)
             if (id == 0) {
                 throw AssertionError("id must be bigger than 0")

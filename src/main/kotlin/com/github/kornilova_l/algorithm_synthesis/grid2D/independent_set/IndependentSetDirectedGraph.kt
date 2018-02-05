@@ -1,6 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.POSITION
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FIVE_POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import java.io.BufferedReader
 import java.io.File
@@ -31,8 +31,8 @@ open class IndependentSetDirectedGraph(n: Int,
             outputStream.write("$n $m $k\n".toByteArray())
             outputStream.write("${neighbourhoods.size}\n".toByteArray())
             for (neighbourhood in neighbourhoods) {
-                outputStream.write(("${neighbourhood.get(POSITION.X)}\n${neighbourhood.get(POSITION.N)}\n" +
-                        "${neighbourhood.get(POSITION.E)}\n${neighbourhood.get(POSITION.S)}\n${neighbourhood.get(POSITION.W)}\n\n").toByteArray())
+                outputStream.write(("${neighbourhood.get(FIVE_POSITION.X)}\n${neighbourhood.get(FIVE_POSITION.N)}\n" +
+                        "${neighbourhood.get(FIVE_POSITION.E)}\n${neighbourhood.get(FIVE_POSITION.S)}\n${neighbourhood.get(FIVE_POSITION.W)}\n\n").toByteArray())
             }
         }
     }

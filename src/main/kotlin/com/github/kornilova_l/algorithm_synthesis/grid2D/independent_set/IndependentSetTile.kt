@@ -1,6 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.POSITION
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FIVE_POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileIntersection
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolver
@@ -73,25 +73,25 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
         /**
          * Created a subtile of size tile.n - 2 x tile.m - 2
          */
-        fun createInstance(tile: IndependentSetTile, position: POSITION): IndependentSetTile {
+        fun createInstance(tile: IndependentSetTile, position: FIVE_POSITION): IndependentSetTile {
             val k = tile.k
             val n = tile.n - 2
             val m = tile.m - 2
             val grid = OpenBitSet((n * m).toLong())
             when (position) {
-                POSITION.N ->
+                FIVE_POSITION.N ->
                     (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m, i % m + 1)) }
                             .forEach { i -> grid.set(i) }
-                POSITION.E ->
+                FIVE_POSITION.E ->
                     (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m + 1, i % m + 2)) }
                             .forEach { i -> grid.set(i) }
-                POSITION.S ->
+                FIVE_POSITION.S ->
                     (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m + 2, i % m + 1)) }
                             .forEach { i -> grid.set(i) }
-                POSITION.W ->
+                FIVE_POSITION.W ->
                     (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m + 1, i % m)) }
                             .forEach { i -> grid.set(i) }
-                POSITION.X ->
+                FIVE_POSITION.X ->
                     (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m + 1, i % m + 1)) }
                             .forEach { i -> grid.set(i) }
             }

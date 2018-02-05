@@ -1,6 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.POSITION
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FIVE_POSITION.X
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.DirectedGraphWithTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile.Companion.getTilesFile
@@ -64,7 +64,7 @@ class DirectedGraphTest {
         for (n in expected) {
             assertTrue(graph.neighbourhoods.contains(n))
         }
-        val count = graph.neighbourhoods.count { it.get(POSITION.X) == 1 }
+        val count = graph.neighbourhoods.count { it.get(X) == 1 }
         assertEquals(expected.size, count)
     }
 }

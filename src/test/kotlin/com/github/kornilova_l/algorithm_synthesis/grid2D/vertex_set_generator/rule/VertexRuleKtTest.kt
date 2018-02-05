@@ -1,7 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FIVE_POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FiveNeighboursRule
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.FiveNeighboursProblem.Companion.parseProblem
 import org.junit.Assert.*
 import org.junit.Test
@@ -16,14 +16,14 @@ class FiveNeighboursRuleKtTest {
 
     @Test
     fun isIncludedTest() {
-        assertTrue(FiveNeighboursRule(31).isIncluded(POSITION.X))
-        assertTrue(FiveNeighboursRule(31).isIncluded(POSITION.N))
-        assertTrue(FiveNeighboursRule(31).isIncluded(POSITION.E))
-        assertTrue(FiveNeighboursRule(31).isIncluded(POSITION.S))
-        assertTrue(FiveNeighboursRule(31).isIncluded(POSITION.W))
+        assertTrue(FiveNeighboursRule(31).isIncluded(FIVE_POSITION.X))
+        assertTrue(FiveNeighboursRule(31).isIncluded(FIVE_POSITION.N))
+        assertTrue(FiveNeighboursRule(31).isIncluded(FIVE_POSITION.E))
+        assertTrue(FiveNeighboursRule(31).isIncluded(FIVE_POSITION.S))
+        assertTrue(FiveNeighboursRule(31).isIncluded(FIVE_POSITION.W))
 
-        assertTrue(FiveNeighboursRule(1).isIncluded(POSITION.X))
-        assertFalse(FiveNeighboursRule(1).isIncluded(POSITION.N))
+        assertTrue(FiveNeighboursRule(1).isIncluded(FIVE_POSITION.X))
+        assertFalse(FiveNeighboursRule(1).isIncluded(FIVE_POSITION.N))
     }
 
     @Test

@@ -1,7 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.POSITION
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.positions
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FIVE_POSITION
 import gnu.trove.set.hash.TIntHashSet
 import java.io.File
 import java.util.*
@@ -31,7 +30,7 @@ abstract class DirectedGraph(override val n: Int,
     private fun calcUniqueIds(neighbourhoods: Set<Neighbourhood>): Int {
         val uniqueIds = TIntHashSet()
         for (neighbourhood in neighbourhoods) {
-            for (position in positions) {
+            for (position in FIVE_POSITION.values()) {
                 uniqueIds.add(neighbourhood.get(position))
             }
         }
@@ -58,13 +57,13 @@ abstract class DirectedGraph(override val n: Int,
                         private val southId: Int,
                         private val westId: Int) {
 
-        fun get(position: POSITION): Int {
+        fun get(position: FIVE_POSITION): Int {
             return when (position) {
-                POSITION.X -> centerId
-                POSITION.N -> northId
-                POSITION.E -> eastId
-                POSITION.S -> southId
-                POSITION.W -> westId
+                FIVE_POSITION.X -> centerId
+                FIVE_POSITION.N -> northId
+                FIVE_POSITION.E -> eastId
+                FIVE_POSITION.S -> southId
+                FIVE_POSITION.W -> westId
             }
         }
 

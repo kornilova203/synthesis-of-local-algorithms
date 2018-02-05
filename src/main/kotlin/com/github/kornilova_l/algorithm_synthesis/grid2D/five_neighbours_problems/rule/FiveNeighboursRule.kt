@@ -1,9 +1,8 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.Positions.Companion.positionIndexes
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.Positions.Companion.positionLetters
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FourPositions.Companion.positionIndexes
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FourPositions.Companion.positionLetters
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getBit
 
 
 val allRulesExceptTrivial = arrayOf(
@@ -48,11 +47,7 @@ class FiveNeighboursRule : VertexRule {
 
     constructor(id: Int) {
         this.id = id
-        if (id >= 32) {
-            throw IllegalArgumentException("Id must be smaller than 32")
-        }
-        (0..4).filter { getBit(id, it) }
-                .forEach { array[it] = true }
+        setArrayValues(id, array)
     }
 
     constructor(rule: String) {
@@ -84,7 +79,7 @@ class FiveNeighboursRule : VertexRule {
     /**
      * Copies `rule` and toggles position
      */
-    constructor(rule: FiveNeighboursRule, position: POSITION) {
+    constructor(rule: FiveNeighboursRule, position: FIVE_POSITION) {
         System.arraycopy(rule.array, 0, this.array, 0, this.array.size)
         array[positionIndexes[position]!!] = !array[positionIndexes[position]!!] // toggle position
         var tempId = 0
@@ -92,13 +87,13 @@ class FiveNeighboursRule : VertexRule {
         id = tempId
     }
 
-    fun isIncluded(position: POSITION): Boolean =
+    fun isIncluded(position: FIVE_POSITION): Boolean =
             when (position) {
-                POSITION.X -> array[0]
-                POSITION.N -> array[1]
-                POSITION.E -> array[2]
-                POSITION.S -> array[3]
-                POSITION.W -> array[4]
+                FIVE_POSITION.X -> array[0]
+                FIVE_POSITION.N -> array[1]
+                FIVE_POSITION.E -> array[2]
+                FIVE_POSITION.S -> array[3]
+                FIVE_POSITION.W -> array[4]
             }
 
     override fun rotate(rotationsCount: Int): FiveNeighboursRule {
