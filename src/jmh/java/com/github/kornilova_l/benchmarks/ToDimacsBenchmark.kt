@@ -1,8 +1,8 @@
 package com.github.kornilova_l.benchmarks
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.addClausesToSatSolver
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetDirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolver
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.addClausesToSatSolver
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
 import org.openjdk.jmh.annotations.*
 import java.io.File
