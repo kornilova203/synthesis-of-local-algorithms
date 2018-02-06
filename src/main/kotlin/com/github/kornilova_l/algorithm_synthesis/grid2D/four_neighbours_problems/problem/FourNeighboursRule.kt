@@ -1,7 +1,10 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.problem
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.problem.VertexRule
+import java.util.*
 
+
+val fourNeighboursNonTrivialRules = (1 until 15).map { FourNeighboursRule(it) }.toSet()
 
 class FourNeighboursRule : VertexRule {
     /* top left, top right, bottom right, bottom left */
@@ -10,6 +13,9 @@ class FourNeighboursRule : VertexRule {
     override val id: Int
 
     constructor(id: Int) {
+        if (id !in 0 until 16) {
+            throw IllegalArgumentException("Id must be in [0, 15]. Id: $id")
+        }
         this.id = id
         setArrayValues(id, array)
     }
@@ -32,12 +38,6 @@ class FourNeighboursRule : VertexRule {
         id = calcId(array)
     }
 
-    private fun calcId(array: BooleanArray): Int {
-        var tempId = 0
-        (0 until 4).forEach { if (array[it]) tempId += Math.pow(2.toDouble(), it.toDouble()).toInt() }
-        return tempId
-    }
-
     override fun rotate(rotationsCount: Int): FourNeighboursRule {
         val rotatedArray = BooleanArray(4)
         for (i in 0 until 4) {
@@ -57,4 +57,15 @@ class FourNeighboursRule : VertexRule {
     }
 
     fun isIncluded(position: FOUR_POSITION): Boolean = array[FourPositions.positionIndexes[position]!!]
+
+    override fun hashCode(): Int {
+        return Objects.hashCode(id)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is FourNeighboursRule) {
+            return false
+        }
+        return id == other.id
+    }
 }

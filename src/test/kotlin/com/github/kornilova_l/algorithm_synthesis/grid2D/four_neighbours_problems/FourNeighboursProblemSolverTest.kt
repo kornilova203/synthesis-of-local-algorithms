@@ -2,6 +2,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_proble
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.problem.FourNeighboursProblem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.problem.FourNeighboursRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.problem.fourNeighboursNonTrivialRules
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
 import org.junit.Assert.assertNotNull
@@ -12,10 +13,16 @@ class FourNeighboursProblemSolverTest {
 
     @Test
     fun simpleTest() {
-        val all = hashSetOf(
+        val problem = FourNeighboursProblem(hashSetOf(
                 FourNeighboursRule("TL TR BR BL")
-        )
-        testLabelingFunction(FourNeighboursProblem(all))
+        ))
+        testLabelingFunction(problem)
+    }
+
+    @Test
+    fun allRulesExceptTrivial() {
+        val problem = FourNeighboursProblem(fourNeighboursNonTrivialRules)
+        testLabelingFunction(problem)
     }
 
     private fun testLabelingFunction(problem: FourNeighboursProblem) {

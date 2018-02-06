@@ -1,16 +1,20 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.problem
+package com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.*
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FiveNeighboursProblem.Companion.parseProblem
 import org.junit.Assert.*
 import org.junit.Test
 
-class FiveNeighboursRuleKtTest {
+class FiveNeighboursRuleTest {
     @Test
     fun toHumanReadableStingTest() {
         assertEquals("X", FiveNeighboursRule(1).toHumanReadableSting())
         assertEquals("N", FiveNeighboursRule(2).toHumanReadableSting())
         assertEquals("XN", FiveNeighboursRule(3).toHumanReadableSting())
+    }
+
+    @Test
+    fun getIdTest() {
+        assertEquals(1, FiveNeighboursRule("X").id)
+        assertEquals(3, FiveNeighboursRule("XN").id)
     }
 
     @Test
@@ -74,10 +78,10 @@ class FiveNeighboursRuleKtTest {
 
     @Test
     fun parseRulesTest() {
-        var actual = parseProblem("[X, NWE]")
+        var actual = FiveNeighboursProblem.parseProblem("[X, NWE]")
         assertEquals(hashSetOf(FiveNeighboursRule("X"), FiveNeighboursRule("NWE")), actual.rules)
 
-        actual = parseProblem("- E]")
+        actual = FiveNeighboursProblem.parseProblem("- E]")
         assertEquals(hashSetOf(FiveNeighboursRule("-"), FiveNeighboursRule("E")), actual.rules)
     }
 
@@ -98,7 +102,7 @@ class FiveNeighboursRuleKtTest {
         rulesAgain = FiveNeighboursProblem(setId)
         assertEquals(problem, rulesAgain)
 
-        problem = FiveNeighboursNonTrivialProblem(parseProblem("XN, XE, NE, XNE, XS, NS, XNS, ES, XES, NES, XNES, XW, NW, XNW, EW, XEW, NEW, XNEW, SW, XSW, NSW, XNSW, ESW, XESW"))
+        problem = FiveNeighboursNonTrivialProblem(FiveNeighboursProblem.parseProblem("XN, XE, NE, XNE, XS, NS, XNS, ES, XES, NES, XNES, XW, NW, XNW, EW, XEW, NEW, XNEW, SW, XSW, NSW, XNSW, ESW, XESW"))
         setId = problem.getId()
         rulesAgain = FiveNeighboursProblem(setId)
         assertEquals(problem, rulesAgain)
@@ -115,7 +119,7 @@ class FiveNeighboursRuleKtTest {
         assertEquals(FiveNeighboursNonTrivialProblem(hashSetOf(FiveNeighboursRule("XSW"), FiveNeighboursRule("N"))).getId(),
                 getNextProblemId(FiveNeighboursNonTrivialProblem(hashSetOf(FiveNeighboursRule("S"), FiveNeighboursRule("XSW"))).getId(), allowedRules))
 
-        val problem = FiveNeighboursNonTrivialProblem(parseProblem("XN, XE, NE, XNE, XS, NS, XNS, ES, XES, NES, XNES, XW, NW, XNW, EW, XEW, NEW, XNEW, SW, XSW, NSW, XNSW, ESW, XESW"))
+        val problem = FiveNeighboursNonTrivialProblem(FiveNeighboursProblem.parseProblem("XN, XE, NE, XNE, XS, NS, XNS, ES, XES, NES, XNES, XW, NW, XNW, EW, XEW, NEW, XNEW, SW, XSW, NSW, XNSW, ESW, XESW"))
         val subproblemsCount = Math.pow(2.toDouble(), problem.rules.size.toDouble()).toLong()
         var actualSubproblemsCount = 0L
 

@@ -12,6 +12,8 @@ class FourNeighboursProblem(rules: Set<FourNeighboursRule>) : Problem<FourNeighb
      */
     constructor(pattern: String) : this(patternToRules(pattern))
 
+    constructor(vararg patterns: String) : this(patterns.flatMap { patternToRules(it) }.toSet())
+
     override fun reverse(): FourNeighboursProblem {
         val ids = HashSet<Int>() // convert rules to ids for convenient compare
         rules.mapTo(ids) { it.id }

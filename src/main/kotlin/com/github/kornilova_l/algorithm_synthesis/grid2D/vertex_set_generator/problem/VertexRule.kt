@@ -3,6 +3,9 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.p
 
 abstract class VertexRule {
     protected abstract val array: BooleanArray
+    /**
+     * The same bits from [array] but in the form of number
+     */
     abstract val id: Int
 
     abstract fun rotate(rotationsCount: Int = 1): VertexRule
@@ -30,5 +33,9 @@ abstract class VertexRule {
                     .forEach { array[it] = true }
             return array
         }
+
+        fun calcId(array: BooleanArray): Int = (0 until array.size)
+                .filter { array[it] }
+                .sumBy { index -> Math.pow(2.toDouble(), index.toDouble()).toInt() }
     }
 }

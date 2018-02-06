@@ -58,22 +58,18 @@ class FiveNeighboursRule : VertexRule {
             this.id = 0
             return
         }
-        var id = 0
         for (i in 0 until rule.length) {
             val c = rule[i]
             val position = positionLetters.getKey(c)!!
             val index = positionIndexes[position]!!
             array[index] = true
-            id += Math.pow(2.toDouble(), index.toDouble()).toInt()
         }
-        this.id = id
+        this.id = calcId(array)
     }
 
     constructor (array: BooleanArray) {
         System.arraycopy(array, 0, this.array, 0, this.array.size)
-        var tempId = 0
-        (0 until 5).forEach { if (array[it]) tempId += Math.pow(2.toDouble(), it.toDouble()).toInt() }
-        id = tempId
+        id = calcId(array)
     }
 
     /**
@@ -82,9 +78,7 @@ class FiveNeighboursRule : VertexRule {
     constructor(rule: FiveNeighboursRule, position: FIVE_POSITION) {
         System.arraycopy(rule.array, 0, this.array, 0, this.array.size)
         array[positionIndexes[position]!!] = !array[positionIndexes[position]!!] // toggle position
-        var tempId = 0
-        (0 until 5).forEach { if (array[it]) tempId += Math.pow(2.toDouble(), it.toDouble()).toInt() }
-        id = tempId
+        id = calcId(array)
     }
 
     fun isIncluded(position: FIVE_POSITION): Boolean =
