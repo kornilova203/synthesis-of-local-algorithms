@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
 fun tryToSolve(problem: FiveNeighboursProblem) {
     println(problem)
 
-    val result = getLabelingFunction(problem)
+    val result = FiveNeighboursProblemSolver().getLabelingFunction(problem)
 
     if (result == null) {
         println("not found")

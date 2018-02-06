@@ -39,7 +39,7 @@ fun main(args: Array<String>) {
         val rules = FiveNeighboursProblem(combinationNum)
         currentIteration.add(rules)
         if (currentIteration.size == iterationSize) {
-            val newSolvable = tryToFindSolutionForEachProblem(currentIteration)
+            val newSolvable = FiveNeighboursProblemSolver().tryToFindSolutionForEachProblem(currentIteration)
             updateSolvableAndUnsolvable(solvable, unsolvable, newSolvable, currentIteration)
             currentIteration.clear()
             println("Checked ${totalNumberOfCombination - combinationNum + 1}")

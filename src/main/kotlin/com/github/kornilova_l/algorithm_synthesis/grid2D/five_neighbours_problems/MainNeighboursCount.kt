@@ -81,7 +81,7 @@ fun calc2DScheme() {
             problems.add(problem)
         }
     }
-    val solvableProblems = tryToFindSolutionForEachProblem(problems)
+    val solvableProblems = FiveNeighboursProblemSolver().tryToFindSolutionForEachProblem(problems)
     val solvableCombinations = getSolvableCombinations(solvableProblems, problemToCombinations)
     for (solvableCombination in solvableCombinations) {
         println(solvableCombination)
@@ -136,7 +136,7 @@ fun calc1DScheme() {
         problemToCombination[problem] = neighboursCombination
         problems.add(problem)
     }
-    val solvableProblems = tryToFindSolutionForEachProblem(problems)
+    val solvableProblems = FiveNeighboursProblemSolver().tryToFindSolutionForEachProblem(problems)
     val solvableCombinations = getSolvableCombinations(solvableProblems, problemToCombination)
     val rowDrawer = createDrawer(neighboursCombinationsList, solvableCombinations)
     rowDrawer.outputImage()

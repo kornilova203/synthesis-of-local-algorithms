@@ -26,14 +26,14 @@ fun main(args: Array<String>) {
 //            println("Solution exist")
         }
         if (currentIteration.size == 10) {
-            val newSolvable = tryToFindSolutionForEachProblem(currentIteration)
+            val newSolvable = FiveNeighboursProblemSolver().tryToFindSolutionForEachProblem(currentIteration)
             updateSolvableAndUnsolvable(solvable, unsolvable, newSolvable, currentIteration)
             currentIteration.clear()
         }
         combinationNum = getNextProblemId(combinationNum, problem)
     }
     if (currentIteration.size != 0) {
-        val newSolvable = tryToFindSolutionForEachProblem(currentIteration)
+        val newSolvable = FiveNeighboursProblemSolver().tryToFindSolutionForEachProblem(currentIteration)
         updateSolvableAndUnsolvable(solvable, unsolvable, newSolvable, currentIteration)
     }
 }

@@ -1,7 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule
 
 
-abstract class  Problem<T : VertexRule>(val rules: Set<T>) {
+abstract class Problem<out T : VertexRule>(val rules: Set<T>) : Cloneable {
 
     abstract fun reverse(): Problem<T>
 
