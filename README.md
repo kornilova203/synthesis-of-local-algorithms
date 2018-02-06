@@ -69,5 +69,8 @@ java -cp -algorithms-synthesis.jar com.github.kornilova_l.algorithm_synthesis.gr
 java -cp -algorithms-synthesis.jar com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.PrecalculateTilesKt <n> <m> <k>
 
 # precalculate graphs:
-java -cp -algorithms-synthesis.jar com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.PrecalculateGraphsKt
+java -cp -algorithms-synthesis.jar com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.PrecalculateGraphsKt
+
+# precalculate graphs with neighbourhoods of 4 tiles:
+java -cp -algorithms-synthesis.jar com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.PrecalculateGraphsKt
 ```

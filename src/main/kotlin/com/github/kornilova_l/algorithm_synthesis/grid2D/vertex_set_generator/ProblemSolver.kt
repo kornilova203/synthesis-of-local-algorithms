@@ -31,7 +31,7 @@ abstract class ProblemSolver<T : Problem<*>, G : IndependentSetDirectedGraph<*>>
         var solution = tryToFindSolution(problem, graph)
         if (solution != null) { // solution found
             return LabelingFunction(solution,
-                    graph.createGraphWithTiles(DirectedGraphWithTiles.getTilesFile(graph.n, graph.m, graph.k, File("independent_set_tiles/directed_graphs/"))!!)
+                    graph.createGraphWithTiles(DirectedGraphWithTiles.getTilesFile(graph.n, graph.m, graph.k, File("independent_set_tiles/five_neighbours_directed_graphs/"))!!)
             )
         }
         solution = tryToFindSolution(rotateProblem(problem), graph)
@@ -39,7 +39,7 @@ abstract class ProblemSolver<T : Problem<*>, G : IndependentSetDirectedGraph<*>>
             return LabelingFunction(solution,
                     graph.createGraphWithTiles(
                             DirectedGraphWithTiles.getTilesFile(
-                                    graph.n, graph.m, graph.k, File("independent_set_tiles/directed_graphs/"))!!
+                                    graph.n, graph.m, graph.k, File("independent_set_tiles/five_neighbours_directed_graphs/"))!!
                     )
             ).rotate()
         }

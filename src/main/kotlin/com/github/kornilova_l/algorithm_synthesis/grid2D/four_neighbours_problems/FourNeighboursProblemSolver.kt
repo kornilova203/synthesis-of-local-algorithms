@@ -10,7 +10,7 @@ import java.io.File
 
 
 class FourNeighboursProblemSolver : ProblemSolver<FourNeighboursProblem, FourNeighboursDirectedGraph>() {
-    override val graphsIterator: Iterable<FourNeighboursDirectedGraph> = FourNeighboursGraphsIterator(File(""))
+    override val graphsIterator: Iterable<FourNeighboursDirectedGraph> = FourNeighboursGraphsIterator(File("independent_set_tiles/four_neighbours_directed_graphs"))
 
     override fun rotateProblem(problem: FourNeighboursProblem): FourNeighboursProblem = problem.rotate()
 
