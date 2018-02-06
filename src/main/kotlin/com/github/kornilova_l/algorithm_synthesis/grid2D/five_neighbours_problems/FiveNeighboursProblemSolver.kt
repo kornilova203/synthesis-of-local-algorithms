@@ -1,21 +1,32 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.graphs.FiveNeighboursDirectedGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.graphs.FiveNeighboursGraphsIterator
 import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FIVE_POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FiveNeighboursProblem
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.FiveNeighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.ProblemSolver
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolver
+import java.io.File
 
 
-class FiveNeighboursProblemSolver : ProblemSolver<FiveNeighboursProblem>() {
+class FiveNeighboursProblemSolver : ProblemSolver<FiveNeighboursProblem, FiveNeighboursDirectedGraph>() {
+    override val graphsIterator = FiveNeighboursGraphsIterator(File("independent_set_tiles/directed_graphs"))
+
 
     override fun reverseProblem(problem: FiveNeighboursProblem): FiveNeighboursProblem = problem.reverse()
 
     override fun rotateProblem(problem: FiveNeighboursProblem): FiveNeighboursProblem = problem.rotate()
 
-    override fun formClause(neighbourhood: DirectedGraph.Neighbourhood,
-                            reversedProblem: FiveNeighboursProblem,
-                            satSolver: SatSolver) {
+    override fun formClauses(graph: FiveNeighboursDirectedGraph,
+                             reversedProblem: FiveNeighboursProblem,
+                             satSolver: SatSolver) {
+        for (neighbourhood in graph.neighbourhoods) {
+            formClause(neighbourhood, reversedProblem, satSolver)
+        }
+    }
+
+    private fun formClause(neighbourhood: FiveNeighbourhood, reversedProblem: FiveNeighboursProblem, satSolver: SatSolver) {
         for (reversedRule in reversedProblem.rules) {
             var i = 0
             val clause = IntArray(5)
@@ -39,18 +50,7 @@ class FiveNeighboursProblemSolver : ProblemSolver<FiveNeighboursProblem>() {
                 }
             }
             if (!isAlwaysTrue) {
-                var zeroPos = -1
-                for (j in 0 until clause.size) {
-                    if (clause[j] == 0) {
-                        zeroPos = j
-                        break
-                    }
-                }
-                if (zeroPos != -1) {
-                    satSolver.addClause(clause.copyOfRange(0, zeroPos))
-                } else {
-                    satSolver.addClause(clause)
-                }
+                addFirstElementsThatAreNotNull(clause, satSolver)
             }
         }
     }

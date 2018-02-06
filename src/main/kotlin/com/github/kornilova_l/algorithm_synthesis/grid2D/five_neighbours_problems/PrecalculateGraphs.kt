@@ -1,8 +1,11 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
+package com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.graphs.FiveNeighboursDirectedGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.graphs.FiveNeighboursGraphWithTiles
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.createDir
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.getM
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.getN
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import com.github.kornilova_l.util.Logger
 import java.io.File
 import java.nio.file.Paths
@@ -13,7 +16,7 @@ private val logger = Logger(File("precalculate_is_tiles.log"))
 
 /**
  * Precalculate graphs and export them to files.
- * So [DirectedGraph] instances can be created and used.
+ * So [FiveNeighboursDirectedGraph] instances can be created and used.
  */
 fun main(args: Array<String>) {
     if (!tilesDir.exists()) {
@@ -32,7 +35,7 @@ fun main(args: Array<String>) {
             }
             logger.info("Process tiles from file: file.name")
             val tileSet = IndependentSetTile.parseTiles(file)
-            val graph = DirectedGraphWithTiles.createInstance(tileSet)
+            val graph = FiveNeighboursGraphWithTiles.createInstance(tileSet)
             logger.info("Start exporting tiles...")
             graph.exportTiles(graphsDir)
             println("Start exporting graph...")

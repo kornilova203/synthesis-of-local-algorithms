@@ -1,6 +1,6 @@
 package com.github.kornilova_l.benchmarks
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.DirectedGraphWithTiles
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.graphs.FiveNeighboursGraphWithTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
 import org.openjdk.jmh.annotations.*
 import java.io.File
@@ -18,6 +18,6 @@ open class DirectedGraphWithTilesBenchmark {
     @BenchmarkMode(Mode.AverageTime)
     @OutputTimeUnit(TimeUnit.SECONDS)
     fun directedGraphBuild() {
-        DirectedGraphWithTiles.createInstance(tiles)
+        FiveNeighboursGraphWithTiles.createInstance(tiles)
     }
 }

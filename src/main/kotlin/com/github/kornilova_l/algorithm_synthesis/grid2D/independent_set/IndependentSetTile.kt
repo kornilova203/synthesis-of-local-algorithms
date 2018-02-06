@@ -1,6 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FIVE_POSITION
+import com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.problem.FOUR_POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileIntersection
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolver
@@ -93,6 +94,32 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
                             .forEach { i -> grid.set(i) }
                 FIVE_POSITION.X ->
                     (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m + 1, i % m + 1)) }
+                            .forEach { i -> grid.set(i) }
+            }
+            return IndependentSetTile(n, m, k, grid)
+        }
+
+        /**
+         * Created a subtile of size tile.n - 1 x tile.m - 1
+         */
+        fun createInstance(tile: IndependentSetTile, position: FOUR_POSITION): IndependentSetTile {
+            // todo: test
+            val k = tile.k
+            val n = tile.n - 1
+            val m = tile.m - 1
+            val grid = OpenBitSet((n * m).toLong())
+            when (position) {
+                FOUR_POSITION.TL ->
+                    (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m, i % m)) }
+                            .forEach { i -> grid.set(i) }
+                FOUR_POSITION.TR ->
+                    (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m + 1, i % m)) }
+                            .forEach { i -> grid.set(i) }
+                FOUR_POSITION.BR ->
+                    (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m + 1, i % m + 1)) }
+                            .forEach { i -> grid.set(i) }
+                FOUR_POSITION.BL ->
+                    (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m, i % m + 1)) }
                             .forEach { i -> grid.set(i) }
             }
             return IndependentSetTile(n, m, k, grid)

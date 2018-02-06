@@ -1,6 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetDirectedGraph.Companion.parseNumber
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph.Companion.parseNumber
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader

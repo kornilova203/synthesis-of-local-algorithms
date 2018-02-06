@@ -15,7 +15,7 @@ class LabelingFunction {
         this.m = tileLabels.entries.first().key.m
     }
 
-    constructor(solution: List<Int>, graph: DirectedGraphWithTiles) {
+    constructor(solution: List<Int>, graph: DirectedGraphWithTiles<*>) {
         tileLabels = HashMap()
         for (index in solution) {
             val id = Math.abs(index)
