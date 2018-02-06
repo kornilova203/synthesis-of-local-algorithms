@@ -23,11 +23,11 @@ class FourNeighboursGraphWithTiles(n: Int,
 
     companion object {
         fun createInstance(tiles: Set<IndependentSetTile>): FourNeighboursGraphWithTiles {
-            val n = tiles.first().n - 2
-            val m = tiles.first().m - 2
+            val n = tiles.first().n - 1
+            val m = tiles.first().m - 1
             val k = tiles.first().k
             if (n <= 0 || m <= 0) {
-                throw IllegalArgumentException("Each dimension of tiles in set must be at least 3")
+                throw IllegalArgumentException("Each dimension of tiles in set must be at least 2")
             }
             val ids = DualHashBidiMap<IndependentSetTile, Int>()
             val neighbourhoods = HashSet<FourNeighbourhood>()
