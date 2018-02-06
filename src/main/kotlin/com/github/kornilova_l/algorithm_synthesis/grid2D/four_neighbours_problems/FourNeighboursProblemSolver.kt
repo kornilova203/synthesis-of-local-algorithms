@@ -1,15 +1,16 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.graphs.FourNeighboursDirectedGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.graphs.FourNeighboursGraphsIterator
 import com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.problem.FourNeighboursProblem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.FourNeighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.ProblemSolver
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolver
+import java.io.File
 
 
 class FourNeighboursProblemSolver : ProblemSolver<FourNeighboursProblem, FourNeighboursDirectedGraph>() {
-    override val graphsIterator: Iterable<FourNeighboursDirectedGraph>
-        get() = TODO("not implemented")
+    override val graphsIterator: Iterable<FourNeighboursDirectedGraph> = FourNeighboursGraphsIterator(File(""))
 
     override fun rotateProblem(problem: FourNeighboursProblem): FourNeighboursProblem = problem.rotate()
 
@@ -24,6 +25,6 @@ class FourNeighboursProblemSolver : ProblemSolver<FourNeighboursProblem, FourNei
     }
 
     private fun formClause(neighbourhood: FourNeighbourhood, reversedProblem: FourNeighboursProblem, satSolver: SatSolver) {
-
+        // todo: implement
     }
 }
