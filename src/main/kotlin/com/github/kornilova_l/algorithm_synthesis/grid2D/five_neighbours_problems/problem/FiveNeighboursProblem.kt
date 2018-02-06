@@ -76,7 +76,7 @@ open class FiveNeighboursProblem(rules: Set<FiveNeighboursRule>) : Problem<FiveN
         }
 
         private fun patternToRules(pattern: String): Set<FiveNeighboursRule> {
-            validatePattern(pattern)
+            validatePattern(pattern, 5)
             val arrays = hashSetOf(BooleanArray(5))
             pattern.forEachIndexed { i, c ->
                 if (c == '0' || c == '1') {
@@ -93,9 +93,9 @@ open class FiveNeighboursProblem(rules: Set<FiveNeighboursRule>) : Problem<FiveN
             return arrays.map { array -> FiveNeighboursRule(array) }.toSet()
         }
 
-        private fun validatePattern(pattern: String) {
-            if (pattern.length != 5) {
-                throw IllegalArgumentException("Length of pattern must be 5")
+        fun validatePattern(pattern: String, length: Int) {
+            if (pattern.length != length) {
+                throw IllegalArgumentException("Length of pattern must be $length. Patten: $pattern")
             }
             pattern.forEach {
                 if (it != '0' && it != '1' && it != '?') {

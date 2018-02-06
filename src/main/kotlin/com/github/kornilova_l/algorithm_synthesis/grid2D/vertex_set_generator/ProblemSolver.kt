@@ -8,6 +8,7 @@ import java.io.File
 
 abstract class ProblemSolver<T : Problem<*>, G : IndependentSetDirectedGraph<*>> {
     abstract val graphsIterator: Iterable<G>
+    abstract val dirWithGraphTiles: File
     /**
      * Try to find tile size such that it is possible to get labels so
      * each vertex has 1-neighbourhood in combinations Set.
@@ -31,7 +32,7 @@ abstract class ProblemSolver<T : Problem<*>, G : IndependentSetDirectedGraph<*>>
         var solution = tryToFindSolution(problem, graph)
         if (solution != null) { // solution found
             return LabelingFunction(solution,
-                    graph.createGraphWithTiles(DirectedGraphWithTiles.getTilesFile(graph.n, graph.m, graph.k, File("independent_set_tiles/five_neighbours_directed_graphs/"))!!)
+                    graph.createGraphWithTiles(DirectedGraphWithTiles.getTilesFile(graph.n, graph.m, graph.k, dirWithGraphTiles)!!)
             )
         }
         solution = tryToFindSolution(rotateProblem(problem), graph)
@@ -39,7 +40,7 @@ abstract class ProblemSolver<T : Problem<*>, G : IndependentSetDirectedGraph<*>>
             return LabelingFunction(solution,
                     graph.createGraphWithTiles(
                             DirectedGraphWithTiles.getTilesFile(
-                                    graph.n, graph.m, graph.k, File("independent_set_tiles/five_neighbours_directed_graphs/"))!!
+                                    graph.n, graph.m, graph.k, dirWithGraphTiles)!!
                     )
             ).rotate()
         }
@@ -50,13 +51,13 @@ abstract class ProblemSolver<T : Problem<*>, G : IndependentSetDirectedGraph<*>>
      * This method is needed because problem.rotate() returns
      * Problem<VertexRule> and it cannot be safely cast to T
      */
-    abstract fun rotateProblem(problem: T): T
+    protected abstract fun rotateProblem(problem: T): T
 
     /**
      * This method is needed because problem.rotate() returns
      * Problem<VertexRule> and it cannot be safely cast to T
      */
-    abstract fun reverseProblem(problem: T): T
+    protected abstract fun reverseProblem(problem: T): T
 
     private fun tryToFindSolution(problem: T, graph: G): List<Int>? {
         val satSolver = SatSolver()

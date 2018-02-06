@@ -12,7 +12,8 @@ import java.io.File
 
 class FiveNeighboursProblemSolver : ProblemSolver<FiveNeighboursProblem, FiveNeighboursDirectedGraph>() {
 
-    override val graphsIterator = FiveNeighboursGraphsIterator(File("independent_set_tiles/five_neighbours_directed_graphs"))
+    override val dirWithGraphTiles: File = File("independent_set_tiles/five_neighbours_directed_graphs")
+    override val graphsIterator = FiveNeighboursGraphsIterator(dirWithGraphTiles)
 
     override fun reverseProblem(problem: FiveNeighboursProblem): FiveNeighboursProblem = problem.reverse()
 

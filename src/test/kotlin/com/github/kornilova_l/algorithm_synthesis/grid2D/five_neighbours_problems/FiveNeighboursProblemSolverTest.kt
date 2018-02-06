@@ -1,6 +1,5 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
+package com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.FiveNeighboursProblemSolver
 import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FiveNeighboursProblem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FiveNeighboursRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
@@ -10,8 +9,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class VertexSetSolverKtTest {
-
+open class FiveNeighboursProblemSolverTest {
     private fun testLabelingFunction(problem: FiveNeighboursProblem) {
         val iterations = 10000
         val labelingFunction = FiveNeighboursProblemSolver().getLabelingFunction(problem)
