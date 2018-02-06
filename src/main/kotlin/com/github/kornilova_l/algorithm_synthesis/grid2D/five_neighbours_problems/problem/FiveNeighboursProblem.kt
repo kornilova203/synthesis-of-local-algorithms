@@ -1,10 +1,9 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule
+package com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FiveNeighboursRule
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.allRulesExceptTrivial
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.problem.Problem
 
 
-fun getNextProblemId(combinationNum: Int, allowedRules: FiveNeighboursProblem): Int? {
+fun getNextProblemId(combinationNum: Int, allowedRules: FiveNeighboursNonTrivialProblem): Int? {
     val allowedRulesId = allowedRules.getId()
     for (i in combinationNum - 1 downTo 0) {
         val xor = allowedRulesId.xor(i)
@@ -15,7 +14,7 @@ fun getNextProblemId(combinationNum: Int, allowedRules: FiveNeighboursProblem): 
     return null
 }
 
-class FiveNeighboursProblem(rules: Set<FiveNeighboursRule>) : Problem<FiveNeighboursRule>(rules) {
+open class FiveNeighboursProblem(rules: Set<FiveNeighboursRule>) : Problem<FiveNeighboursRule>(rules) {
 
     constructor(pattern: String) : this(patternToRules(pattern))
 
@@ -26,30 +25,13 @@ class FiveNeighboursProblem(rules: Set<FiveNeighboursRule>) : Problem<FiveNeighb
         rules.mapTo(ids) { it.id }
 
         val reversedRules = HashSet<FiveNeighboursRule>()
-        (0..31).filter { !ids.contains(it) }
+        (0 until Math.pow(2.0, 5.0).toInt()).filter { !ids.contains(it) }
                 .forEach { reversedRules.add(FiveNeighboursRule(it)) }
         return FiveNeighboursProblem(reversedRules)
     }
 
     override fun rotate(rotationsCount: Int): FiveNeighboursProblem = FiveNeighboursProblem(
             rules.map { rule -> rule.rotate(rotationsCount) }.toSet())
-
-
-    override fun getId(): Int {
-        var setId = 0
-        for (rule in rules) {
-            var ruleId = -1
-            for (i in 0 until allRulesExceptTrivial.size) {
-                if (rule == allRulesExceptTrivial[i]) {
-                    ruleId = i
-                    break
-                }
-            }
-            assert(ruleId != -1)
-            setId = setId.or(1.shl(ruleId))
-        }
-        return setId
-    }
 
     override fun toString(): String {
         val stringBuilder = StringBuilder()
@@ -122,7 +104,7 @@ class FiveNeighboursProblem(rules: Set<FiveNeighboursRule>) : Problem<FiveNeighb
             }
         }
 
-        private fun idToRules(combinationNum: Int): Set<FiveNeighboursRule> {
+        internal fun idToRules(combinationNum: Int): Set<FiveNeighboursRule> {
             val rules = HashSet<FiveNeighboursRule>()
             (0..31).forEach { shift ->
                 if (combinationNum.and(1.shl(shift)) > 0) { // if rule is included

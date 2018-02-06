@@ -1,8 +1,7 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule
+package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.problem
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FIVE_POSITION
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FiveNeighboursRule
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.FiveNeighboursProblem.Companion.parseProblem
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.*
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FiveNeighboursProblem.Companion.parseProblem
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -84,22 +83,22 @@ class FiveNeighboursRuleKtTest {
 
     @Test
     fun rulesToIdTest() {
-        var problem = FiveNeighboursProblem(hashSetOf(FiveNeighboursRule("XN"), FiveNeighboursRule("NSW"), FiveNeighboursRule("S")))
+        var problem = FiveNeighboursNonTrivialProblem(hashSetOf(FiveNeighboursRule("XN"), FiveNeighboursRule("NSW"), FiveNeighboursRule("S")))
         var setId = problem.getId()
         var rulesAgain = FiveNeighboursProblem(setId)
         assertEquals(problem, rulesAgain)
 
-        problem = FiveNeighboursProblem(hashSetOf())
+        problem = FiveNeighboursNonTrivialProblem(hashSetOf())
         setId = problem.getId()
         rulesAgain = FiveNeighboursProblem(setId)
         assertEquals(problem, rulesAgain)
 
-        problem = FiveNeighboursProblem(hashSetOf(FiveNeighboursRule("E"), FiveNeighboursRule("NSWE"), FiveNeighboursRule("X")))
+        problem = FiveNeighboursNonTrivialProblem(hashSetOf(FiveNeighboursRule("E"), FiveNeighboursRule("NSWE"), FiveNeighboursRule("X")))
         setId = problem.getId()
         rulesAgain = FiveNeighboursProblem(setId)
         assertEquals(problem, rulesAgain)
 
-        problem = parseProblem("XN, XE, NE, XNE, XS, NS, XNS, ES, XES, NES, XNES, XW, NW, XNW, EW, XEW, NEW, XNEW, SW, XSW, NSW, XNSW, ESW, XESW")
+        problem = FiveNeighboursNonTrivialProblem(parseProblem("XN, XE, NE, XNE, XS, NS, XNS, ES, XES, NES, XNES, XW, NW, XNW, EW, XEW, NEW, XNEW, SW, XSW, NSW, XNSW, ESW, XESW"))
         setId = problem.getId()
         rulesAgain = FiveNeighboursProblem(setId)
         assertEquals(problem, rulesAgain)
@@ -107,16 +106,16 @@ class FiveNeighboursRuleKtTest {
 
     @Test
     fun getNextRuleIdTest() {
-        val allowedRules = FiveNeighboursProblem(hashSetOf(FiveNeighboursRule("N"), FiveNeighboursRule("S"), FiveNeighboursRule("XSW")))
+        val allowedRules = FiveNeighboursNonTrivialProblem(hashSetOf(FiveNeighboursRule("N"), FiveNeighboursRule("S"), FiveNeighboursRule("XSW")))
         val setId = allowedRules.getId()
 
-        assertEquals(FiveNeighboursProblem(hashSetOf(FiveNeighboursRule("S"), FiveNeighboursRule("XSW"))).getId(),
+        assertEquals(FiveNeighboursNonTrivialProblem(hashSetOf(FiveNeighboursRule("S"), FiveNeighboursRule("XSW"))).getId(),
                 getNextProblemId(setId, allowedRules))
 
-        assertEquals(FiveNeighboursProblem(hashSetOf(FiveNeighboursRule("XSW"), FiveNeighboursRule("N"))).getId(),
-                getNextProblemId(FiveNeighboursProblem(hashSetOf(FiveNeighboursRule("S"), FiveNeighboursRule("XSW"))).getId(), allowedRules))
+        assertEquals(FiveNeighboursNonTrivialProblem(hashSetOf(FiveNeighboursRule("XSW"), FiveNeighboursRule("N"))).getId(),
+                getNextProblemId(FiveNeighboursNonTrivialProblem(hashSetOf(FiveNeighboursRule("S"), FiveNeighboursRule("XSW"))).getId(), allowedRules))
 
-        val problem = parseProblem("XN, XE, NE, XNE, XS, NS, XNS, ES, XES, NES, XNES, XW, NW, XNW, EW, XEW, NEW, XNEW, SW, XSW, NSW, XNSW, ESW, XESW")
+        val problem = FiveNeighboursNonTrivialProblem(parseProblem("XN, XE, NE, XNE, XS, NS, XNS, ES, XES, NES, XNES, XW, NW, XNW, EW, XEW, NEW, XNEW, SW, XSW, NSW, XNSW, ESW, XESW"))
         val subproblemsCount = Math.pow(2.toDouble(), problem.rules.size.toDouble()).toLong()
         var actualSubproblemsCount = 0L
 

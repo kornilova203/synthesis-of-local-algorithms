@@ -1,9 +1,10 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FiveNeighboursRule
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.FiveNeighboursProblem
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getNextProblemId
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FiveNeighboursNonTrivialProblem
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FiveNeighboursProblem
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FiveNeighboursRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.getNextProblemId
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.problem.getRulePermutations
 
 
 fun main(args: Array<String>) {
@@ -12,7 +13,7 @@ fun main(args: Array<String>) {
     val problem = atLeastOneIncludedAndOneExcluded()
     var combinationNum: Int? = problem.getId()
 
-    val currentIteration = ArrayList<FiveNeighboursProblem>()
+    val currentIteration = ArrayList<FiveNeighboursNonTrivialProblem>()
     var i = 0
     while (combinationNum != null) {
         i++
@@ -21,7 +22,7 @@ fun main(args: Array<String>) {
         }
         if (!isUnsolvable(combinationNum, unsolvable) && !isSolvable(combinationNum, solvable)) {
             println("add $combinationNum")
-            currentIteration.add(FiveNeighboursProblem(combinationNum))
+            currentIteration.add(FiveNeighboursNonTrivialProblem(combinationNum))
         } else {
 //            println("Solution exist")
         }

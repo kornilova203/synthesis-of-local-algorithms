@@ -1,8 +1,7 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule
+package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.problem
 
+import org.junit.Assert.assertEquals
 import org.junit.Test
-
-import org.junit.Assert.*
 
 class UtilKtTest {
     @Test

@@ -1,6 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.FiveNeighboursProblem
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FiveNeighboursNonTrivialProblem
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FiveNeighboursProblem
 import gnu.trove.list.array.TIntArrayList
 import java.io.BufferedWriter
 import java.io.File
@@ -24,7 +25,7 @@ fun main(args: Array<String>) {
     val solvable = parseInts(solvableFile)
     val unsolvable = parseInts(unsolvableFile)
 
-    val currentIteration = ArrayList<FiveNeighboursProblem>()
+    val currentIteration = ArrayList<FiveNeighboursNonTrivialProblem>()
     for (combinationNum in totalNumberOfCombination - skipFirst downTo 0) {
 //        val combinationNum = Math.abs(random.nextLong()) % totalNumberOfCombination
         if (isSolvable(combinationNum, solvable)) {
@@ -36,7 +37,7 @@ fun main(args: Array<String>) {
             continue
         }
         // here we do not know if it is solvable or not
-        val rules = FiveNeighboursProblem(combinationNum)
+        val rules = FiveNeighboursNonTrivialProblem(combinationNum)
         currentIteration.add(rules)
         if (currentIteration.size == iterationSize) {
             val newSolvable = FiveNeighboursProblemSolver().tryToFindSolutionForEachProblem(currentIteration)
@@ -48,7 +49,7 @@ fun main(args: Array<String>) {
 }
 
 fun updateSolvableAndUnsolvable(solvable: TIntArrayList, unsolvable: TIntArrayList,
-                                newSolvable: Set<FiveNeighboursProblem>, allCheckedProblems: List<FiveNeighboursProblem>) {
+                                newSolvable: Set<FiveNeighboursProblem>, allCheckedProblems: List<FiveNeighboursNonTrivialProblem>) {
     println("Solvable size before: ${solvable.size()}")
     println("Unsolvable size before: ${unsolvable.size()}")
     for (problem in allCheckedProblems) {

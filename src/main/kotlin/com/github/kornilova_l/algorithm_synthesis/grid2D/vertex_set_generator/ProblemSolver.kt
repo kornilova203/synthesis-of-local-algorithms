@@ -4,7 +4,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.Directe
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetDirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetDirectedGraphsIterator
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.Problem
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.problem.Problem
 import java.io.File
 
 

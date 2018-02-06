@@ -1,8 +1,8 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule
+package com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FourPositions.Companion.positionIndexes
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FourPositions.Companion.positionLetters
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.VertexRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FourPositions.Companion.positionIndexes
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FourPositions.Companion.positionLetters
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.problem.VertexRule
 
 
 val allRulesExceptTrivial = arrayOf(

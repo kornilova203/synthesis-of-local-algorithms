@@ -1,11 +1,12 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.rule.FiveNeighboursRule
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FiveNeighboursNonTrivialProblem
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FiveNeighboursProblem
+import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FiveNeighboursRule
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.LabelingFunction
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.FiveNeighboursProblem
-import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule.getRulePermutations
+import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.problem.getRulePermutations
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.visualization.drawLabels
 
 fun main(args: Array<String>) {
@@ -94,7 +95,7 @@ fun columnMinimalDominatingSet(): FiveNeighboursProblem {
     return FiveNeighboursProblem(rules)
 }
 
-fun atLeastOneIncludedAndOneExcluded(): FiveNeighboursProblem {
+fun atLeastOneIncludedAndOneExcluded(): FiveNeighboursNonTrivialProblem {
     val rules = HashSet<FiveNeighboursRule>()
     rules.addAll(getRulePermutations(1, true))
     rules.addAll(getRulePermutations(2, true))
@@ -103,7 +104,7 @@ fun atLeastOneIncludedAndOneExcluded(): FiveNeighboursProblem {
     rules.addAll(getRulePermutations(1, false))
     rules.addAll(getRulePermutations(2, false))
     rules.addAll(getRulePermutations(3, false))
-    return FiveNeighboursProblem(rules)
+    return FiveNeighboursNonTrivialProblem(rules)
 }
 
 fun gameOfLife(): FiveNeighboursProblem {

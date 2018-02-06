@@ -1,4 +1,4 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.rule
+package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.problem
 
 
 abstract class Problem<out T : VertexRule>(val rules: Set<T>) : Cloneable {
@@ -6,8 +6,6 @@ abstract class Problem<out T : VertexRule>(val rules: Set<T>) : Cloneable {
     abstract fun reverse(): Problem<T>
 
     abstract fun rotate(rotationsCount: Int = 1): Problem<T>
-
-    abstract fun getId(): Int
 
     override fun toString(): String {
         val stringBuilder = StringBuilder()
