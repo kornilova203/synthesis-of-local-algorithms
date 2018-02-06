@@ -1,6 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FIVE_POSITION
+import com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.problem.FOUR_POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.Grid2D
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgorithm
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
@@ -65,7 +66,7 @@ internal class IndependentSetTileTest {
     }
 
     @Test
-    fun tileConstructorWithPosition() {
+    fun tileConstructorWithFivePosition() {
         val biggerTile = IndependentSetTile.createInstance("0000\n0 1 0 0\n1 0 0 0\n0 0 0 1", 1)
 
         val tileNorth = IndependentSetTile.createInstance("0 0\n1 0", 1)
@@ -82,6 +83,23 @@ internal class IndependentSetTileTest {
 
         val tileCenter = IndependentSetTile.createInstance("1 0\n0 0", 1)
         assertEquals(tileCenter, IndependentSetTile.createInstance(biggerTile, FIVE_POSITION.X))
+    }
+
+    @Test
+    fun tileConstructorWithFourPosition() {
+        val biggerTile = IndependentSetTile.createInstance("0000\n0100\n1000\n0001", 1)
+
+        val topLeft = IndependentSetTile.createInstance("000\n010\n100", 1)
+        assertEquals(topLeft, IndependentSetTile.createInstance(biggerTile, FOUR_POSITION.TL))
+
+        val topRight = IndependentSetTile.createInstance("000\n100\n000", 1)
+        assertEquals(topRight, IndependentSetTile.createInstance(biggerTile, FOUR_POSITION.TR))
+
+        val bottomRight = IndependentSetTile.createInstance("100\n000\n001", 1)
+        assertEquals(bottomRight, IndependentSetTile.createInstance(biggerTile, FOUR_POSITION.BR))
+
+        val bottomLeft = IndependentSetTile.createInstance("010\n100\n000", 1)
+        assertEquals(bottomLeft, IndependentSetTile.createInstance(biggerTile, FOUR_POSITION.BL))
     }
 
     @Test

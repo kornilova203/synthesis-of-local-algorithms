@@ -103,7 +103,6 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
          * Created a subtile of size tile.n - 1 x tile.m - 1
          */
         fun createInstance(tile: IndependentSetTile, position: FOUR_POSITION): IndependentSetTile {
-            // todo: test
             val k = tile.k
             val n = tile.n - 1
             val m = tile.m - 1
@@ -113,13 +112,13 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
                     (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m, i % m)) }
                             .forEach { i -> grid.set(i) }
                 FOUR_POSITION.TR ->
-                    (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m + 1, i % m)) }
+                    (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m, i % m + 1)) }
                             .forEach { i -> grid.set(i) }
                 FOUR_POSITION.BR ->
                     (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m + 1, i % m + 1)) }
                             .forEach { i -> grid.set(i) }
                 FOUR_POSITION.BL ->
-                    (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m, i % m + 1)) }
+                    (0L until n * m).filter { i -> tile.grid.get(tile.getIndex(i / m + 1, i % m)) }
                             .forEach { i -> grid.set(i) }
             }
             return IndependentSetTile(n, m, k, grid)
