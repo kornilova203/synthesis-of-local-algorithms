@@ -1,4 +1,4 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.rule
+package com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.problem
 
 import org.apache.commons.collections4.BidiMap
 import org.apache.commons.collections4.bidimap.DualHashBidiMap

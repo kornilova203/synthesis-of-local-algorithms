@@ -1,4 +1,4 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.rule
+package com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.problem
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.problem.VertexRule
 
