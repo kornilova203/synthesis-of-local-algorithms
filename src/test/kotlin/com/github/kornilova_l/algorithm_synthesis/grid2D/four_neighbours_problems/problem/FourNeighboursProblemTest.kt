@@ -28,7 +28,7 @@ class FourNeighboursProblemTest {
                         FourNeighboursRule(booleanArrayOf(false, false, true, true)),
                         FourNeighboursRule(booleanArrayOf(false, true, false, false)),
                         FourNeighboursRule(booleanArrayOf(false, true, false, true)),
-                        FourNeighboursRule(booleanArrayOf(false, true, true, true)),
+                        FourNeighboursRule(booleanArrayOf(false, true, true, false)),
                         FourNeighboursRule(booleanArrayOf(false, true, true, true))
                 ),
                 reversedProblem.rules)

@@ -50,13 +50,10 @@ class FourNeighboursRule : VertexRule {
         val stringBuilder = StringBuilder()
         for (i in 0 until array.size) {
             if (array[i]) {
-                stringBuilder.append(FourPositions.positionIndexes.getKey(i))
-                if (i != array.size - 1) {
-                    stringBuilder.append(" ")
-                }
+                stringBuilder.append(FourPositions.positionIndexes.getKey(i)).append(" ")
             }
         }
-        return "[" + stringBuilder.toString() + "]"
+        return "[" + stringBuilder.toString().removeSuffix(" ") + "]"
     }
 
     fun isIncluded(position: FOUR_POSITION): Boolean = array[FourPositions.positionIndexes[position]!!]
