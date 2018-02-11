@@ -40,7 +40,7 @@ Using normal form of grid and a SAT solver we can find a mapping from local neig
 Green stroke indicated original independent set.  
 This is not surprising because normal form for this problem is a maximal independent set of a grid.
 
-Dominating set (1 x 1 tiles, 1 power)   
+Dominating set (1 x 1 tiles, 1 power)  
 ![dominating set](images/dominating_set.png)
 
 Column maximal independent set (5 x 2 tiles, 1 power)  
@@ -62,15 +62,15 @@ jar file will be placed in `build/libs` directory.
 ## Usage
 Precalculate independent set tiles:
 ```
-# calculate predefined set of tiles:
-java -cp -algorithms-synthesis.jar com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.PrecalculateTilesKt
+# calculate set of tiles:
+java -cp algorithm-synthesis.jar com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.PrecalculateTilesKt <difficulty index>
 
 # calculate specific tiles:
-java -cp -algorithms-synthesis.jar com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.PrecalculateTilesKt <n> <m> <k>
+java -cp algorithm-synthesis.jar com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.PrecalculateTilesKt <n> <m> <k>
 
 # precalculate graphs:
-java -cp -algorithms-synthesis.jar com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.PrecalculateGraphsKt
+java -cp algorithm-synthesis.jar com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.PrecalculateGraphsKt
 
 # precalculate graphs with neighbourhoods of 4 tiles:
-java -cp -algorithms-synthesis.jar com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.PrecalculateGraphsKt
+java -cp algorithm-synthesis.jar com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.PrecalculateGraphsKt
 ```

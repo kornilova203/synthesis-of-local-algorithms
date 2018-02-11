@@ -3,18 +3,21 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile.Companion.getTilesFile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile.Companion.parseTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTileGenerator
+import com.github.kornilova_l.util.Util
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.io.File
 
 internal class SimpleGraphWithTilesTest {
-    private val tiles32 = IndependentSetTileGenerator(3, 2, 1).tiles
-    private val tiles23 = IndependentSetTileGenerator(2, 3, 1).tiles
+    private val tempDir = File("temp-dir")
     private val tiles67 = parseTiles(getTilesFile(6, 7, 3, File("independent_set_tiles"))!!)
     private val tiles58 = parseTiles(getTilesFile(5, 8, 3, File("independent_set_tiles"))!!)
 
     @Test
     fun getGraph() {
+        tempDir.mkdir()
+        val tiles32 = IndependentSetTileGenerator(3, 2, 1, tempDir).tiles
+        val tiles23 = IndependentSetTileGenerator(2, 3, 1, tempDir).tiles
         var tileGraph = SimpleGraphWithTiles.createInstance(tiles32, tiles23)
         assertEquals(7, tileGraph.size)
 
@@ -22,10 +25,14 @@ internal class SimpleGraphWithTilesTest {
 
         tileGraph = SimpleGraphWithTiles.createInstance(tiles67, tiles58)
         assertEquals(2079, tileGraph.size)
+        Util.deleteDir(tempDir.toPath())
     }
 
     @Test
     fun exportAndImport() {
+        tempDir.mkdir()
+        val tiles32 = IndependentSetTileGenerator(3, 2, 1, tempDir).tiles
+        val tiles23 = IndependentSetTileGenerator(2, 3, 1, tempDir).tiles
         val graph = SimpleGraphWithTiles.createInstance(tiles32, tiles23)
         val file = File("temp.txt")
         graph.export(file)
@@ -34,5 +41,6 @@ internal class SimpleGraphWithTilesTest {
         assertEquals(graph.graph, parsedGraph.graph)
 
         file.delete()
+        Util.deleteDir(tempDir.toPath())
     }
 }

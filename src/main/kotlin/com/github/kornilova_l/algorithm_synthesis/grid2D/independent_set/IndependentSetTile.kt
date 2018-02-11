@@ -3,6 +3,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FIVE_POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.problem.FOUR_POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileFileNameCreator
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileIntersection
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolver
 import gnu.trove.set.hash.TIntHashSet
@@ -11,28 +12,6 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.util.regex.Pattern
-
-
-fun parseSet(reader: BufferedReader, n: Int, m: Int): OpenBitSet {
-    val grid = OpenBitSet(n * m.toLong())
-    var i = 0L
-    var line = reader.readLine() // readLine() is faster that read()
-    var lineIndex = 0
-    while (i < n * m) {
-        val c = line[lineIndex++]
-        if (line.length == lineIndex) {
-            line = reader.readLine()
-            lineIndex = 0
-        }
-        if (c == '1' || c == '0') {
-            if (c == '1') {
-                grid.set(i)
-            }
-            i++
-        }
-    }
-    return grid
-}
 
 open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : BinaryTile(n, m, grid) {
 
@@ -54,6 +33,8 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
         const val name = "independent_set"
         val independentSetTilesFilePattern = Pattern.compile("$name-\\d+-\\d+-\\d+-\\d+\\.tiles")!!
 
+        fun getFileName(n: Int, m: Int, k: Int, size: Int): String = "$name-$n-$m-$k-$size.tiles"
+
         fun getTilesFile(n: Int, m: Int, k: Int, dir: File): File? {
             for (file in dir.listFiles()) {
                 if (file.isDirectory) {
@@ -64,11 +45,6 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
                 }
             }
             return null
-        }
-
-        fun getK(file: File): Int {
-            val parts = file.name.split("-")
-            return Integer.parseInt(parts[3])
         }
 
         /**
@@ -334,4 +310,8 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
      * Creates a new tile that equals to the original tile rotated clockwise
      */
     override fun rotate(): IndependentSetTile = IndependentSetTile(m, n, k, rotateGrid(grid))
+}
+
+class ISTilesFileNameCreator(val k: Int) : TileFileNameCreator() {
+    override fun getFileNameInner(n: Int, m: Int, size: Int): String = "${IndependentSetTile.name}-$n-$m-$k-$size"
 }

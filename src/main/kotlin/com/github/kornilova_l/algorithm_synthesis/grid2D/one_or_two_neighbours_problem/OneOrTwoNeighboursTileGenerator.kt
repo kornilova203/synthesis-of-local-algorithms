@@ -3,47 +3,41 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTileGenerator.Companion.generatePossiblyValidTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTileGenerator.Companion.removeInvalid
 import com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_problem.OneOrTwoNeighboursTile.Companion.getTilesFile
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Expand
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator
 import java.io.File
+import java.io.FileOutputStream
+import java.nio.file.Paths
 
 
 class OneOrTwoNeighboursTileGenerator(finalN: Int,
                                       finalM: Int,
-                                      dir: File? = null) : TileGenerator(finalN, finalM, getInitialTiles(finalN, finalM, dir)) {
+                                      dir: File) : TileGenerator<OneOrTwoNeighboursTile>(finalN, finalM, getInitialTiles(finalN, finalM, dir), dir, OneOrTwoNeighboursTilesFactory(), OneOrTwoNeighboursTilesFileNameCreator()) {
 
-    override fun getFileNameWithoutExtension(): String = "${OneOrTwoNeighboursTile.name}-$finalN-$finalM"
-
-
-    /**
-     * If it does not matter if tiles have class [BinaryTile] or [OneOrTwoNeighboursTileGenerator] then
-     * use [OneOrTwoNeighboursTileGenerator.tiles]. Because this method copies all tiles to new set
-     */
-    fun getIndependentSetTiles(): Set<OneOrTwoNeighboursTile> {
-        val set = HashSet<OneOrTwoNeighboursTile>()
-        for (tile in tiles) {
-            if (tile is OneOrTwoNeighboursTile) {
-                set.add(tile)
-            } else {
-                throw AssertionError("Tiles set contains tile that is not an instance of IndependentSetTile")
+    override fun addValidExtensionsToSet(tile: OneOrTwoNeighboursTile,
+                                         expandedTiles: MutableSet<OneOrTwoNeighboursTile>,
+                                         side: Expand) {
+        val newTiles = tile.getAllExpandedTiles(side)
+        for (newTile in newTiles) {
+            if (newTile.isValid()) {
+                if (newTile !is OneOrTwoNeighboursTile) {
+                    throw AssertionError("OneOrTwoNeighboursTile.getAllExpandedTiles() should produce set of OneOrTwoNeighboursTile")
+                }
+                expandedTiles.add(newTile)
             }
         }
-        return set
     }
 
     companion object {
 
-        private fun getInitialTiles(finalN: Int, finalM: Int, dir: File?): Set<BinaryTile> {
-            if (dir == null) {
-                return generateNew(finalN, finalM)
-            }
+        private fun getInitialTiles(finalN: Int, finalM: Int, dir: File): File {
             var currentN = finalN
             var currentM = finalM
             while (currentN >= 3 && currentM >= 3) {
                 val file = getTilesFile(currentN, currentM, dir)
                 if (file != null) {
                     println("Found file: $file")
-                    return OneOrTwoNeighboursTile.parseTiles(file)
+                    return file
                 }
                 if (currentM > currentN) {
                     currentM--
@@ -52,14 +46,20 @@ class OneOrTwoNeighboursTileGenerator(finalN: Int,
                 }
             }
             /* if suitable file was not found */
-            return generateNew(finalN, finalM)
+            return generateNew(Math.min(3, finalN), Math.min(3, finalM), dir)
         }
 
-        private fun generateNew(finalN: Int, finalM: Int): Set<BinaryTile> {
-            val currentN = if (finalN < 3) finalN else 3
-            val currentM = if (finalM < 3) finalM else 3
-            val tiles = generatePossiblyValidTiles(OneOrTwoNeighboursTile(currentN, currentM), currentN, currentM)
-            return removeInvalid(tiles)
+        private fun generateNew(n: Int, m: Int, dir: File): File {
+            val tiles = generatePossiblyValidTiles(OneOrTwoNeighboursTile(n, m), n, m)
+            val validTiles = removeInvalid(tiles)
+            val file = Paths.get(dir.toString(), "name-$n-$m.tiles").toFile()
+            FileOutputStream(file).use { stream ->
+                for (validTile in validTiles) {
+                    stream.write(validTile.longsToString().toByteArray())
+                    stream.write("\n".toByteArray())
+                }
+            }
+            return file
         }
     }
 }

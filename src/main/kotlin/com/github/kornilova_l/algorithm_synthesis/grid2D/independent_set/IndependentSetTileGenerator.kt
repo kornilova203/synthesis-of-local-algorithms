@@ -1,10 +1,12 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile.Companion.getTilesFile
-import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile.Companion.name
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Expand
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator
 import java.io.File
+import java.io.FileOutputStream
+import java.nio.file.Paths
 
 
 /**
@@ -12,40 +14,33 @@ import java.io.File
  */
 class IndependentSetTileGenerator(finalN: Int,
                                   finalM: Int,
-                                  private val k: Int,
-                                  dir: File? = null) : TileGenerator(finalN, finalM, getInitialTiles(finalN, finalM, k, dir)) {
+                                  k: Int,
+                                  dir: File) : TileGenerator<IndependentSetTile>(finalN, finalM, getInitialTiles(finalN, finalM, k, dir), dir, ISTilesParserFactory(), ISTilesFileNameCreator(k)) {
 
-    override fun getFileNameWithoutExtension(): String = "$name-$finalN-$finalM-$k"
-
-    /**
-     * If it does not matter if tiles have class [BinaryTile] or [IndependentSetTile] then
-     * use [TileGenerator.tiles]. Because this method copies all tiles to new set
-     */
-    fun getIndependentSetTiles(): Set<IndependentSetTile> {
-        val set = HashSet<IndependentSetTile>()
-        for (tile in tiles) {
-            if (tile is IndependentSetTile) {
-                set.add(tile)
-            } else {
-                throw AssertionError("Tiles set contains tile that is not an instance of IndependentSetTile")
+    override fun addValidExtensionsToSet(tile: IndependentSetTile,
+                                         expandedTiles: MutableSet<IndependentSetTile>,
+                                         side: Expand) {
+        val newTiles = tile.getAllExpandedTiles(side)
+        for (newTile in newTiles) {
+            if (newTile.isValid()) {
+                if (newTile !is IndependentSetTile) {
+                    throw AssertionError("IndependentSetTile.getAllExpandedTiles() should produce set of IndependentSetTile")
+                }
+                expandedTiles.add(newTile)
             }
         }
-        return set
     }
 
     companion object {
 
-        private fun getInitialTiles(finalN: Int, finalM: Int, k: Int, dir: File?): Set<BinaryTile> {
-            if (dir == null) {
-                return generateNew(finalN, finalM, k)
-            }
+        private fun getInitialTiles(finalN: Int, finalM: Int, k: Int, dir: File): File {
             var currentN = finalN
             var currentM = finalM
             while (currentN >= 3 && currentM >= 3) {
                 val file = getTilesFile(currentN, currentM, k, dir)
                 if (file != null) {
                     println("Found file: $file")
-                    return IndependentSetTile.parseTiles(file)
+                    return file
                 }
                 if (currentM > currentN) {
                     currentM--
@@ -54,14 +49,20 @@ class IndependentSetTileGenerator(finalN: Int,
                 }
             }
             /* if suitable file was not found */
-            return generateNew(finalN, finalM, k)
+            return generateNew(Math.min(3, finalN), Math.min(3, finalM), k, dir)
         }
 
-        private fun generateNew(finalN: Int, finalM: Int, k: Int): Set<BinaryTile> {
-            val currentN = if (finalN < 3) finalN else 3
-            val currentM = if (finalM < 3) finalM else 3
-            val tiles = generatePossiblyValidTiles(IndependentSetTile(currentN, currentM, k), currentN, currentM)
-            return removeInvalid(tiles)
+        private fun generateNew(n: Int, m: Int, k: Int, dir: File): File {
+            val tiles = generatePossiblyValidTiles(IndependentSetTile(n, m, k), n, m)
+            val validTiles = removeInvalid(tiles)
+            val file = Paths.get(dir.toString(), IndependentSetTile.getFileName(n, m, k, validTiles.size)).toFile()
+            FileOutputStream(file).use { stream ->
+                for (validTile in validTiles) {
+                    stream.write(validTile.longsToString().toByteArray())
+                    stream.write("\n".toByteArray())
+                }
+            }
+            return file
         }
 
         /**

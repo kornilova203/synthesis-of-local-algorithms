@@ -1,9 +1,7 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters.getParametersSet
 import com.github.kornilova_l.util.Logger
 import java.io.File
-import java.nio.file.Paths
 
 private val dir = File("independent_set_tiles")
 private val logger = Logger(File("precalculate_is_tiles.log"))
@@ -15,18 +13,15 @@ private val logger = Logger(File("precalculate_is_tiles.log"))
  */
 fun main(args: Array<String>) {
     createDir(dir, logger)
-    if (args.isEmpty()) {
-        precalculateAll()
-    } else {
-        if (args.size != 3) {
-            System.err.println("To precalculate specific tile you must specify n, m and k")
-            return
-        }
+    if (args.size == 1) {
+        precalculateAll(getParametersSet(Integer.parseInt(args[0])))
+    } else if (args.size == 3) {
         val n = Integer.parseInt(args[0])
         val m = Integer.parseInt(args[1])
         val k = Integer.parseInt(args[2])
         precalculateSpecificTile(n, m, k)
     }
+    System.err.println("Specify difficulty or n, m and k")
 }
 
 fun createDir(dir: File, logger: Logger? = null) {
@@ -40,21 +35,19 @@ private fun precalculateSpecificTile(n: Int, m: Int, k: Int) {
     if (IndependentSetTile.getTilesFile(n, m, k, dir) == null) { // if was not precalculated
         println("Calculate $n x $m tile in power $k")
         IndependentSetTileGenerator(n, m, k, dir)
-                .export(dir)
     }
 }
 
-private fun precalculateAll() {
-    val parametersSet = getParametersSet()
+private fun precalculateAll(parametersSet: Set<Parameters>) {
     for (parameters in parametersSet) {
         val n = parameters.n
         val m = parameters.m
         val k = parameters.k
-        if (Paths.get(dir.toString(), "$n-$m-$k.txt").toFile().exists()) { // if was precalculated
+        if (IndependentSetTile.getTilesFile(n, m, k, dir) != null) { // if was precalculated
             logger.info("Tiles n = $n m = $m k = $k were already calculated")
         } else {
             logger.info("Calculate $n x $m tile in power $k")
-            IndependentSetTileGenerator(n, m, k, dir).export(dir)
+            IndependentSetTileGenerator(n, m, k, dir)
         }
     }
 }

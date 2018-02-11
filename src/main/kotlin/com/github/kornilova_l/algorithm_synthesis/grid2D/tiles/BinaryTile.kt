@@ -2,7 +2,6 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
 import org.apache.lucene.util.OpenBitSet
 import java.io.File
-import java.util.*
 
 open class BinaryTile(n: Int,
                       m: Int,

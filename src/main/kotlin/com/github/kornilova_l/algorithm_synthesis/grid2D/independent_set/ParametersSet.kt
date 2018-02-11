@@ -1,4 +1,4 @@
-package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters
+package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
 import java.util.*
 
@@ -8,28 +8,28 @@ import java.util.*
  * This class generated disjoint sets of parameters based of given difficulty
  */
 fun getParametersSet(difficulty: Int = 1): Set<Parameters> {
-    if (difficulty == 1) {
-        val parameters = TreeSet<Parameters>()
-        for (n in 3..8) {
-            for (m in n..8) {
-                (1..5)
-                        .filter { k -> k >= (m * n) / 5 - 10 } // if not too difficult
-                        .mapTo(parameters) { Parameters(n, m, it) }
-            }
+    val maxSideLength: Int
+    val offset: Int // used to check if parameters set is too difficult
+    when (difficulty) {
+        1 -> {
+            maxSideLength = 8
+            offset = 10
         }
-        return parameters
+        2 -> {
+            maxSideLength = 10
+            offset = 12
+        }
+        else -> throw IllegalArgumentException("Difficulty is unsupported: $difficulty")
     }
-    throw IllegalArgumentException("Method getParametersSet() supports only difficulty == 1")
-}
-
-fun printParameters(parametersSet: Set<Parameters>) {
-    for (parameters in parametersSet) {
-        println("power: ${parameters.k}, n: ${parameters.n}, m: ${parameters.m}")
+    val parameters = TreeSet<Parameters>()
+    for (n in 3..maxSideLength) {
+        for (m in n..maxSideLength) {
+            (1..5)
+                    .filter { k -> k >= (m * n) / 5 - offset } // if not too difficult
+                    .mapTo(parameters) { Parameters(n, m, it) }
+        }
     }
-}
-
-fun main(args: Array<String>) {
-    printParameters(getParametersSet(1))
+    return parameters
 }
 
 class Parameters(val n: Int, val m: Int, val k: Int) : Comparable<Parameters> {

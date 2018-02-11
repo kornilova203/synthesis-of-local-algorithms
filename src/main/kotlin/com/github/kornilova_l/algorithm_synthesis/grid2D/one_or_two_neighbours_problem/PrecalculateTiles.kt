@@ -1,6 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_problem
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.tile_parameters.getParametersSet
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.getParametersSet
 import java.io.File
 
 const val dirName = "one_or_two_neighbours_tiles"
@@ -16,7 +16,6 @@ private fun precalculateSpecificTile() {
     if (OneOrTwoNeighboursTile.getTilesFile(n, m, File(dirName)) == null) { // if was not precalculated
         println("Calculate $n x $m")
         OneOrTwoNeighboursTileGenerator(n, m, File(dirName))
-                .export(File(dirName))
     }
 }
 
@@ -27,7 +26,7 @@ private fun precalculateAll() {
         val m = parameters.m
         if (OneOrTwoNeighboursTile.getTilesFile(n, m, File(dirName)) == null) { // if was not precalculated
             println("Calculate $n x $m")
-            OneOrTwoNeighboursTileGenerator(n, m, File(dirName)).export(File(dirName))
+            OneOrTwoNeighboursTileGenerator(n, m, File(dirName))
         }
     }
 }

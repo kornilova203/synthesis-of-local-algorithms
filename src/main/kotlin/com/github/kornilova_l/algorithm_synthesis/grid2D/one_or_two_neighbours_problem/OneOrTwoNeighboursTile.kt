@@ -1,6 +1,8 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_problem
 
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileFileNameCreator
 import org.apache.lucene.util.OpenBitSet
 import java.io.File
 import java.util.regex.Pattern
@@ -119,4 +121,8 @@ class OneOrTwoNeighboursTile(n: Int, m: Int, grid: OpenBitSet) : BinaryTile(n, m
         }
         return calcIncluded
     }
+}
+
+class OneOrTwoNeighboursTilesFileNameCreator : TileFileNameCreator() {
+    override fun getFileNameInner(n: Int, m: Int, size: Int): String = "${IndependentSetTile.name}-$n-$m-$size"
 }
