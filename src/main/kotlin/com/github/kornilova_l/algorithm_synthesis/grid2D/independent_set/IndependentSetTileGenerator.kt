@@ -1,9 +1,9 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile.Companion.getTilesFile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Expand
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator
+import com.github.kornilova_l.util.FileNameCreator
 import java.io.File
 import java.io.FileOutputStream
 import java.nio.file.Paths
@@ -37,7 +37,7 @@ class IndependentSetTileGenerator(finalN: Int,
             var currentN = finalN
             var currentM = finalM
             while (currentN >= 3 && currentM >= 3) {
-                val file = getTilesFile(currentN, currentM, k, dir)
+                val file = FileNameCreator.getFile(dir, currentN, currentM, k)
                 if (file != null) {
                     println("Found file: $file")
                     return file
@@ -55,7 +55,7 @@ class IndependentSetTileGenerator(finalN: Int,
         private fun generateNew(n: Int, m: Int, k: Int, dir: File): File {
             val tiles = generatePossiblyValidTiles(IndependentSetTile(n, m, k), n, m)
             val validTiles = removeInvalid(tiles)
-            val file = Paths.get(dir.toString(), IndependentSetTile.getFileName(n, m, k, validTiles.size)).toFile()
+            val file = Paths.get(dir.toString(), ISTilesFileNameCreator(k).getFileName(n, m, validTiles.size)).toFile()
             FileOutputStream(file).use { stream ->
                 for (validTile in validTiles) {
                     stream.write(validTile.longsToString().toByteArray())

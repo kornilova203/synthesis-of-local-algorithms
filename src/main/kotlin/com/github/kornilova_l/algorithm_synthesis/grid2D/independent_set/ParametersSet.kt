@@ -7,7 +7,7 @@ import java.util.*
  * All of them are proportional to computational difficulty
  * This class generated disjoint sets of parameters based of given difficulty
  */
-fun getParametersSet(difficulty: Int = 1): Set<Parameters> {
+fun getParametersSet(difficulty: Int = 1): List<Parameters> {
     val maxSideLength: Int
     val offset: Int // used to check if parameters set is too difficult
     when (difficulty) {
@@ -19,9 +19,17 @@ fun getParametersSet(difficulty: Int = 1): Set<Parameters> {
             maxSideLength = 10
             offset = 12
         }
+        3 -> {
+            maxSideLength = 12
+            offset = 14
+        }
+        4 -> {
+            maxSideLength = 14
+            offset = 16
+        }
         else -> throw IllegalArgumentException("Difficulty is unsupported: $difficulty")
     }
-    val parameters = TreeSet<Parameters>()
+    val parameters = ArrayList<Parameters>()
     for (n in 3..maxSideLength) {
         for (m in n..maxSideLength) {
             (1..5)
@@ -29,6 +37,13 @@ fun getParametersSet(difficulty: Int = 1): Set<Parameters> {
                     .mapTo(parameters) { Parameters(n, m, it) }
         }
     }
+    parameters.sortWith(kotlin.Comparator { p1, p2 ->
+        when {
+            p1.n != p1.n -> Integer.compare(p1.n, p2.n)
+            p1.m != p1.m -> Integer.compare(p1.m, p2.m)
+            else -> Integer.compare(p1.k, p2.k)
+        }
+    })
     return parameters
 }
 

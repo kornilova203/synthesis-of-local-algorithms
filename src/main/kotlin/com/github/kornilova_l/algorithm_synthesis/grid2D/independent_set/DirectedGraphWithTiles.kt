@@ -1,12 +1,11 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.Neighbourhood
+import com.github.kornilova_l.util.FileNameCreator
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
 import java.io.File
 import java.nio.file.Paths
-import java.util.regex.Pattern
 
 
 /**
@@ -37,7 +36,11 @@ abstract class DirectedGraphWithTiles<out N : Neighbourhood>(n: Int,
      * <tile's array of longs>
      */
     fun exportTiles(dir: File) {
-        val file = Paths.get(dir.toString(), "${IndependentSetTile.name}-$n-$m-$k-${ids.size}.$tilesFileExtension").toFile()
+        val file = Paths.get(dir.toString(), FileNameCreator.getFileName(
+                IndependentSetTile.name,
+                mapOf(Pair("n", n), Pair("m", m), Pair("k", k), Pair("size", size)),
+                graphTilesFileExtension
+        )).toFile()
         file.outputStream().use { outputStream ->
             for (tileAndId in ids) {
                 outputStream.write(tileAndId.value.toString().toByteArray())
@@ -46,32 +49,6 @@ abstract class DirectedGraphWithTiles<out N : Neighbourhood>(n: Int,
                 outputStream.write("\n".toByteArray())
                 outputStream.write("\n".toByteArray())
             }
-        }
-    }
-
-    companion object {
-        private const val tilesFileExtension = "graphtiles"
-        private val tilesFilePattern = Pattern.compile("${IndependentSetTile.name}-\\d+-\\d+-\\d+-\\d+\\.$tilesFileExtension")!!
-
-        fun isTilesFile(fileName: String): Boolean {
-            return tilesFilePattern.matcher(fileName).matches()
-        }
-
-        fun getTilesFile(n: Int, m: Int, k: Int, dir: File): File? {
-            for (file in dir.listFiles()) {
-                if (file.isDirectory) {
-                    continue
-                }
-                if (!isTilesFile(file.name)) {
-                    continue
-                }
-                if (BinaryTile.parseNumber(file.name, 1) == n &&
-                        BinaryTile.parseNumber(file.name, 2) == m &&
-                        BinaryTile.parseNumber(file.name, 3) == k) {
-                    return file
-                }
-            }
-            return null
         }
     }
 }

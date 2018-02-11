@@ -1,21 +1,21 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
+import com.github.kornilova_l.util.FileNameCreator
 import com.github.kornilova_l.util.ProgressBar
 import java.io.File
 import java.io.FileOutputStream
 import java.nio.file.Paths
 
 fun main(args: Array<String>) {
-    val files = File("independent_set_tiles").listFiles()
+    val files = IndependentSetTile.defaultISTilesDir.listFiles()
     val progressBar = ProgressBar(files.size)
     for (file in files) {
         progressBar.updateProgress()
         if (file.isDirectory) {
             continue
         }
-        val parts = file.name.split("-")
-        val n = Integer.parseInt(parts[0])
-        val m = Integer.parseInt(parts[1])
+        val n = FileNameCreator.getIntParameter(file.name, "n")!!
+        val m = FileNameCreator.getIntParameter(file.name, "m")!!
         if (n <= m) {
             convert(file, File("independent_set_tiles/binary"))
         }

@@ -1,9 +1,10 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
+import com.github.kornilova_l.util.FileNameCreator
 import com.github.kornilova_l.util.Logger
 import java.io.File
 
-private val dir = File("independent_set_tiles")
+private val dir = IndependentSetTile.defaultISTilesDir
 private val logger = Logger(File("precalculate_is_tiles.log"))
 
 /**
@@ -32,18 +33,18 @@ fun createDir(dir: File, logger: Logger? = null) {
 }
 
 private fun precalculateSpecificTile(n: Int, m: Int, k: Int) {
-    if (IndependentSetTile.getTilesFile(n, m, k, dir) == null) { // if was not precalculated
+    if (FileNameCreator.getFile(dir, n, m, k) == null) { // if was not precalculated
         println("Calculate $n x $m tile in power $k")
         IndependentSetTileGenerator(n, m, k, dir)
     }
 }
 
-private fun precalculateAll(parametersSet: Set<Parameters>) {
+private fun precalculateAll(parametersSet: List<Parameters>) {
     for (parameters in parametersSet) {
         val n = parameters.n
         val m = parameters.m
         val k = parameters.k
-        if (IndependentSetTile.getTilesFile(n, m, k, dir) != null) { // if was precalculated
+        if (FileNameCreator.getFile(dir, n, m, k) != null) { // if was precalculated
             logger.info("Tiles n = $n m = $m k = $k were already calculated")
         } else {
             logger.info("Calculate $n x $m tile in power $k")

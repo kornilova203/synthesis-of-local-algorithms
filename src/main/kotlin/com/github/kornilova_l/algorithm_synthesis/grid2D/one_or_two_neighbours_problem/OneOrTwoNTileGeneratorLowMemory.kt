@@ -2,6 +2,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTileGenerator.Companion.removeInvalid
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Expand
+import com.github.kornilova_l.util.FileNameCreator
 import com.github.kornilova_l.util.ProgressBar
 import java.io.File
 import java.io.FileOutputStream
@@ -10,7 +11,7 @@ import java.nio.file.Paths
 fun main(args: Array<String>) {
     val tilesDir = File("one_or_two_neighbours_tiles")
     val outputDir = File("one_or_two_neighbours_tiles/expanded")
-    OneOrTwoNTileGeneratorLowMemory(OneOrTwoNeighboursTile.getTilesFile(5, 6, tilesDir)!!,
+    OneOrTwoNTileGeneratorLowMemory(FileNameCreator.getFile(tilesDir, 5, 6)!!,
             Expand.HEIGHT, outputDir)
 }
 

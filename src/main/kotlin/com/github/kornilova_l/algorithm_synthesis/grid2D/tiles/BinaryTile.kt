@@ -1,7 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 
 import org.apache.lucene.util.OpenBitSet
-import java.io.File
 
 open class BinaryTile(n: Int,
                       m: Int,
@@ -203,26 +202,11 @@ open class BinaryTile(n: Int,
             return OpenBitSet(longs, longs.size)
         }
 
-        fun parseNumber(line: String, numIndex: Int): Int {
-            val parts = line.split("-", ".")
-            return Integer.parseInt(parts[numIndex])
-        }
-
         fun createInstance(string: String): BinaryTile {
             val lines = string.split("\n").filter { it != "" }
             val n = lines.size
             val m = calculateM(lines)
             return BinaryTile(n, m, parseGrid(n, m, lines))
-        }
-
-        fun getN(file: File): Int {
-            val parts = file.name.split("-")
-            return Integer.parseInt(parts[1])
-        }
-
-        fun getM(file: File): Int {
-            val parts = file.name.split("-")
-            return Integer.parseInt(parts[2])
         }
 
         private fun getGrid(independentSet: Array<BooleanArray>, x: Int, y: Int, n: Int, m: Int): OpenBitSet {

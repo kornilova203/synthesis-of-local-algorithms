@@ -1,11 +1,9 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_problem
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileFileNameCreator
+import com.github.kornilova_l.util.FileNameCreator
 import org.apache.lucene.util.OpenBitSet
 import java.io.File
-import java.util.regex.Pattern
 
 
 /**
@@ -38,19 +36,7 @@ class OneOrTwoNeighboursTile(n: Int, m: Int, grid: OpenBitSet) : BinaryTile(n, m
 
     companion object {
         const val name = "one_or_two_neighbours_tile"
-        val oneOrTwoNeighboursTilesFilePattern = Pattern.compile("$name-\\d+-\\d+-\\d+\\.tiles")!!
-
-        fun getTilesFile(n: Int, m: Int, dir: File): File? {
-            for (file in dir.listFiles()) {
-                if (file.isDirectory) {
-                    continue
-                }
-                if (file.name.startsWith("${OneOrTwoNeighboursTile.name}-$n-$m")) {
-                    return file
-                }
-            }
-            return null
-        }
+        val defaultTilesDir = File(name)
 
         fun createInstance(string: String): OneOrTwoNeighboursTile {
             val lines = string.split("\n").filter { it != "" }
@@ -123,6 +109,8 @@ class OneOrTwoNeighboursTile(n: Int, m: Int, grid: OpenBitSet) : BinaryTile(n, m
     }
 }
 
-class OneOrTwoNeighboursTilesFileNameCreator : TileFileNameCreator() {
-    override fun getFileNameInner(n: Int, m: Int, size: Int): String = "${IndependentSetTile.name}-$n-$m-$size"
+class OneOrTwoNeighboursTilesFileNameCreator : FileNameCreator() {
+    override fun getParameters(n: Int, m: Int, size: Int): Map<String, Int> = mapOf(Pair("n", n), Pair("m", m), Pair("size", size))
+
+    override fun getName(): String = OneOrTwoNeighboursTile.name
 }

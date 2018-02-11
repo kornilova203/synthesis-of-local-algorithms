@@ -16,8 +16,6 @@ import kotlin.collections.HashMap
 open class SimpleGraphWithTiles(n: Int, m: Int, graph: Map<Int, Set<Int>>, protected val ids: DualHashBidiMap<Tile, Int>) :
         SimpleGraph(n, m, graph) {
 
-    protected val tilesFileExtension = "graphtiles"
-
     companion object {
 
         fun createInstance(tileSet1: Set<BinaryTile>, tileSet2: Set<BinaryTile>): SimpleGraphWithTiles {

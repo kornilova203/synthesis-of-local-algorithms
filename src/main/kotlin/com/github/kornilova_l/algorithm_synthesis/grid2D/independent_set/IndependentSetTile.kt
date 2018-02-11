@@ -3,15 +3,14 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.problem.FIVE_POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.problem.FOUR_POSITION
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileFileNameCreator
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileIntersection
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolver
+import com.github.kornilova_l.util.FileNameCreator
 import gnu.trove.set.hash.TIntHashSet
 import org.apache.lucene.util.OpenBitSet
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
-import java.util.regex.Pattern
 
 open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : BinaryTile(n, m, grid) {
 
@@ -30,22 +29,9 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
 
     companion object {
 
-        const val name = "independent_set"
-        val independentSetTilesFilePattern = Pattern.compile("$name-\\d+-\\d+-\\d+-\\d+\\.tiles")!!
+        val defaultISTilesDir = File("independent_set_tiles")
 
-        fun getFileName(n: Int, m: Int, k: Int, size: Int): String = "$name-$n-$m-$k-$size.tiles"
-
-        fun getTilesFile(n: Int, m: Int, k: Int, dir: File): File? {
-            for (file in dir.listFiles()) {
-                if (file.isDirectory) {
-                    continue
-                }
-                if (file.name.startsWith("$name-$n-$m-$k")) {
-                    return file
-                }
-            }
-            return null
-        }
+        const val name = "independent-set"
 
         /**
          * Created a subtile of size tile.n - 2 x tile.m - 2
@@ -176,13 +162,13 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
             if (!file.exists() || !file.isFile) {
                 throw IllegalArgumentException("File does not exist or it is not a file")
             }
-            if (!independentSetTilesFilePattern.matcher(file.name).matches()) {
-                throw IllegalArgumentException("File name does not match pattern: ${file.name}")
+            if (FileNameCreator.getExtension(file.name) != "tiles") {
+                throw IllegalArgumentException("File must have extension 'tiles': ${file.name}")
             }
-            val n = BinaryTile.parseNumber(file.name, 1)
-            val m = BinaryTile.parseNumber(file.name, 2)
-            val k = BinaryTile.parseNumber(file.name, 3)
-            val size = BinaryTile.parseNumber(file.name, 4)
+            val n = FileNameCreator.getIntParameter(file.name, "n")!!
+            val m = FileNameCreator.getIntParameter(file.name, "m")!!
+            val k = FileNameCreator.getIntParameter(file.name, "k")!!
+            val size = FileNameCreator.getIntParameter(file.name, "size")!!
             BufferedReader(FileReader(file)).use { reader ->
                 val tiles = HashSet<IndependentSetTile>(size)
                 for (i in 0 until size) {
@@ -312,6 +298,10 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
     override fun rotate(): IndependentSetTile = IndependentSetTile(m, n, k, rotateGrid(grid))
 }
 
-class ISTilesFileNameCreator(val k: Int) : TileFileNameCreator() {
-    override fun getFileNameInner(n: Int, m: Int, size: Int): String = "${IndependentSetTile.name}-$n-$m-$k-$size"
+class ISTilesFileNameCreator(val k: Int) : FileNameCreator() {
+    override fun getParameters(n: Int, m: Int, size: Int): Map<String, Int> = mapOf(
+            Pair("n", n), Pair("m", m), Pair("k", k), Pair("size", size)
+    )
+
+    override fun getName(): String = IndependentSetTile.name
 }

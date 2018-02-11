@@ -2,15 +2,16 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_proble
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.FourNeighbourhood
+import com.github.kornilova_l.util.FileNameCreator
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.io.File
 
 class FourNeighboursGraphWithTilesTest {
+
     @Test
     fun smallGraphTest() {
-        val tileSet = IndependentSetTile.parseTiles(IndependentSetTile.getTilesFile(2, 2, 1, File("independent_set_tiles"))!!)
+        val tileSet = IndependentSetTile.parseTiles(FileNameCreator.getFile(IndependentSetTile.defaultISTilesDir, 2, 2, 1)!!)
         val graph = FourNeighboursGraphWithTiles.createInstance(tileSet)
 
         val idOne = graph.getId(IndependentSetTile.createInstance("1", 1))
@@ -31,7 +32,7 @@ class FourNeighboursGraphWithTilesTest {
 
     @Test
     fun graphTest() {
-        val tileSet = IndependentSetTile.parseTiles(IndependentSetTile.getTilesFile(4, 4, 1, File("independent_set_tiles"))!!)
+        val tileSet = IndependentSetTile.parseTiles(FileNameCreator.getFile(IndependentSetTile.defaultISTilesDir, 4, 4, 1)!!)
         val graph = FourNeighboursGraphWithTiles.createInstance(tileSet)
 
         assertEquals(3, graph.n)

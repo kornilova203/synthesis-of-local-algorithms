@@ -3,13 +3,12 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_proble
 import com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.graphs.FourNeighboursGraphWithTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.createDir
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.getM
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.getN
+import com.github.kornilova_l.util.FileNameCreator
 import com.github.kornilova_l.util.Logger
 import java.io.File
 import java.nio.file.Paths
 
-private val tilesDir = File("independent_set_tiles")
+private val tilesDir = IndependentSetTile.defaultISTilesDir
 private val graphsDir = Paths.get(tilesDir.toString(), "four_neighbours_directed_graphs").toFile()
 private val logger = Logger(File("precalculate_is_tiles.log"))
 
@@ -26,9 +25,9 @@ fun main(args: Array<String>) {
     val files = tilesDir.listFiles()
     for (i in 0 until files.size) {
         val file = files[i]
-        if (IndependentSetTile.independentSetTilesFilePattern.matcher(file.name).matches()) {
-            val n = getN(file)
-            val m = getM(file)
+        if (FileNameCreator.getExtension(file.name) == "tiles") {
+            val n = FileNameCreator.getIntParameter(file.name, "n")!!
+            val m = FileNameCreator.getIntParameter(file.name, "m")!!
             if (n < 2 || m < 2) {
                 continue
             }

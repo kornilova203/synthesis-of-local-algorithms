@@ -6,10 +6,11 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Compan
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Expand.WIDTH
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Part.E
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Part.S
-import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.parseNumber
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.Tile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleGraphWithTiles
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileGraph
+import com.github.kornilova_l.util.FileNameCreator
 import com.github.kornilova_l.util.ProgressBar
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
 import java.io.BufferedReader
@@ -30,9 +31,9 @@ fun main(args: Array<String>) {
     val files = tilesDir.listFiles()
     for (i in 0 until files.size) {
         val file = files[i]
-        if (file.isFile && OneOrTwoNeighboursTile.oneOrTwoNeighboursTilesFilePattern.matcher(file.name).matches()) {
-            val n = parseNumber(file.name, 1)
-            val m = parseNumber(file.name, 2)
+        if (file.isFile && FileNameCreator.getExtension(file.name) == "tiles") {
+            val n = FileNameCreator.getIntParameter(file.name, "n")!!
+            val m = FileNameCreator.getIntParameter(file.name, "m")!!
             if (File("$outputDirName/$n-$m.graph").exists())
                 continue
             val tileSet = OneOrTwoNeighboursTile.parseTiles(file)
@@ -56,7 +57,7 @@ class OneOrTwoNeighboursTileSimpleGraph(n: Int, m: Int, graph: Map<Int, Set<Int>
      * <tile's array of longs>
      */
     fun exportTiles(dir: File) {
-        val file = Paths.get(dir.toString(), "${OneOrTwoNeighboursTile.name}-$n-$m-${ids.size}.$tilesFileExtension").toFile()
+        val file = Paths.get(dir.toString(), "${OneOrTwoNeighboursTile.name}-$n-$m-${ids.size}.${TileGraph.graphTilesFileExtension}").toFile()
         file.outputStream().use { outputStream ->
             for (tileAndId in ids) {
                 outputStream.write(tileAndId.value.toString().toByteArray())
@@ -70,9 +71,9 @@ class OneOrTwoNeighboursTileSimpleGraph(n: Int, m: Int, graph: Map<Int, Set<Int>
     companion object {
         fun createInstance(tilesFile: File, simpleGraph: SimpleGraph): OneOrTwoNeighboursTileSimpleGraph {
             val ids = DualHashBidiMap<Tile, Int>()
-            val n = BinaryTile.parseNumber(tilesFile.name, 1)
-            val m = BinaryTile.parseNumber(tilesFile.name, 2)
-            val size = BinaryTile.parseNumber(tilesFile.name, 3)
+            val n = FileNameCreator.getIntParameter(tilesFile.name, "n")!!
+            val m = FileNameCreator.getIntParameter(tilesFile.name, "m")!!
+            val size = FileNameCreator.getIntParameter(tilesFile.name, "size")!!
             if (n != simpleGraph.n || m != simpleGraph.m) {
                 throw IllegalArgumentException("Parameters of graph do not match size of tiles. Graph: n = ${simpleGraph.n} " +
                         "m = ${simpleGraph.m}. IndependentSetTile: n = $n m = $m.")

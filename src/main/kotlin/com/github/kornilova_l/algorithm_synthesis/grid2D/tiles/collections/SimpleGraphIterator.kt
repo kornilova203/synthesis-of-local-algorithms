@@ -1,5 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
+import com.github.kornilova_l.util.FileNameCreator
 import java.io.File
 import java.util.*
 import java.util.regex.Pattern
@@ -32,9 +33,8 @@ class SimpleGraphIterator(val dir: File) : Iterable<SimpleGraph> {
             val useless = ArrayList<File>()
             val checkedParameters = HashSet<Pair<Int, Int>>() // n and m
             for (graphFile in graphFiles) {
-                val parts = graphFile.name.split("-")
-                val n = Integer.parseInt(parts[0])
-                val m = Integer.parseInt(parts[1].split(".")[0])
+                val n = FileNameCreator.getIntParameter(graphFile.name, "n")!!
+                val m = FileNameCreator.getIntParameter(graphFile.name, "m")!!
                 if (isUseless(n, m, checkedParameters)) {
                     useless.add(graphFile)
                 } else {

@@ -26,7 +26,7 @@ abstract class DirectedGraph<out N : Neighbourhood>(override val n: Int,
             return cachedSize
         }
 
-    protected fun calcUniqueIds(neighbourhoods: Set<Neighbourhood>): Int {
+    private fun calcUniqueIds(neighbourhoods: Set<Neighbourhood>): Int {
         val uniqueIds = TIntHashSet()
         for (neighbourhood in neighbourhoods) {
             uniqueIds.addAll(neighbourhood.getValues())

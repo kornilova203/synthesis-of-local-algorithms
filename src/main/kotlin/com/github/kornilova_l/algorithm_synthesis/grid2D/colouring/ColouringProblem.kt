@@ -1,11 +1,11 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.colouring
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_problem.OneOrTwoNeighboursTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_problem.OneOrTwoNeighboursTileSimpleGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleGraphWithTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolver
+import com.github.kornilova_l.util.FileNameCreator
 import java.io.File
 
 /**
@@ -52,7 +52,7 @@ class ColouringProblem {
     }
 
     private fun createColouringFunction(solution: List<Int>, coloursCount: Int, dir: File, graph: SimpleGraph): ColouringFunction? {
-        val tilesFile = OneOrTwoNeighboursTile.getTilesFile(graph.n, graph.m, dir) ?: return null
+        val tilesFile = FileNameCreator.getFile(dir, graph.n, graph.m) ?: return null
         val graphWithTiles = OneOrTwoNeighboursTileSimpleGraph.createInstance(tilesFile, graph)
         return createColouringFunction(solution, coloursCount, graphWithTiles)
     }

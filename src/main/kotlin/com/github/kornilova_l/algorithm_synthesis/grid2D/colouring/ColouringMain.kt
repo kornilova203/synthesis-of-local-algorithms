@@ -4,11 +4,11 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgo
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleGraphWithTiles
-import java.io.File
+import com.github.kornilova_l.util.FileNameCreator
 
 private const val k = 3
-private val tiles67 = IndependentSetTile.parseTiles(IndependentSetTile.getTilesFile(6, 5, k, File("independent_set_tiles"))!!)
-private val tiles58 = IndependentSetTile.parseTiles(IndependentSetTile.getTilesFile(5, 8, k, File("independent_set_tiles"))!!)
+private val tiles67 = IndependentSetTile.parseTiles(FileNameCreator.getFile(IndependentSetTile.defaultISTilesDir, 6, 5, k)!!)
+private val tiles58 = IndependentSetTile.parseTiles(FileNameCreator.getFile(IndependentSetTile.defaultISTilesDir, 5, 8, k)!!)
 
 fun getRandomFourColouring() {
     val grid2D = generateGrid(7, 10)

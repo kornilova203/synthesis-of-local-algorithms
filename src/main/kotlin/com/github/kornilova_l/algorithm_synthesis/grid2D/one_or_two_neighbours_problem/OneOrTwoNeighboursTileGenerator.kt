@@ -2,9 +2,9 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTileGenerator.Companion.generatePossiblyValidTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTileGenerator.Companion.removeInvalid
-import com.github.kornilova_l.algorithm_synthesis.grid2D.one_or_two_neighbours_problem.OneOrTwoNeighboursTile.Companion.getTilesFile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Expand
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileGenerator
+import com.github.kornilova_l.util.FileNameCreator
 import java.io.File
 import java.io.FileOutputStream
 import java.nio.file.Paths
@@ -34,7 +34,7 @@ class OneOrTwoNeighboursTileGenerator(finalN: Int,
             var currentN = finalN
             var currentM = finalM
             while (currentN >= 3 && currentM >= 3) {
-                val file = getTilesFile(currentN, currentM, dir)
+                val file = FileNameCreator.getFile(dir, currentN, currentM)
                 if (file != null) {
                     println("Found file: $file")
                     return file

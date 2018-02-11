@@ -21,7 +21,6 @@ class ProgressBar(private val total: Int, private val title: String = "") {
         }, 0, 1000)
     }
 
-    @Synchronized
     fun finish() {
         if (wasFinished) {
             return
@@ -33,7 +32,8 @@ class ProgressBar(private val total: Int, private val title: String = "") {
         println()
     }
 
-    fun redraw() {
+    @Synchronized
+    private fun redraw() {
         var percent = current.get().toDouble() * 100 / total
         percent /= 2
         val resizingTotal = 50
@@ -67,7 +67,6 @@ class ProgressBar(private val total: Int, private val title: String = "") {
         print(string)
     }
 
-    @Synchronized
     fun updateProgress(addToProgress: Int = 1) {
         if (addToProgress == 0 && (System.currentTimeMillis() - lastUpdateTime.get()) / 1000 == 0L) {
             return

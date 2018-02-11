@@ -1,8 +1,9 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.DirectedGraphWithTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetDirectedGraph
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.problem.Problem
+import com.github.kornilova_l.util.FileNameCreator
 import java.io.File
 
 
@@ -32,15 +33,16 @@ abstract class ProblemSolver<T : Problem<*>, G : IndependentSetDirectedGraph<*>>
         var solution = tryToFindSolution(problem, graph)
         if (solution != null) { // solution found
             return LabelingFunction(solution,
-                    graph.createGraphWithTiles(DirectedGraphWithTiles.getTilesFile(graph.n, graph.m, graph.k, dirWithGraphTiles)!!)
+                    graph.createGraphWithTiles(
+                            FileNameCreator.getFile(dirWithGraphTiles, graph.n, graph.m, graph.k, TileGraph.graphTilesFileExtension)!!
+                    )
             )
         }
         solution = tryToFindSolution(rotateProblem(problem), graph)
         if (solution != null) { // solution found
             return LabelingFunction(solution,
                     graph.createGraphWithTiles(
-                            DirectedGraphWithTiles.getTilesFile(
-                                    graph.n, graph.m, graph.k, dirWithGraphTiles)!!
+                            FileNameCreator.getFile(dirWithGraphTiles, graph.n, graph.m, graph.k, TileGraph.graphTilesFileExtension)!!
                     )
             ).rotate()
         }

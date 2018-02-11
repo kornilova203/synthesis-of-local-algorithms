@@ -26,4 +26,8 @@ abstract class TileGraph {
     abstract val size: Int
     abstract val n: Int
     abstract val m: Int
+
+    companion object {
+        const val graphTilesFileExtension = "graphtiles"
+    }
 }

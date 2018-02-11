@@ -1,5 +1,6 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
+import com.github.kornilova_l.util.FileNameCreator
 import com.github.kornilova_l.util.Util
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -31,7 +32,7 @@ class IndependentSetTileGeneratorTest {
             val n = parameters.n
             val m = parameters.m
             val k = parameters.k
-            val file = IndependentSetTile.getTilesFile(n, m, k, File("src/test/resources/tiles"))
+            val file = FileNameCreator.getFile(File("src/test/resources/tiles"), n, m, k)
             if (file != null) {
                 val tiles = IndependentSetTileGenerator(n, m, k, tempDir).tiles
                 val expectedTiles = IndependentSetTile.parseTiles(file)

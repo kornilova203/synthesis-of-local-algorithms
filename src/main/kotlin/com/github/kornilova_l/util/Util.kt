@@ -11,6 +11,9 @@ import java.nio.file.attribute.BasicFileAttributes
 
 object Util {
     fun deleteDir(path: Path) {
+        if (!path.toFile().exists()) {
+            return
+        }
         Files.walkFileTree(path, object : SimpleFileVisitor<Path>() {
             @Throws(IOException::class)
             override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {

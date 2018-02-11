@@ -5,6 +5,8 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.Directe
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.FourNeighbourhood
+import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileGraph
+import com.github.kornilova_l.util.FileNameCreator
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
 import java.io.BufferedReader
 import java.io.File
@@ -49,13 +51,13 @@ class FourNeighboursGraphWithTiles(n: Int,
 
         fun createInstance(tilesFile: File, directedGraph: FourNeighboursDirectedGraph): FourNeighboursGraphWithTiles {
             val ids = DualHashBidiMap<IndependentSetTile, Int>()
-            if (!isTilesFile(tilesFile.name)) {
+            if (FileNameCreator.getExtension(tilesFile.name) != TileGraph.graphTilesFileExtension) {
                 throw IllegalArgumentException("File must contain independent set tiles. File: ${tilesFile.name}")
             }
-            val n = BinaryTile.parseNumber(tilesFile.name, 1)
-            val m = BinaryTile.parseNumber(tilesFile.name, 2)
-            val k = BinaryTile.parseNumber(tilesFile.name, 3)
-            val tilesCount = BinaryTile.parseNumber(tilesFile.name, 4)
+            val n = FileNameCreator.getIntParameter(tilesFile.name, "n")!!
+            val m = FileNameCreator.getIntParameter(tilesFile.name, "m")!!
+            val k = FileNameCreator.getIntParameter(tilesFile.name, "k")!!
+            val tilesCount = FileNameCreator.getIntParameter(tilesFile.name, "size")!!
             if (n != directedGraph.n || m != directedGraph.m || k != directedGraph.k) {
                 throw IllegalArgumentException("Parameters of graph do not match size of tiles. Graph: n = ${directedGraph.n} " +
                         "m = ${directedGraph.m} k = ${directedGraph.k}. IndependentSetTile: n = $n m = $m k = $k.")

@@ -2,6 +2,7 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set
 
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.DirectedGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.Neighbourhood
+import com.github.kornilova_l.util.FileNameCreator
 import java.io.File
 import java.nio.file.Paths
 
@@ -20,7 +21,11 @@ abstract class IndependentSetDirectedGraph<out N : Neighbourhood>(n: Int,
      * blank line
      */
     override fun export(dir: File) {
-        val file = Paths.get(dir.toString(), "$n-$m-$k.graph").toFile()
+        val file = Paths.get(dir.toString(), FileNameCreator.getFileName(
+                "is-graph",
+                mapOf(Pair("n", n), Pair("m", m), Pair("k", k)),
+                "graph"
+        )).toFile()
         file.outputStream().use { outputStream ->
             outputStream.write("$n $m $k\n".toByteArray())
             outputStream.write("${neighbourhoods.size}\n".toByteArray())

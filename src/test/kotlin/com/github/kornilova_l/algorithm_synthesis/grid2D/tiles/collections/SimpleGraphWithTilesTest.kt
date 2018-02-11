@@ -1,8 +1,9 @@
 package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections
 
-import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile.Companion.getTilesFile
+import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile.Companion.parseTiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTileGenerator
+import com.github.kornilova_l.util.FileNameCreator
 import com.github.kornilova_l.util.Util
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -10,8 +11,8 @@ import java.io.File
 
 internal class SimpleGraphWithTilesTest {
     private val tempDir = File("temp-dir")
-    private val tiles67 = parseTiles(getTilesFile(6, 7, 3, File("independent_set_tiles"))!!)
-    private val tiles58 = parseTiles(getTilesFile(5, 8, 3, File("independent_set_tiles"))!!)
+    private val tiles67 = parseTiles(FileNameCreator.getFile(IndependentSetTile.defaultISTilesDir, 6, 7, 3)!!)
+    private val tiles58 = parseTiles(FileNameCreator.getFile(IndependentSetTile.defaultISTilesDir, 5, 8, 3)!!)
 
     @Test
     fun getGraph() {

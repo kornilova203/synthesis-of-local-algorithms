@@ -3,6 +3,8 @@ package com.github.kornilova_l.algorithm_synthesis.grid2D.tiles
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Expand
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Expand.HEIGHT
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile.Companion.Expand.WIDTH
+import com.github.kornilova_l.util.FileNameCreator
+import com.github.kornilova_l.util.ProgressBar
 import com.github.kornilova_l.util.Util
 import java.io.File
 import java.io.FileOutputStream
@@ -14,13 +16,13 @@ import java.util.concurrent.ConcurrentHashMap
  * On each step this generator expands set of tiles by 1 row or 1 column.
  * Two different tiles cannot produce equal expanded tiles so it is possible to not store all tiles in memory
  * therefore tiles are parsed from file one by one, expanded and stored to temporal file
- * @param fileWithInitialTiles file name must contain n and m
+ * @param fileWithInitialTiles file with initial tiles. File name must contain n, m and size
  */
 abstract class TileGenerator<T : BinaryTile>(private val finalN: Int, private val finalM: Int,
                                              fileWithInitialTiles: File,
                                              outputDir: File,
                                              private val tilesParserFactory: TilesParserFactory<T>,
-                                             protected val tilesFileNameCreator: TileFileNameCreator) {
+                                             private val tilesFileNameCreator: FileNameCreator) {
     val size: Int
     val file: File
     private val tempDir = File("TileGenerator_temp_dir")
@@ -34,19 +36,19 @@ abstract class TileGenerator<T : BinaryTile>(private val finalN: Int, private va
         }
 
     init {
+        Util.deleteDir(tempDir.toPath())
         tempDir.mkdir()
         var currentTilesFile = fileWithInitialTiles
-        // todo files may not contain this info
-        var currentN = BinaryTile.parseNumber(currentTilesFile.name, 1)
-        var currentM = BinaryTile.parseNumber(currentTilesFile.name, 2)
-        var currentSize = BinaryTile.parseNumber(currentTilesFile.name, 4) // todo: this works only for IS tiles
+        var currentN = FileNameCreator.getIntParameter(currentTilesFile.name, "n")!!
+        var currentM = FileNameCreator.getIntParameter(currentTilesFile.name, "m")!!
+        var currentSize = FileNameCreator.getIntParameter(currentTilesFile.name, "size")!!
         while (currentM < finalM || currentN < finalN) {
             val pair = expandTileSet(currentTilesFile, currentN, currentM)
             currentTilesFile.delete()
             currentTilesFile = pair.first
             currentSize = pair.second
-            currentN = BinaryTile.parseNumber(currentTilesFile.name, 1)
-            currentM = BinaryTile.parseNumber(currentTilesFile.name, 2)
+            currentN = FileNameCreator.getIntParameter(currentTilesFile.name, "n")!!
+            currentM = FileNameCreator.getIntParameter(currentTilesFile.name, "m")!!
         }
         size = currentSize
         file = Paths.get(outputDir.toString(),
@@ -62,29 +64,38 @@ abstract class TileGenerator<T : BinaryTile>(private val finalN: Int, private va
      */
     private fun expandTileSet(currentTilesFile: File, currentN: Int, currentM: Int): Pair<File, Int> {
         val side = if (currentN < currentM && currentN < finalN || currentM == finalM) HEIGHT else WIDTH
-        println("Expand tiles $currentN x $currentM. Side: $side")
+        val currentTilesCount = FileNameCreator.getIntParameter(currentTilesFile.name, "size")!!
+        println("Expand tiles $currentN x $currentM. Side: $side. Tiles count: $currentTilesCount")
+        val progressBar = ProgressBar(currentTilesCount)
         val tilesSetsIterator = TilesSetsIterator(tilesParserFactory.createParser(currentTilesFile)) // process tiles by small groups
-        var newN = currentN
-        var newM = currentM
-        if (side == HEIGHT) {
-            newN++
-        } else {
-            newM++
-        }
-        val tempNewOutputFile = Paths.get(tempDir.toString(), "${System.currentTimeMillis()}.tiles").toFile()
-        var tilesCount = 0
+
+        /* we cannot create temp file with valid name because we do not know how many tiles will be there */
+        val tempOutputFile = Paths.get(tempDir.toString(), "${System.currentTimeMillis()}.tiles").toFile()
+        var expandedTilesCount = 0
         for (tilesSet in tilesSetsIterator) {
-            val expandedTiles: MutableSet<T> = ConcurrentHashMap.newKeySet()
-            tilesSet.parallelStream().forEach { tile ->
-                addValidExtensionsToSet(tile, expandedTiles, side)
-            }
-            tilesCount += expandedTiles.size
-            appendToFile(expandedTiles, tempNewOutputFile)
+            val createdTilesCount = processPackOfTilesConcurrently(tilesSet, tempOutputFile, side, progressBar)
+            expandedTilesCount += createdTilesCount
         }
         println()
-        val newOutputFile = Paths.get(tempDir.toString(), tilesFileNameCreator.getFileName(newN, newM, tilesCount)).toFile()
-        tempNewOutputFile.renameTo(newOutputFile)
-        return Pair(newOutputFile, tilesCount)
+        return Pair(renameToValidFile(tempOutputFile, currentN, currentM, expandedTilesCount, side), expandedTilesCount)
+    }
+
+    private fun renameToValidFile(tempOutputFile: File, currentN: Int, currentM: Int, tilesCount: Int, side: Expand): File {
+        val newN = if (side == HEIGHT) currentN + 1 else currentN
+        val newM = if (side == WIDTH) currentM + 1 else currentM
+        val outputFile = Paths.get(tempDir.toString(), tilesFileNameCreator.getFileName(newN, newM, tilesCount)).toFile()
+        tempOutputFile.renameTo(outputFile)
+        return outputFile
+    }
+
+    private fun processPackOfTilesConcurrently(tilesSet: Set<T>, tempNewOutputFile: File, side: Expand, progressBar: ProgressBar): Int {
+        val expandedTiles: MutableSet<T> = ConcurrentHashMap.newKeySet()
+        tilesSet.parallelStream().forEach { tile ->
+            addValidExtensionsToSet(tile, expandedTiles, side)
+            progressBar.updateProgress()
+        }
+        appendToFile(expandedTiles, tempNewOutputFile)
+        return expandedTiles.size
     }
 
     private fun appendToFile(expandedTiles: MutableSet<T>, newOutputFile: File) {
@@ -101,7 +112,7 @@ abstract class TileGenerator<T : BinaryTile>(private val finalN: Int, private va
                                                    side: Expand)
 
     inner class TilesSetsIterator(val tilesParser: Iterable<T>) : Iterable<Set<T>> {
-        val size = 10_000
+        val size = 100_000
         override fun iterator(): Iterator<Set<T>> = MyIterator()
 
         inner class MyIterator : Iterator<Set<T>> {

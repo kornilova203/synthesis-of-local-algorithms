@@ -4,15 +4,15 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.IndependentSetAlgo
 import com.github.kornilova_l.algorithm_synthesis.grid2D.grid.generateGrid
 import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.IndependentSetTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.SimpleGraphWithTiles
+import com.github.kornilova_l.util.FileNameCreator
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.io.File
 
 internal class ColouringFunctionTest {
     private val k = 3
-    private val tiles67 = IndependentSetTile.parseTiles(IndependentSetTile.getTilesFile(6, 7, 3, File("independent_set_tiles"))!!)
-    private val tiles58 = IndependentSetTile.parseTiles(IndependentSetTile.getTilesFile(5, 8, 3, File("independent_set_tiles"))!!)
+    private val tiles67 = IndependentSetTile.parseTiles(FileNameCreator.getFile(IndependentSetTile.defaultISTilesDir, 6, 7, 3)!!)
+    private val tiles58 = IndependentSetTile.parseTiles(FileNameCreator.getFile(IndependentSetTile.defaultISTilesDir, 5, 8, 3)!!)
     private val iterationsCount = 1000
 
     @Test
