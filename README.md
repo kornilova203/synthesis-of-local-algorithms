@@ -73,4 +73,9 @@ java -cp algorithm-synthesis.jar com.github.kornilova_l.algorithm_synthesis.grid
 
 # precalculate graphs with neighbourhoods of 4 tiles:
 java -cp algorithm-synthesis.jar com.github.kornilova_l.algorithm_synthesis.grid2D.four_neighbours_problems.PrecalculateGraphsKt
+
+# solve problem
+java -cp algorithm-synthesis.jar com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.MainKt <problem-id>
+# or
+java -cp algorithm-synthesis.jar com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problems.MainKt true=<numbers of neighbours with included center> false=<the same for excluded center>
 ```
