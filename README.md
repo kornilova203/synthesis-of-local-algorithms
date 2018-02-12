@@ -60,7 +60,6 @@ XN XE NE XNE XS NS XNS ES XES NES XNES XW NW XNW EW XEW NEW XNEW SW XSW NSW XNSW
 jar file will be placed in `build/libs` directory.
 
 ## Usage
-Precalculate independent set tiles:
 ```
 # calculate set of tiles:
 java -cp algorithm-synthesis.jar com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.PrecalculateTilesKt <difficulty index>
