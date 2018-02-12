@@ -9,19 +9,54 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.La
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.problem.getRulePermutations
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.visualization.drawLabels
 
-fun main(args: Array<String>) {
-//    val problem = independentSet()
-//    val problem = columnIS()
-//    val problem = idTo FiveNeighboursProblem(1073732864)
-//    val problem = parse FiveNeighboursProblem("XN, XE, NE, XNE, XS, NS, XNS, ES, XES, NES, XNES, XW, NW, XNW, EW, XEW, NEW, XNEW, SW, XSW, NSW, XNSW, ESW, XESW")
-//    val problem = columnMinimalDominatingSet()
-//    val problem = atLeastOneIncludedAndOneExcluded()
-//    val problem = test()
-//    val problem = gameOfLife()
-    val problem = oneOrTwoNeighbours()
-//    val problem = invertedIndependentSet()
+private val errMessage = """
+Specify problem to solve:
+* Id of a problem (example 3452252)
+* Number of included neighbours and if center is included (example true=23 false=140)"""
 
+fun main(args: Array<String>) {
+    if (args.isEmpty()) {
+        System.err.println(errMessage)
+        return
+    }
+    val problem: FiveNeighboursProblem
+    when {
+        args.size == 1 -> {
+            val problemId = Integer.parseInt(args[0])
+            problem = FiveNeighboursProblem(problemId)
+        }
+        args.size == 2 -> {
+            val configForIncluded = get(args, "true") ?: return
+            val configForExcluded = get(args, "false") ?: return
+            val rules = HashSet<FiveNeighboursRule>()
+            for (neighboursCount in configForIncluded) {
+                rules.addAll(getRulePermutations(neighboursCount, true))
+            }
+            for (neighboursCount in configForExcluded) {
+                rules.addAll(getRulePermutations(neighboursCount, false))
+            }
+            problem = FiveNeighboursProblem(rules)
+        }
+        else -> {
+            System.err.println(errMessage)
+            return
+        }
+    }
     tryToSolve(problem)
+}
+
+private fun get(args: Array<String>, name: String): List<Int>? {
+    var string: String? = null
+    for (arg in args) {
+        if (arg.startsWith(name)) {
+            string = arg
+        }
+    }
+    if (string == null) {
+        System.err.println(errMessage)
+        return null
+    }
+    return string.substring(name.length + 1, string.length).split("").filter { it != "" }.map { Integer.parseInt(it) }
 }
 
 fun tryToSolve(problem: FiveNeighboursProblem) {
@@ -105,18 +140,6 @@ fun atLeastOneIncludedAndOneExcluded(): FiveNeighboursNonTrivialProblem {
     rules.addAll(getRulePermutations(2, false))
     rules.addAll(getRulePermutations(3, false))
     return FiveNeighboursNonTrivialProblem(rules)
-}
-
-fun gameOfLife(): FiveNeighboursProblem {
-    val rules = HashSet<FiveNeighboursRule>()
-    /* cell survives if it has 2 or 3 neighbours */
-    rules.addAll(getRulePermutations(1, true))
-//    rules.addAll(getRulePermutations(2, true))
-//    rules.addAll(getRulePermutations(3, true))
-    /* cell does not survive if it has 4 of 1 neighbour */
-    rules.addAll(getRulePermutations(1, false))
-//    rules.addAll(getRulePermutations(3, false))
-    return FiveNeighboursProblem(rules)
 }
 
 fun oneOrTwoNeighbours(): FiveNeighboursProblem {
