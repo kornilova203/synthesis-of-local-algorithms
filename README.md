@@ -55,6 +55,9 @@ XN XE NE XNE XS NS XNS ES XES NES XNES XW NW XNW EW XEW NEW XNEW SW XSW NSW XNSW
 
 ## Build
 ```
+# install sat solver:
+sudo apt-get install minisat picosat
+
 ./gradlew jar
 ```
 jar file will be placed in `build/libs` directory.
