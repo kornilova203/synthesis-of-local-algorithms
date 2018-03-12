@@ -10,6 +10,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ForkJoinPool
 
 /**
  * Generates all possible combinations of tileSet finalN x finalM in kth power of grid.
@@ -44,7 +45,9 @@ abstract class TileGenerator<T : BinaryTile>(private val finalN: Int, private va
         var currentSize = FileNameCreator.getIntParameter(currentTilesFile.name, "size")!!
         while (currentM < finalM || currentN < finalN) {
             val pair = expandTileSet(currentTilesFile, currentN, currentM)
-            currentTilesFile.delete()
+            if (currentTilesFile.absoluteFile.parent == tempDir.name) { // if inside temp file
+                currentTilesFile.delete()
+            }
             currentTilesFile = pair.first
             currentSize = pair.second
             currentN = FileNameCreator.getIntParameter(currentTilesFile.name, "n")!!
@@ -53,8 +56,12 @@ abstract class TileGenerator<T : BinaryTile>(private val finalN: Int, private va
         size = currentSize
         file = Paths.get(outputDir.toString(),
                 tilesFileNameCreator.getFileName(finalN, finalM, size)).toFile()
-        currentTilesFile.renameTo(file)
-        println("output file: $file")
+        val res = currentTilesFile.renameTo(file.absoluteFile)
+        if (res) {
+            println("Output file: $file")
+        } else {
+            System.err.println("Cannot rename file to $file")
+        }
         Util.deleteDir(tempDir.toPath())
     }
 
@@ -88,12 +95,19 @@ abstract class TileGenerator<T : BinaryTile>(private val finalN: Int, private va
         return outputFile
     }
 
-    private fun processPackOfTilesConcurrently(tilesSet: Set<T>, tempNewOutputFile: File, side: Expand, progressBar: ProgressBar): Int {
+    private fun processPackOfTilesConcurrently(tiles: Set<T>, tempNewOutputFile: File, side: Expand, progressBar: ProgressBar): Int {
         val expandedTiles: MutableSet<T> = ConcurrentHashMap.newKeySet()
-        tilesSet.parallelStream().forEach { tile ->
-            addValidExtensionsToSet(tile, expandedTiles, side)
-            progressBar.updateProgress()
-        }
+        /* limit number of threads to 4 because sat solver allocates memory outside java heap and
+         * therefore sat solver may consume all memory and cause java process to be killed.
+         * the number of threads needs to be adjusted to each computer separately */
+        val forkJoinPool = ForkJoinPool(4)
+        forkJoinPool.submit {
+            tiles.parallelStream().forEach { tile ->
+                addValidExtensionsToSet(tile, expandedTiles, side)
+                progressBar.updateProgress()
+            }
+        }.get()
+        forkJoinPool.shutdown()
         appendToFile(expandedTiles, tempNewOutputFile)
         return expandedTiles.size
     }
