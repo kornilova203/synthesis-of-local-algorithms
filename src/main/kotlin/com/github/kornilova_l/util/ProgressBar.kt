@@ -10,7 +10,10 @@ class ProgressBar(private val total: Int, private val title: String = "") {
     private val timer: Timer = Timer()
     private val lastUpdateTime = AtomicLong()
     private val current = AtomicInteger()
-    @Volatile private var wasFinished = false
+    private val barLength = 50
+    private val floatingPointFormat = DecimalFormat("##.##")
+    @Volatile
+    private var wasFinished = false
 
     init {
         timer.schedule(object : TimerTask() {
@@ -34,37 +37,43 @@ class ProgressBar(private val total: Int, private val title: String = "") {
 
     @Synchronized
     private fun redraw() {
-        var percent = current.get().toDouble() * 100 / total
-        percent /= 2
-        val resizingTotal = 50
+        val percent = current.get().toDouble() * 100 / total
         val string = StringBuilder(140)
-        percent = if (percent == 0.toDouble()) 0.01 else percent
-        val intPercent = Math.ceil(percent).toInt()
-        val format = DecimalFormat("####")
         val timePassed = lastUpdateTime.get() - startTime.get()
+        val filledLength = Math.ceil(barLength * (percent / 100)).toInt()
         string.append('\r')
                 .append(title)
-                .append(Collections.nCopies(2 - Math.log10((intPercent * 2).toDouble()).toInt(), " ").joinToString(""))
-                .append(String.format("%.2f%% [", percent * 2))
-                .append(Collections.nCopies(intPercent, "=").joinToString(""))
+                .append(String.format("%5s", floatingPointFormat.format(percent)))
+                .append("% [")
+                .append(Collections.nCopies(filledLength, "=").joinToString(""))
                 .append('>')
-                .append(Collections.nCopies(resizingTotal - intPercent, " ").joinToString(""))
-                .append(']')
-                .append(String.format("%4s", format.format(timePassed / 1000)))
-                .append("s")
+                .append(Collections.nCopies(barLength - filledLength, " ").joinToString(""))
+                .append("] ")
+                .append(msToPrettyString(timePassed))
 
         if (timePassed / 1000 > 0 && current.get() > 0) { // predict time
-            val timePerElement = timePassed.toDouble() / 1000 / current.get()
+            val timePerElement = timePassed.toDouble() / current.get()
             val totalTime = timePerElement * total
             string
-                    .append(" / ")
-                    .append(String.format("%4s", format.format(totalTime / 60)))
-                    .append("m ")
-                    .append(format.format(totalTime % 60))
-                    .append("s")
+                    .append(" | ")
+                    .append(msToPrettyString(totalTime.toLong()))
+                    .append(" | ")
+                    .append(String.format("%-70s", Util.getBasicMemoryInfo()))
         }
-
         print(string)
+    }
+
+    private fun msToPrettyString(timePassed: Long): String {
+        val sec = timePassed / 1000
+        val stringBuilder = StringBuilder()
+        stringBuilder
+                .append(String.format("%2s", sec / 60 / 60))
+                .append("h ")
+                .append(String.format("%2s", sec / 60 % 60))
+                .append("m ")
+                .append(String.format("%2s", sec % 60))
+                .append("s")
+        return stringBuilder.toString()
     }
 
     fun updateProgress(addToProgress: Int = 1) {

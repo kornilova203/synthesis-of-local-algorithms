@@ -1,5 +1,6 @@
 package com.github.kornilova_l.util
 
+import oshi.SystemInfo
 import java.io.IOException
 import java.lang.management.ManagementFactory
 import java.nio.file.FileVisitResult
@@ -14,6 +15,7 @@ import java.text.NumberFormat
 object Util {
     private val runtime = Runtime.getRuntime()
     private val format = NumberFormat.getInstance()
+    private val hardware = SystemInfo().hardware
 
     fun deleteDir(path: Path) {
         if (!path.toFile().exists()) {
@@ -55,8 +57,19 @@ object Util {
         println("Total free memory in JVM:    ${format.format((freeMemory + (maxMemory - allocatedMemory)) / bytesInKByte)}K")
         val heapMemoryUsage = ManagementFactory.getMemoryMXBean().heapMemoryUsage
         println("Heap memory used:            ${format.format(heapMemoryUsage.used / bytesInKByte)}K")
-        val nonHeapMemoryUsage = ManagementFactory.getMemoryMXBean().nonHeapMemoryUsage
-        println("Non heap memory usage. Used: ${format.format(nonHeapMemoryUsage.used / bytesInKByte)}K," +
-                " committed: ${format.format(nonHeapMemoryUsage.committed / bytesInKByte)}K")
+        println("Non-heap memory available:  ${format.format(hardware.memory.available / 1024)}K")
+    }
+
+    /**
+     * @return one-line string that contains
+     * non-heap memory used and total free JVM memory
+     */
+    fun getBasicMemoryInfo(): String {
+        val maxMemory = runtime.maxMemory()
+        val allocatedMemory = runtime.totalMemory()
+        val freeMemory = runtime.freeMemory()
+
+        return "non-heap memory available: ${format.format(hardware.memory.available / 1024)}K | " +
+                "total free JVM memory: ${format.format((freeMemory + (maxMemory - allocatedMemory)) / 1024)}K"
     }
 }
