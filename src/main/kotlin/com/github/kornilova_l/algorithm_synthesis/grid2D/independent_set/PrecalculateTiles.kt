@@ -14,15 +14,16 @@ private val logger = Logger(File("precalculate_is_tiles.log"))
  */
 fun main(args: Array<String>) {
     createDir(dir, logger)
-    if (args.size == 1) {
-        precalculateAll(getParametersSet(Integer.parseInt(args[0])))
-    } else if (args.size == 3) {
-        val n = Integer.parseInt(args[0])
-        val m = Integer.parseInt(args[1])
-        val k = Integer.parseInt(args[2])
-        precalculateSpecificTile(n, m, k)
+    when {
+        args.size == 1 -> precalculateAll(getParametersSet(Integer.parseInt(args[0])))
+        args.size == 3 -> {
+            val n = Integer.parseInt(args[0])
+            val m = Integer.parseInt(args[1])
+            val k = Integer.parseInt(args[2])
+            precalculateSpecificTile(n, m, k)
+        }
+        else -> System.err.println("Specify difficulty or n, m and k")
     }
-    System.err.println("Specify difficulty or n, m and k")
 }
 
 fun createDir(dir: File, logger: Logger? = null) {

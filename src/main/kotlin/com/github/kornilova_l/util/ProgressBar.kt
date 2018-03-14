@@ -43,6 +43,7 @@ class ProgressBar(private val total: Int, private val title: String = "") {
         val filledLength = Math.ceil(barLength * (percent / 100)).toInt()
         string.append('\r')
                 .append(title)
+                .append(" ")
                 .append(String.format("%5s", floatingPointFormat.format(percent)))
                 .append("% [")
                 .append(Collections.nCopies(filledLength, "=").joinToString(""))
@@ -58,7 +59,8 @@ class ProgressBar(private val total: Int, private val title: String = "") {
                     .append(" | ")
                     .append(msToPrettyString(totalTime.toLong()))
                     .append(" | ")
-                    .append(String.format("%-70s", Util.getBasicMemoryInfo()))
+                    .append(Util.getBasicMemoryInfo())
+                    .append(Collections.nCopies(5, " ").joinToString(""))
         }
         print(string)
     }

@@ -69,7 +69,7 @@ object Util {
         val allocatedMemory = runtime.totalMemory()
         val freeMemory = runtime.freeMemory()
 
-        return "non-heap memory available: ${format.format(hardware.memory.available / 1024)}K | " +
-                "JVM memory available: ${format.format((freeMemory + (maxMemory - allocatedMemory)) / 1024)}K"
+        return "non-heap: ${format.format(hardware.memory.available / 1024)}K | " +
+                "heap: ${format.format((freeMemory + (maxMemory - allocatedMemory)) / 1024)}K"
     }
 }

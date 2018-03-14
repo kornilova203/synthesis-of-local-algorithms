@@ -29,16 +29,17 @@ fun main(args: Array<String>) {
         if (FileNameCreator.getExtension(file.name) == "tiles") {
             val n = FileNameCreator.getIntParameter(file.name, "n")!!
             val m = FileNameCreator.getIntParameter(file.name, "m")!!
+            val k = FileNameCreator.getIntParameter(file.name, "k")!!
             if (n < 3 || m < 3) {
                 continue
             }
-            if (FileNameCreator.getFile(graphsDir, n - 2, m - 2) != null) { // graph tiles are smaller than sourse tile
+            if (FileNameCreator.getFile(graphsDir, n - 2, m - 2, k) != null) { // graph tiles are smaller than sourse tile
                 logger.info("Graph was already calculated. Tiles file: ${file.name}")
                 continue
             }
             logger.info("Process tiles from file: ${file.name}")
-            val tileSet = IndependentSetTile.parseTiles(file)
-            val graph = FiveNeighboursGraphWithTiles.createInstance(tileSet)
+            val tileSet = IndependentSetTile.parseTiles(file, true)
+            val graph = FiveNeighboursGraphWithTiles.createInstance(tileSet, true)
             logger.info("Start exporting tiles...")
             graph.exportTiles(graphsDir)
             println("Start exporting graph...")
