@@ -41,7 +41,7 @@ fun getParametersSet(difficulty: Int = 1): List<Parameters> {
         when {
             p1.n != p1.n -> Integer.compare(p1.n, p2.n)
             p1.m != p1.m -> Integer.compare(p1.m, p2.m)
-            else -> Integer.compare(p1.k, p2.k)
+            else -> Integer.compare(p2.k, p1.k)
         }
     })
     return parameters
