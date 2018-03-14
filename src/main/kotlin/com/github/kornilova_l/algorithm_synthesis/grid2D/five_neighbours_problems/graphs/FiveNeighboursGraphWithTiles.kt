@@ -7,6 +7,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.FiveNeighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileGraph
 import com.github.kornilova_l.util.FileNameCreator
+import com.github.kornilova_l.util.ProgressBar
 import org.apache.commons.collections4.bidimap.DualHashBidiMap
 import java.io.BufferedReader
 import java.io.File
@@ -24,7 +25,8 @@ class FiveNeighboursGraphWithTiles(n: Int,
         get() = neighbourhoods.size * 4
 
     companion object {
-        fun createInstance(tiles: Set<IndependentSetTile>): FiveNeighboursGraphWithTiles {
+        fun createInstance(tiles: MutableSet<IndependentSetTile>,
+                           showProgressBar: Boolean = false): FiveNeighboursGraphWithTiles {
             val n = tiles.first().n - 2
             val m = tiles.first().m - 2
             val k = tiles.first().k
@@ -33,8 +35,11 @@ class FiveNeighboursGraphWithTiles(n: Int,
             }
             val ids = DualHashBidiMap<IndependentSetTile, Int>()
             val neighbourhoods = HashSet<FiveNeighbourhood>()
+            val progressBar = if (showProgressBar) ProgressBar(tiles.size, "Construct graph") else null
             /* There must exist at most one instance of each tile */
-            for (tile in tiles) {
+            val iterator = tiles.iterator()
+            while (iterator.hasNext()) {
+                val tile = iterator.next()
                 neighbourhoods.add(
                         FiveNeighbourhood(
                                 getId(IndependentSetTile.createInstance(tile, FIVE_POSITION.X), ids),
@@ -43,7 +48,10 @@ class FiveNeighboursGraphWithTiles(n: Int,
                                 getId(IndependentSetTile.createInstance(tile, FIVE_POSITION.S), ids),
                                 getId(IndependentSetTile.createInstance(tile, FIVE_POSITION.W), ids)
                         ))
+                progressBar?.updateProgress()
+                iterator.remove()
             }
+            progressBar?.finish()
             if (neighbourhoods.size == 0) {
                 throw IllegalArgumentException("Cannot construct graph")
             }
