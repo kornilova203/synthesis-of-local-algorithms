@@ -32,6 +32,10 @@ fun main(args: Array<String>) {
             if (n < 3 || m < 3) {
                 continue
             }
+            if (FileNameCreator.getFile(graphsDir, n - 2, m - 2) != null) { // graph tiles are smaller than sourse tile
+                logger.info("Graph was already calculated. Tiles file: ${file.name}")
+                continue
+            }
             logger.info("Process tiles from file: ${file.name}")
             val tileSet = IndependentSetTile.parseTiles(file)
             val graph = FiveNeighboursGraphWithTiles.createInstance(tileSet)
