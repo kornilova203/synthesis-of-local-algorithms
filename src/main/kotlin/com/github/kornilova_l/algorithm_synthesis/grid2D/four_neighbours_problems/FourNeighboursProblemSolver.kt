@@ -20,7 +20,7 @@ class FourNeighboursProblemSolver : ProblemSolver<FourNeighboursProblem, FourNei
 
     override fun formClauses(graph: FourNeighboursDirectedGraph,
                              reversedProblem: FourNeighboursProblem,
-                             satSolver: SatSolver) {
+                             satSolver: SatSolver, showProgressBar: Boolean) {
         for (neighbourhood in graph.neighbourhoods) {
             formClause(neighbourhood, reversedProblem, satSolver)
         }

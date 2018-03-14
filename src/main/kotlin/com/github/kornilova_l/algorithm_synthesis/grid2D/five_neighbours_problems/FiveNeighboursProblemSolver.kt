@@ -7,6 +7,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.five_neighbours_problem
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.FiveNeighbourhood
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.ProblemSolver
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolver
+import com.github.kornilova_l.util.ProgressBar
 import java.io.File
 
 
@@ -21,10 +22,13 @@ class FiveNeighboursProblemSolver : ProblemSolver<FiveNeighboursProblem, FiveNei
 
     override fun formClauses(graph: FiveNeighboursDirectedGraph,
                              reversedProblem: FiveNeighboursProblem,
-                             satSolver: SatSolver) {
+                             satSolver: SatSolver, showProgressBar: Boolean) {
+        val progressBar = if (showProgressBar) ProgressBar(graph.neighbourhoods.size) else null
         for (neighbourhood in graph.neighbourhoods) {
             formClause(neighbourhood, reversedProblem, satSolver)
+            progressBar?.updateProgress()
         }
+        progressBar?.finish()
     }
 
     private fun formClause(neighbourhood: FiveNeighbourhood, reversedProblem: FiveNeighboursProblem, satSolver: SatSolver) {

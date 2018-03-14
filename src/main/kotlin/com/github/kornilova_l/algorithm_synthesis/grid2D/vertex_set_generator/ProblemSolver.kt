@@ -32,7 +32,7 @@ abstract class ProblemSolver<T : Problem<*>, G : IndependentSetDirectedGraph<*>>
     }
 
     private fun getLabelingFunction(problem: T, graph: G): LabelingFunction? {
-        var solution = tryToFindSolution(problem, graph)
+        var solution = tryToFindSolution(problem, graph, true)
         if (solution != null) { // solution found
             return LabelingFunction(solution,
                     graph.createGraphWithTiles(
@@ -40,7 +40,7 @@ abstract class ProblemSolver<T : Problem<*>, G : IndependentSetDirectedGraph<*>>
                     )
             )
         }
-        solution = tryToFindSolution(rotateProblem(problem), graph)
+        solution = tryToFindSolution(rotateProblem(problem), graph, true)
         if (solution != null) { // solution found
             return LabelingFunction(solution,
                     graph.createGraphWithTiles(
@@ -63,15 +63,15 @@ abstract class ProblemSolver<T : Problem<*>, G : IndependentSetDirectedGraph<*>>
      */
     protected abstract fun reverseProblem(problem: T): T
 
-    private fun tryToFindSolution(problem: T, graph: G): List<Int>? {
+    private fun tryToFindSolution(problem: T, graph: G, showProgressBar: Boolean = false): List<Int>? {
         val satSolver = SatSolver()
-        addClausesToSatSolver(graph, problem, satSolver)
+        addClausesToSatSolver(graph, problem, satSolver, showProgressBar)
         return satSolver.solve(graph.size)
     }
 
-    private fun addClausesToSatSolver(graph: G, problem: T, satSolver: SatSolver) {
+    private fun addClausesToSatSolver(graph: G, problem: T, satSolver: SatSolver, showProgressBar: Boolean = false) {
         val reversedProblem = reverseProblem(problem)
-        formClauses(graph, reversedProblem, satSolver)
+        formClauses(graph, reversedProblem, satSolver, showProgressBar)
     }
 
     /**
@@ -87,7 +87,7 @@ abstract class ProblemSolver<T : Problem<*>, G : IndependentSetDirectedGraph<*>>
      * really big number of clauses, so I decided to load clauses directly to sat solver in order to
      * reduce memory consumption and memory spent on objects creation)
      */
-    protected abstract fun formClauses(graph: G, reversedProblem: T, satSolver: SatSolver)
+    protected abstract fun formClauses(graph: G, reversedProblem: T, satSolver: SatSolver, showProgressBar: Boolean)
 
     /**
      * @param clause array of integers of size n. First m elements are bigger than 0. m in (0, m]
