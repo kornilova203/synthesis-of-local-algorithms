@@ -4,6 +4,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.independent_set.Indepen
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.collections.TileGraph
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.problem.Problem
 import com.github.kornilova_l.util.FileNameCreator
+import com.github.kornilova_l.util.Util
 import java.io.File
 
 
@@ -18,7 +19,8 @@ abstract class ProblemSolver<T : Problem<*>, G : IndependentSetDirectedGraph<*>>
      */
     fun getLabelingFunction(problem: T): Pair<LabelingFunction, Int>? {
         for (graph in graphsIterator) {
-            println("n = ${graph.n} m = ${graph.m} k = ${graph.k}")
+            println("n = ${graph.n} m = ${graph.m} k = ${graph.k} size = ${graph.size}")
+            Util.printMemoryStatus()
             val function = getLabelingFunction(problem, graph)
 
             if (function != null) {
@@ -122,6 +124,7 @@ abstract class ProblemSolver<T : Problem<*>, G : IndependentSetDirectedGraph<*>>
     fun tryToFindSolutionForEachProblem(problems: List<T>): Set<T> {
         val solvable = HashSet<T>()
         for (graph in graphsIterator) {
+            Util.printMemoryStatus()
             if (solvable.size == problems.size) { // if everything is solved
                 return solvable
             }
@@ -156,6 +159,7 @@ abstract class ProblemSolver<T : Problem<*>, G : IndependentSetDirectedGraph<*>>
     fun doesSolutionExist(problem: T): Boolean {
         for (graph in graphsIterator) {
             println("n = ${graph.n} m = ${graph.m} k = ${graph.k}")
+            Util.printMemoryStatus()
             var solution = tryToFindSolution(problem, graph)
             if (solution != null) { // solution found
                 return true
