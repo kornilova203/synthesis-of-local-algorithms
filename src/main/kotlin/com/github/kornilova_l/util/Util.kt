@@ -57,7 +57,7 @@ object Util {
         println("Total free memory in JVM:    ${format.format((freeMemory + (maxMemory - allocatedMemory)) / bytesInKByte)}K")
         val heapMemoryUsage = ManagementFactory.getMemoryMXBean().heapMemoryUsage
         println("Heap memory used:            ${format.format(heapMemoryUsage.used / bytesInKByte)}K")
-        println("Non-heap memory available:  ${format.format(hardware.memory.available / 1024)}K")
+        println("Non-heap memory available:   ${format.format(hardware.memory.available / 1024)}K")
     }
 
     /**
@@ -70,6 +70,6 @@ object Util {
         val freeMemory = runtime.freeMemory()
 
         return "non-heap memory available: ${format.format(hardware.memory.available / 1024)}K | " +
-                "total free JVM memory: ${format.format((freeMemory + (maxMemory - allocatedMemory)) / 1024)}K"
+                "JVM memory available: ${format.format((freeMemory + (maxMemory - allocatedMemory)) / 1024)}K"
     }
 }

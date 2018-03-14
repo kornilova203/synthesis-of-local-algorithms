@@ -31,6 +31,7 @@ class SatSolver {
     fun solve(varCount: Int): List<Int>? {
         val res = sat.solve()
         if (!res) {
+            reset()
             return null
         }
         val solution = ArrayList<Int>()
@@ -42,23 +43,23 @@ class SatSolver {
                 else -> solution.add(-variable) // variable may be any
             }
         }
-        /* remove sat variables from memory.
-         * It seems like gc is not fast enough to finalize all sat solvers
-         * therefore we need to call reset beforehand
-         * without this reset() native code consumes all memory */
+        reset()
+        return solution
+    }
+
+    /**
+     * Remove sat variables from memory.
+     * It seems like gc is not fast enough to finalize all sat solvers
+     * therefore we need to call reset beforehand
+     * without this reset() native code consumes all memory */
+    private fun reset() {
         sat.reset()
         isSolved = true
-        return solution
     }
 
     fun isSolvable(): Boolean {
         val res = sat.solve()
-        /* remove sat variables from memory.
-         * It seems like gc is not fast enough to finalize all sat solvers
-         * therefore we need to call reset beforehand
-         * without this reset() native code consumes all memory */
-        sat.reset()
-        isSolved = true
+        reset()
         return res
     }
 }
