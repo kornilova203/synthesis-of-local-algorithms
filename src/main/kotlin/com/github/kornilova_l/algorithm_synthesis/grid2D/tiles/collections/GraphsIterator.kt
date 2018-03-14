@@ -16,7 +16,7 @@ abstract class DGIterator<out G : IndependentSetDirectedGraph<*>>(dir: File) : I
                 graphFiles.add(file)
             }
         }
-        Collections.shuffle(graphFiles)
+        graphFiles.shuffle()
         removeUseless(graphFiles)
     }
 

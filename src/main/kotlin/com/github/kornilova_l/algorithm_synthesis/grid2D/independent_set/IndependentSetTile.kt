@@ -6,6 +6,7 @@ import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.BinaryTile
 import com.github.kornilova_l.algorithm_synthesis.grid2D.tiles.TileIntersection
 import com.github.kornilova_l.algorithm_synthesis.grid2D.vertex_set_generator.SatSolver
 import com.github.kornilova_l.util.FileNameCreator
+import com.github.kornilova_l.util.ProgressBar
 import gnu.trove.set.hash.TIntHashSet
 import org.apache.lucene.util.OpenBitSet
 import java.io.BufferedReader
@@ -158,7 +159,7 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
             return clause
         }
 
-        fun parseTiles(file: File): Set<IndependentSetTile> {
+        fun parseTiles(file: File, showProgressBar: Boolean = false): MutableSet<IndependentSetTile> {
             if (!file.exists() || !file.isFile) {
                 throw IllegalArgumentException("File does not exist or it is not a file")
             }
@@ -171,10 +172,13 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
             val size = FileNameCreator.getIntParameter(file.name, "size")!!
             BufferedReader(FileReader(file)).use { reader ->
                 val tiles = HashSet<IndependentSetTile>(size)
+                val progressBar = if (showProgressBar) ProgressBar(size, "Parse tiles") else null
                 for (i in 0 until size) {
                     val grid = parseBitSet(reader.readLine())
                     tiles.add(IndependentSetTile(n, m, k, grid))
+                    progressBar?.updateProgress()
                 }
+                progressBar?.finish()
                 if (size != tiles.size) {
                     throw IllegalArgumentException("File contains less tiles that it states in the beginning of the file")
                 }
