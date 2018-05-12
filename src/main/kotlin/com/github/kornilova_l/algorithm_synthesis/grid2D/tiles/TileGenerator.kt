@@ -8,7 +8,9 @@ import com.github.kornilova_l.util.ProgressBar
 import com.github.kornilova_l.util.Util
 import java.io.File
 import java.io.FileOutputStream
+import java.nio.file.Files
 import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ForkJoinPool
 
@@ -56,12 +58,7 @@ abstract class TileGenerator<T : BinaryTile>(private val finalN: Int, private va
         size = currentSize
         file = Paths.get(outputDir.toString(),
                 tilesFileNameCreator.getFileName(finalN, finalM, size)).toFile()
-        val res = currentTilesFile.renameTo(file.absoluteFile)
-        if (res) {
-            println("Output file: $file")
-        } else {
-            System.err.println("Cannot rename file to $file")
-        }
+        Files.move(currentTilesFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE)
         Util.deleteDir(tempDir.toPath())
     }
 
@@ -91,7 +88,7 @@ abstract class TileGenerator<T : BinaryTile>(private val finalN: Int, private va
         val newN = if (side == HEIGHT) currentN + 1 else currentN
         val newM = if (side == WIDTH) currentM + 1 else currentM
         val outputFile = Paths.get(tempDir.toString(), tilesFileNameCreator.getFileName(newN, newM, tilesCount)).toFile()
-        tempOutputFile.renameTo(outputFile)
+        Files.move(tempOutputFile.toPath(), outputFile.toPath(), StandardCopyOption.ATOMIC_MOVE)
         return outputFile
     }
 

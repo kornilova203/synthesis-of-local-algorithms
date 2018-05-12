@@ -6,7 +6,9 @@ import com.github.kornilova_l.util.FileNameCreator
 import com.github.kornilova_l.util.ProgressBar
 import java.io.File
 import java.io.FileOutputStream
+import java.nio.file.Files
 import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 
 fun main(args: Array<String>) {
     val tilesDir = File("one_or_two_neighbours_tiles")
@@ -35,7 +37,7 @@ class OneOrTwoNTileGeneratorLowMemory(tilesFile: File, side: Expand, outputDir: 
         val tempOutputFile = Paths.get(outputDir.toString(), "$n-$m-temp.txt").toFile()
         val tilesCount = expandTiles(tempOutputFile, parser, side)
         val outputFile = Paths.get(outputDir.toString(), "${OneOrTwoNeighboursTile.name}-$n-$m-$tilesCount.tiles").toFile()
-        tempOutputFile.renameTo(outputFile)
+        Files.move(tempOutputFile.toPath(), outputFile.toPath(), StandardCopyOption.ATOMIC_MOVE)
     }
 
     private fun expandTiles(tempOutputFile: File, parser: OneOrTwoNeighboursTileParser, side: Expand): Int {
