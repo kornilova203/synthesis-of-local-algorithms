@@ -94,16 +94,6 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
             return IndependentSetTile(n, m, k, parseGrid(n, m, lines))
         }
 
-        private fun neighbourhoodIsInsideTile(x: Int, y: Int, n: Int, m: Int, k: Int): Boolean {
-            if (x - k < 0 || y - k < 0) {
-                return false
-            }
-            if (x + k >= n || y + k >= m) {
-                return false
-            }
-            return true
-        }
-
         private fun cellMustStayTheSame(x: Int, y: Int, biggerTile: BinaryTile, satSolver: SatSolver) {
             val value = if (biggerTile.isI(x, y)) {
                 biggerTile.getId(x, y)
@@ -130,8 +120,9 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
         /**
          * If (x, y) is 1 then non of it's neighbours is 1
          */
-        private fun ifCenterIsOneAllOtherAreNot(x: Int, y: Int, biggerTile: BinaryTile, satSolver: SatSolver,
-                                                newN: Int, newM: Int, k: Int, intersection: TileIntersection) {
+        private fun setIfCenterIsOneThenNeighboursAreZero(x: Int, y: Int, biggerTile: BinaryTile,
+                                                          satSolver: SatSolver, newN: Int, newM: Int,
+                                                          k: Int, intersection: TileIntersection) {
             for (i in x - k..x + k) {
                 for (j in y - k..y + k) {
                     if (!intersection.isInside(i, j) && // cells inside cannot be changed
@@ -222,48 +213,44 @@ open class IndependentSetTile(n: Int, m: Int, val k: Int, grid: OpenBitSet) : Bi
         val newN = n + k * 2
         val newM = m + k * 2
         val biggerTile = this.cloneAndExpand(newN, newM)
-        /* intersection is used to check if we can change a cell */
+        /* intersection is used to check if we a cell
+         * is inside or outside of original tile */
         val intersection = TileIntersection(newN, newM, n, m)
 
         /* for each cell in bigger tile */
         for (x in 0 until newN) {
             for (y in 0 until newM) {
                 if (intersection.isInside(x, y)) { // if we cannot change cell
-                    if (!processCellInsideIntersection(x, y, newN, newM, intersection, biggerTile, satSolver)) {
+                    if (!processInnerCell(x, y, newN, newM, intersection, biggerTile, satSolver)) {
                         return false
                     }
                 } else {
-                    processCellOutsideIntersection(x, y, newN, newM, intersection, biggerTile, satSolver)
+                    processOuterCell(x, y, newN, newM, intersection, biggerTile, satSolver)
                 }
             }
         }
         return true
     }
 
-    private fun processCellOutsideIntersection(x: Int, y: Int, newN: Int,
-                                               newM: Int, intersection: TileIntersection,
-                                               biggerTile: BinaryTile, satSolver: SatSolver) {
+    private fun processOuterCell(x: Int, y: Int, newN: Int,
+                                 newM: Int, intersection: TileIntersection,
+                                 biggerTile: BinaryTile, satSolver: SatSolver) {
         if (biggerTile.canBeIncluded(x, y)) {
-            ifCenterIsOneAllOtherAreNot(x, y, biggerTile, satSolver, newN, newM, k, intersection)
-            if (neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
-                val clause = atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k, intersection)
-                clause.add(biggerTile.getId(x, y)) // center may also be in IS
-                satSolver.addClause(clause.toArray())
-            }
-        } // there is not else branch because if internal cell is in IS then all neighbours are zero
+            setIfCenterIsOneThenNeighboursAreZero(x, y, biggerTile, satSolver, newN, newM, k, intersection)
+        } // there is not else branch because if inner cell is in IS then all neighbours are zero
     }
 
     /**
      * @return true if tile may be valid
      */
-    private fun processCellInsideIntersection(x: Int, y: Int,
-                                              newN: Int, newM: Int,
-                                              intersection: TileIntersection,
-                                              biggerTile: BinaryTile, satSolver: SatSolver): Boolean {
+    private fun processInnerCell(x: Int, y: Int,
+                                 newN: Int, newM: Int,
+                                 intersection: TileIntersection,
+                                 biggerTile: BinaryTile, satSolver: SatSolver): Boolean {
         cellMustStayTheSame(x, y, biggerTile, satSolver)
         if (biggerTile.isI(x, y)) {
             allNeighboursMustBeZero(x, y, biggerTile, newN, newM, k, intersection, satSolver)
-        } else if (biggerTile.canBeIncluded(x, y) && neighbourhoodIsInsideTile(x, y, newN, newM, k)) {
+        } else if (biggerTile.canBeIncluded(x, y)) {
             val clause = atLeastOneNeighbourMustBeOne(x, y, biggerTile, newN, newM, k, intersection)
             if (clause.isEmpty) { // this cannot be satisfied
                 return false
